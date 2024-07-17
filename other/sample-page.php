@@ -576,7 +576,10 @@ top: 0;
 
               <tr>
                   <td style="vertical-align: top;">1</td>
-                  <td style="vertical-align: top;">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolor excepturi, autem ipsa perspiciatis, laboriosam minus molestiae similique suscipit non maiores necessitatibus sed aliquam quia nisi iure perferendis omnis, explicabo et?</td>
+                  <td style="vertical-align: top;">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolor excepturi, autem ipsa perspiciatis, laboriosam minus molestiae similique suscipit non maiores necessitatibus sed aliquam quia nisi iure perferendis omnis, explicabo et?<br>
+                  <a class="pc-head-link dropdown-toggle arrow-none m-0" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false"> <i class="ph ph-trash text-danger"></i>
+                </a>
+                </td>
                   <td style="vertical-align: top;">1</td>
                   <td style="vertical-align: top;">1,000</td>
                 </tr>
