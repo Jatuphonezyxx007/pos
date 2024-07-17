@@ -591,7 +591,24 @@ top: 0;
             </thead>
           </table>
             
-            <button type="button" class="btn btn-success">ชำระเงิน</button>
+          <!-- <div class="d-grid gap-2">
+            <button class="btn btn-success" type="button">ชำระเงิน</button>
+          </div> -->
+
+          <p class="d-grid gap-1">
+          <button class="btn btn-success" type="button">ชำระเงิน</button>
+          </p>
+          
+          <p class="d-inline-flex gap-1">
+            <button type="button" class="btn btn-danger" data-bs-toggle="button">ล้างทั้งหมด</button>
+          </p>
+
+
+</div>
+
+            <!-- <button type="button" class="btn btn-success">ชำระเงิน</button> 
+            <button type="button" class="btn btn-danger">เคลียร์</button> -->
+
           </div>
       </div>
 
