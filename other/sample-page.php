@@ -59,6 +59,8 @@ error_reporting(E_NOTICE);
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai+Looped:wght@500&display=swap" rel="stylesheet">
 
 
+  <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+
 
 <!-- Script -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -70,6 +72,24 @@ error_reporting(E_NOTICE);
   font-family: "IBM Plex Sans Thai Looped", sans-serif;
 }
 
+    .fixed-col {
+      position: fixed;
+      top: 70;
+      right: 0;
+      width: 16.666667%;
+      height: 100%;
+      background-color: #f8f9fa;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+    .fixed-col h1 {
+      font-size: 1rem;
+      color: black;
+    }
+/* .order{
+position: sticky;
+top: 0;
+} */
 /* .nav-right {
   background-color: lightgrey;
   position: sticky;
@@ -108,18 +128,6 @@ error_reporting(E_NOTICE);
     </div>
     <div class="navbar-content">
       <ul class="pc-navbar">
-
-        <!-- <li class="pc-item pc-caption">
-          <label>หน้าร้าน</label>
-        </li> -->
-
-        <!-- <li class="pc-item">
-          <a href="sample-page.php" class="pc-link"
-            ><span class="pc-micon">
-              <i class="ph ph-gauge"></i></span
-            ><span class="pc-mtext">หน้าขาย</span></a>
-        </li> -->
-
         <li class="pc-item pc-hasmenu">
           <a href="#!" class="pc-link"
             ><span class="pc-micon">
@@ -356,11 +364,12 @@ error_reporting(E_NOTICE);
 <div class="me-auto pc-mob-drp">
   <ul class="list-unstyled">
     <!-- ======= Menu collapse Icon ===== -->
-    <li class="pc-h-item pc-sidebar-collapse">
+    <!-- <li class="pc-h-item pc-sidebar-collapse">
       <a href="#" class="pc-head-link ms-0" id="sidebar-hide">
         <i class="ph ph-list"></i>
       </a>
-    </li>
+    </li> -->
+    
     <li class="pc-h-item pc-sidebar-popup">
       <a href="#" class="pc-head-link ms-0" id="mobile-collapse">
         <i class="ph ph-list"></i>
@@ -478,149 +487,118 @@ error_reporting(E_NOTICE);
 
   <!-- [ Main Content ] start -->
 
+<!-- <div class="col-12 col-md-10">
   <div class="pc-container px-1">
     <div class="pc-content">
-      
-      <!-- [ breadcrumb ] start -->
-      <!-- <div class="page-header">
-        <div class="page-block card mb-0">
-          <div class="card-body">
-            <div class="row align-items-center">
-              <div class="col-md-12">
-                <div class="page-header-title border-bottom pb-2 mb-2">
-                  <h4 class="mb-0">Sample Page</h4>
-                </div>
-              </div>
-              <div class="col-md-12">
-                <ul class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="../dashboard/index.html"><i class="ph ph-house"></i></a></li>
-                  <li class="breadcrumb-item"><a href="javascript: void(0)">Other</a></li>
-                  <li class="breadcrumb-item" aria-current="page">Sample Page</li>
-                </ul>
-                
-                <form class="d-flex justify-content-center">
-                  <input class="form-control" type="text" placeholder="Default input" aria-label="default input example">          
-                  <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> -->
-      <!-- [ breadcrumb ] end -->
-
-      <!-- [ Main Content ] start -->
-
-      <!-- <div class="row g-0"> -->
-        <!-- [ sample-page ] start -->
-        <!-- <div class="col-sm-6 col-md-8">
-          <div class="card">
-            <div class="card-header">
-              <h5>Hello card</h5>
-            </div>
-            <div class="card-body">
-            </div>
-          </div>
-        </div>
-      </div> -->
-
-        <!-- <div class="col-6 col-md-4">
-          <div class="card">
-            <div class="card-header">
-              <h5>Hello card</h5>
-            </div>
-            <div class="card-body">
-            </div>
-          </div>
-        </div>
-      </div> -->
-
-      <br>
-      
-      <!-- <div class="container-fluid"> -->
-        <!-- <div class="container-fluid"> -->
+      <br> 
           <div class="row g-2">
-            
           <?php
                   include("connectdb.php");
                   @$src = $_POST['src'];
                   $sql = "SELECT * FROM `products`  WHERE (`name` LIKE '%{$src}%' OR `detail` LIKE '%{$src}%') ORDER BY `products`.`type` ASC";
                   $rs = mysqli_query($conn, $sql);
-
                   while ($data = mysqli_fetch_array($rs)){
                     ?>
-
-            <div class="col-sm-12 col-md-4 col-lg-3">
+            <div class="col-sm-12 col-md-3 col-lg-4">
               <div class="card">
                 <img src="../assets/images/products/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="350px">
                 <div class="card-body">
                   <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
-                  <p class="card-text"><?= number_format($data['price'], );?> บาท</p>
-
-                  <!-- Button trigger modal -->
-<!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">เพิ่มลงตะกร้า</button> -->
-
-<!-- Modal -->
-<!-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel"><?=$_SESSION['sname'][$pid];?></h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div> -->
-                  
+                  <p class="card-text"><?= number_format($data['price'], );?> บาท</p>                  
                   <a href="checkout.php?id=<?=$data['id'];?>" class="btn btn-primary">เพิ่มลงตะกร้า</a>
-
-                  <!-- <div class="row row-cols-1">
-                  <div class="input-group quantity-selector">
-
-                  <button type="button" class="btn btn-danger" aria-describedby="inputQuantitySelector" data-bs-step="down">
-                    <i class="ph ph-minus"></i>
-                    </button>
-
-                    <input type="number" id="inputQuantitySelector" class="form-control" aria-live="polite" data-bs-step="counter" name="quantity" title="quantity" value="0" min="0" max="10" step="1" data-bs-round="0" aria-label="Quantity selector">
-
-                    <button type="button" class="btn btn-success" aria-describedby="inputQuantitySelector" data-bs-step="up">
-                      <i class="ph ph-plus"></i>
-                    </button>
-                    </div>
-                  </div> -->
-
-                  <!-- <a href="update.php?id=<?=$data['id'];?>"class="btn btn-warning">แก้ไข</a>
-                  <a href="delete.php?id=<?=$data['id'];?>&ext=<?=$data['img'];?>" type="button" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?')"; >ลบสินค้า</a> -->
                 </div>
               </div>
             </div>
-
             <?php
                   }
                   mysqli_close($conn);
                   ?> 
-
           </div>
-        <!-- </div> -->
-      <!-- </div> -->
-
-
-
-        <!-- [ sample-page ] end -->
-      <!-- [ Main Content ] end -->
     </div>
   </div>
-  
-  <!-- <nav class="nav-right">
-    <div>right sidebar</div>
-  </nav> -->
+  </div>
+
+  <div class="col-6 col-md-2">
+    <div class="pc-container px-1">
+      <div class="pc-content">
+        <div class="row">
+          <h1>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque, delectus provident a, accusamus labore veritatis dolore consequuntur assumenda, exercitationem eum deserunt temporibus error? Optio totam a magnam laborum minima perspiciatis.</h1>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+<div class="col-12 col-md-10">
+  <div class="pc-container px-1">
+        <div class="pc-content">
+          <br> 
+          <div class="row g-2">
+            <?php
+              include("connectdb.php");
+              @$src = $_POST['src'];
+              $sql = "SELECT * FROM `products`  WHERE (`name` LIKE '%{$src}%' OR `detail` LIKE '%{$src}%') ORDER BY `products`.`type` ASC";
+              $rs = mysqli_query($conn, $sql);
+              while ($data = mysqli_fetch_array($rs)){
+            ?>
+            <div class="col-sm-12 col-md-3 col-lg-4">
+              <div class="card">
+                <img src="../assets/images/products/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="350px">
+                <div class="card-body">
+                  <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
+                  <p class="card-text"><?= number_format($data['price'], );?> บาท</p>                  
+                  <a href="checkout.php?id=<?=$data['id'];?>" class="btn btn-primary">เพิ่มลงตะกร้า</a>
+                </div>
+              </div>
+            </div>
+            <?php
+              }
+              mysqli_close($conn);
+            ?> 
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-2 fixed-col">
+          <div class="row">
+            <center>
+            <h1>รายการสินค้า</h1>
+            </center>
+
+            <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">First</th>
+      <th scope="col">Last</th>
+      <th scope="col">Handle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Mark</td>
+      <td>Otto</td>
+      <td>@mdo</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>Jacob</td>
+      <td>Thornton</td>
+      <td>@fat</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td colspan="2">Larry the Bird</td>
+      <td>@twitter</td>
+    </tr>
+  </tbody>
+</table>
+            
+            <button type="button" class="btn btn-success">ชำระเงิน</button>
+          </div>
+      </div>
+
 
 
   <!-- [ Main Content ] end -->
@@ -657,6 +635,11 @@ error_reporting(E_NOTICE);
 <script>preset_change("preset-1");</script>
 <script>header_change("header-1");</script>
 
+<!-- <style>
+ @import "style.css";
+ @import url("style.css");
+</style> -->
+
 
 <script>
 $(document).ready(function() {
@@ -680,6 +663,8 @@ $("#clock").html(hours + ":" + minutesString + ":" + secondsString);
 moment.locale('th');
 document.getElementById('date').innerHTML = moment().format('dddd D MMMM YYYY');
 </script>
+
+
 
 
 </body>
