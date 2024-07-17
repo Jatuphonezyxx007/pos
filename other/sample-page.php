@@ -1,4 +1,4 @@
-<?php
+<td?php
 error_reporting(E_NOTICE);
 
 	@session_start();
@@ -76,7 +76,7 @@ error_reporting(E_NOTICE);
       position: fixed;
       top: 70;
       right: 0;
-      width: 16.666667%;
+      width: 25%;
       height: 100%;
       background-color: #f8f9fa;
       overflow-y: auto;
@@ -528,7 +528,7 @@ top: 0;
     </div>
   </div> -->
 
-<div class="col-12 col-md-10">
+<div class="col-12 col-md-9">
   <div class="pc-container px-1">
         <div class="pc-content">
           <br> 
@@ -559,41 +559,37 @@ top: 0;
       </div>
     </div>
 
-    <div class="col-6 col-md-2 fixed-col">
+    <div class="col-6 col-md-3 fixed-col">
           <div class="row">
             <center>
             <h1>รายการสินค้า</h1>
             </center>
 
             <table class="table">
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">First</th>
-      <th scope="col">Last</th>
-      <th scope="col">Handle</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-    </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td colspan="2">Larry the Bird</td>
-      <td>@twitter</td>
-    </tr>
-  </tbody>
-</table>
+              <thead>
+                <tr>
+                  <td width="5%" class="text-center">ที่</td>
+                  <td width="75%" class="text-center">สินค้า</td>
+                  <td width="10%" class="text-center">จำนวน</td>
+                  <td width="10%" class="text-center">ราคา</td>
+              </tr>
+
+              <tr>
+                  <td style="vertical-align: top;">1</td>
+                  <td style="vertical-align: top;">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolor excepturi, autem ipsa perspiciatis, laboriosam minus molestiae similique suscipit non maiores necessitatibus sed aliquam quia nisi iure perferendis omnis, explicabo et?</td>
+                  <td style="vertical-align: top;">1</td>
+                  <td style="vertical-align: top;">1,000</td>
+                </tr>
+
+              <tr>
+                  <td>รวม</td>
+                  <td></td>
+                  <td></td></td>
+                  <td style="vertical-align: top;">1,000</td>
+                </tr>
+
+            </thead>
+          </table>
             
             <button type="button" class="btn btn-success">ชำระเงิน</button>
           </div>
