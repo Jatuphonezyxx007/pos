@@ -493,7 +493,6 @@ error_reporting(E_NOTICE);
 </header>
 <!-- [ Header ] end -->
 
-
   <!-- [ Main Content ] start -->
 <div class="col-12 col-md-9">
   <div class="pc-container px-1">
@@ -540,25 +539,20 @@ error_reporting(E_NOTICE);
                   <td width="10%" class="text-center">จำนวน</td>
                   <td width="10%" class="text-center">ราคา</td>
               </tr>
-
+              
               <?php
-if(!empty($_SESSION['sid'])) {
-	foreach($_SESSION['sid'] as $pid) {
-		@$i++;
-		$sum[$pid] = $_SESSION['sprice'][$pid] * $_SESSION['sitem'][$pid] ;
-		@$total += $sum[$pid] ;
-?>
-
+              if(!empty($_SESSION['sid'])) {
+                foreach($_SESSION['sid'] as $pid) {
+                  @$i++;
+                  $sum[$pid] = $_SESSION['sprice'][$pid] * $_SESSION['sitem'][$pid] ;
+                  @$total += $sum[$pid] ;
+                  ?>
 
               <tr>
                   <td style="vertical-align: top;"><?=$i;?></td>
-
                   <td style="vertical-align: top;"><?=$_SESSION['sname'][$pid];?><br>
-
-                  <!-- <a class="pc-head-link dropdown-toggle arrow-none m-0" data-bs-toggle="dropdown" href="clear_product.php?id=<?=$pid;?>" role="button" aria-haspopup="false" aria-expanded="false"><i class="ph ph-trash text-danger"></i></a> -->
                   <a href="clear_product.php?id=<?=$pid;?>" class="ph ph-trash text-danger"></a>
                 </td>
-
                   <td style="vertical-align: top;"><?=$_SESSION['sitem'][$pid];?></td>
                   <td style="vertical-align: top;"><?=number_format($_SESSION['sprice'][$pid],0);?></td>
                 </tr>
@@ -570,19 +564,16 @@ if(!empty($_SESSION['sid'])) {
                   <td></td></td>
                   <td style="vertical-align: top;"><?=number_format($total,0);?></td>
                 </tr>
-
+                
                 <?php 
-} else {
-?>
-	<tr>
-		<td colspan="7" height="50" align="center">ไม่มีสินค้าในตะกร้า</td>
-	</tr>
-<?php } // end if ?>
-
-
+                } else {
+                  ?>
+                  
+                  <tr>
+                    <td colspan="7" height="50" align="center">ไม่มีสินค้าในตะกร้า</td>
+                  </tr>
+                  <?php } // end if ?>
             </thead>
-
-
 
           </table>
           <p class="d-grid gap-1">
@@ -594,8 +585,6 @@ if(!empty($_SESSION['sid'])) {
         </div>
       </div>
     </div>
-
-
 
   <!-- [ Main Content ] end -->
   <footer class="pc-footer">
