@@ -420,9 +420,9 @@ error_reporting(E_NOTICE);
     </div>
 
     <!-- เพิ่ม form control ตรงนี้ -->
-    <form class="search-form">
-      <input type="text" placeholder="ค้นหาสินค้า" class="search-input" autofocus>
-      <a class="btn btn-primary" href="#" role="button"><i class="ph ph-magnifying-glass"></i></a>
+    <form method="post" class="search-form">
+      <input type="text" name="src" placeholder="ค้นหาสินค้า" class="search-input" autofocus>
+      <a class="btn btn-primary" type="submit" name="Submit"><i class="ph ph-magnifying-glass"></i></a>
       </button>
     </form>
 
@@ -495,48 +495,6 @@ error_reporting(E_NOTICE);
 
 
   <!-- [ Main Content ] start -->
-
-<!-- <div class="col-12 col-md-10">
-  <div class="pc-container px-1">
-    <div class="pc-content">
-      <br> 
-          <div class="row g-2">
-          <?php
-                  include("connectdb.php");
-                  @$src = $_POST['src'];
-                  $sql = "SELECT * FROM `products`  WHERE (`name` LIKE '%{$src}%' OR `detail` LIKE '%{$src}%') ORDER BY `products`.`type` ASC";
-                  $rs = mysqli_query($conn, $sql);
-                  while ($data = mysqli_fetch_array($rs)){
-                    ?>
-            <div class="col-sm-12 col-md-3 col-lg-4">
-              <div class="card">
-                <img src="../assets/images/products/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="350px">
-                <div class="card-body">
-                  <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
-                  <p class="card-text"><?= number_format($data['price'], );?> บาท</p>                  
-                  <a href="checkout.php?id=<?=$data['id'];?>" class="btn btn-primary">เพิ่มลงตะกร้า</a>
-                </div>
-              </div>
-            </div>
-            <?php
-                  }
-                  mysqli_close($conn);
-                  ?> 
-          </div>
-    </div>
-  </div>
-  </div>
-
-  <div class="col-6 col-md-2">
-    <div class="pc-container px-1">
-      <div class="pc-content">
-        <div class="row">
-          <h1>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque, delectus provident a, accusamus labore veritatis dolore consequuntur assumenda, exercitationem eum deserunt temporibus error? Optio totam a magnam laborum minima perspiciatis.</h1>
-        </div>
-      </div>
-    </div>
-  </div> -->
-
 <div class="col-12 col-md-9">
   <div class="pc-container px-1">
         <div class="pc-content">
