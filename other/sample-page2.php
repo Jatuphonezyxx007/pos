@@ -86,20 +86,70 @@ error_reporting(E_NOTICE);
       font-size: 1rem;
       color: black;
     }
-/* .order{
-position: sticky;
-top: 0;
-} */
-/* .nav-right {
-  background-color: lightgrey;
-  position: sticky;
+
+    /*
+*
+* ==========================================
+* CUSTOM UTIL CLASSES
+* ==========================================
+*
+*/
+
+.form-control:focus {
+  box-shadow: none;
 }
 
-.nav-right div {
-  position: fixed;
-  top: 60px;
+.form-control-underlined {
+  border-width: 0;
+  border-bottom-width: 0px;
+  border-radius: 0;
+  padding-left: 0;
+  padding-top: 5px;
+}
+
+/*
+*
+* ==========================================
+* FOR DEMO PURPOSE
+* ==========================================
+*
+*/
+
+/* body {
+  background: #ffd89b;
+  background: -webkit-linear-gradient(to right, #ffd89b, #19547b);
+  background: linear-gradient(to right, #ffd89b, #19547b);
+  min-height: 100vh;
 } */
 
+.form-control::placeholder {
+  font-size: 0.95rem;
+  color: #aaa;
+  font-style: italic;
+}
+
+
+.pc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.search-form {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  margin: 5px 5px 5px 5px; /* เพิ่ม margin ด้านบน ด้านซ้ายและขวา */
+}
+
+.search-input {
+  width: 100%;
+  max-width: 600px; /* กำหนดขนาดสูงสุดตามที่คุณต้องการ */
+  padding: 0.5em;
+  /* padding-top: 5px; */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
 
 
   </style>
@@ -353,134 +403,93 @@ top: 0;
 
 <header class="pc-header">
   <div class="m-header">
-
     <a href="sample-page.php" class="b-brand text-primary">
-      <!-- ========   Change your logo from here   ============ -->
       <img src="../assets/images/logo/logo_homeware.png" alt="logo image" class="logo-lg" height="45">
     </a>
   </div>
 
-  <div class="header-wrapper"> <!-- [Mobile Media Block] start -->
-<div class="me-auto pc-mob-drp">
-  <ul class="list-unstyled">
-    <!-- ======= Menu collapse Icon ===== -->
-    <!-- <li class="pc-h-item pc-sidebar-collapse">
-      <a href="#" class="pc-head-link ms-0" id="sidebar-hide">
-        <i class="ph ph-list"></i>
-      </a>
-    </li> -->
-    
-    <li class="pc-h-item pc-sidebar-popup">
-      <a href="#" class="pc-head-link ms-0" id="mobile-collapse">
-        <i class="ph ph-list"></i>
-      </a>
-    </li>
+  <div class="header-wrapper">
+    <div class="me-auto pc-mob-drp">
+      <ul class="list-unstyled">
+        <li class="pc-h-item pc-sidebar-popup">
+          <a href="#" class="pc-head-link ms-0" id="mobile-collapse">
+            <i class="ph ph-list"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
 
-    <li class="dropdown pc-h-item">
+    <!-- เพิ่ม form control ตรงนี้ -->
+    <form class="search-form">
+      <input type="text" placeholder="ค้นหาสินค้า" class="search-input" autofocus>
+      <a class="btn btn-primary" href="#" role="button"><i class="ph ph-magnifying-glass"></i></a>
+      </button>
+    </form>
 
-      <a class="pc-head-link dropdown-toggle arrow-none m-0" data-bs-toggle="dropdown" href="#" role="button"
-        aria-haspopup="false" aria-expanded="false">
-        <i class="ph ph-magnifying-glass"></i>
-      </a>
-
-      <!-- <form class="p-2 flex-grow-1 bd-highlight">
-      <input class="form-control" type="text" placeholder="Default input" aria-label="default input example">          
-      <button class="btn btn-outline-success" type="submit">Search</button>
-        </form> -->
-
-
-          <!-- <form class="d-flex">
-            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-success" type="submit">Search</button>
-          </form> -->
-
-
-
-      <div class="dropdown-menu pc-h-dropdown drp-search">
-        <form method="post" action="" class="px-3" role="search">
-          <div class="form-group mb-0 d-flex align-items-center">
-            <input type="search" class="form-control border-0 shadow-none" name="src" placeholder="Search here. . .">
-            <button class="btn btn-light-secondary btn-search">Search</button>
+    <div class="ms-auto">
+      <h7 id="clock" class="text-white text-center">00:00:00</h7>
+      <ul class="list-unstyled">
+        <li class="dropdown pc-h-item header-user-profile">
+          <h8>|</h8>
+          <h8 class="text-white text-center" id="date"></h8>
+          <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
+            aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
+            <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
+          </a>
+          <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
+            <div class="dropdown-body">
+              <div class="profile-notification-scroll position-relative" style="max-height: calc(100vh - 225px)">
+                <ul class="list-group list-group-flush w-100">
+                  <li class="list-group-item">
+                    <a href="https://codedthemes.com/item/gradient-able-admin-template/" class="dropdown-item">
+                      <span class="d-flex align-items-center">
+                        <i class="ph ph-arrow-circle-down"></i>
+                        <span>Download</span>
+                      </span>
+                    </a>
+                  </li>
+                  <li class="list-group-item">
+                    <a href="#" class="dropdown-item">
+                      <span class="d-flex align-items-center">
+                        <i class="ph ph-user-circle"></i>
+                        <span>Edit profile</span>
+                      </span>
+                    </a>
+                    <a href="#" class="dropdown-item">
+                      <span class="d-flex align-items-center">
+                        <i class="ph ph-bell"></i>
+                        <span>Notifications</span>
+                      </span>
+                    </a>
+                    <a href="#" class="dropdown-item">
+                      <span class="d-flex align-items-center">
+                        <i class="ph ph-gear-six"></i>
+                        <span>Settings</span>
+                      </span>
+                    </a>
+                  </li>
+                  <li class="list-group-item">
+                    <a href="#" class="dropdown-item">
+                      <span class="d-flex align-items-center">
+                        <i class="ph ph-plus-circle"></i>
+                        <span>Add account</span>
+                      </span>
+                    </a>
+                    <a href="#" class="dropdown-item">
+                      <span class="d-flex align-items-center">
+                        <i class="ph ph-power"></i>
+                        <span>Logout</span>
+                      </span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
-        </form>
-      </div>
-
-
-    </li>
-
-  </ul>
-</div>
-
-
-<!-- [Mobile Media Block end] -->
-<div class="ms-auto">
-<h7 id="clock" class="text-white text-center">00:00:00</h7>
-  <ul class="list-unstyled">
-    <li class="dropdown pc-h-item header-user-profile">
-
-
-    <h8>|</h8>
-    <h8 class="text-white text-center" id="date"></h8>
-
-
-      <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
-        aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
-        <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
-      </a>
-      <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
-        <div class="dropdown-body">
-          <div class="profile-notification-scroll position-relative" style="max-height: calc(100vh - 225px)">
-            <ul class="list-group list-group-flush w-100">
-              <li class="list-group-item">
-                <a href="https://codedthemes.com/item/gradient-able-admin-template/" class="dropdown-item">
-                  <span class="d-flex align-items-center">
-                    <i class="ph ph-arrow-circle-down"></i>
-                    <span>Download</span>
-                  </span>
-                </a>
-              </li>
-              <li class="list-group-item">
-                <a href="#" class="dropdown-item">
-                  <span class="d-flex align-items-center">
-                    <i class="ph ph-user-circle"></i>
-                    <span>Edit profile</span>
-                  </span>
-                </a>
-                <a href="#" class="dropdown-item">
-                  <span class="d-flex align-items-center">
-                    <i class="ph ph-bell"></i>
-                    <span>Notifications</span>
-                  </span>
-                </a>
-                <a href="#" class="dropdown-item">
-                  <span class="d-flex align-items-center">
-                    <i class="ph ph-gear-six"></i>
-                    <span>Settings</span>
-                  </span>
-                </a>
-              </li>
-              <li class="list-group-item">
-                <a href="#" class="dropdown-item">
-                  <span class="d-flex align-items-center">
-                    <i class="ph ph-plus-circle"></i>
-                    <span>Add account</span>
-                  </span>
-                </a>
-                <a href="#" class="dropdown-item">
-                  <span class="d-flex align-items-center">
-                    <i class="ph ph-power"></i>
-                    <span>Logout</span>
-                  </span>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </li>
-  </ul>
-</div> 
-</div>
+        </li>
+      </ul>
+    </div> 
+  </div>
 </header>
 <!-- [ Header ] end -->
 
