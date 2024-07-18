@@ -1,4 +1,4 @@
-<td?php
+<?php
 error_reporting(E_NOTICE);
 
 	@session_start();
@@ -12,8 +12,8 @@ error_reporting(E_NOTICE);
 		$_SESSION['sid'][$id] = $data['id'];
 		$_SESSION['sname'][$id] = $data['name'];
 		$_SESSION['sprice'][$id] = $data['price'];
-		$_SESSION['sdetail'][$id] = $data['detail'];
-		$_SESSION['spicture'][$id] = $data['img'];
+		// $_SESSION['sdetail'][$id] = $data['detail'];
+		// $_SESSION['spicture'][$id] = $data['img'];
 		@$_SESSION['sitem'][$id]++;
 	}
 
@@ -546,7 +546,7 @@ top: 0;
                 <div class="card-body">
                   <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
                   <p class="card-text"><?= number_format($data['price'], );?> บาท</p>                  
-                  <a href="checkout.php?id=<?=$data['id'];?>" class="btn btn-primary">เพิ่มลงตะกร้า</a>
+                  <a href="sample-page2.php?id=<?=$data['id'];?>" class="btn btn-primary">เพิ่มลงตะกร้า</a>
                 </div>
               </div>
             </div>
@@ -574,24 +574,49 @@ top: 0;
                   <td width="10%" class="text-center">ราคา</td>
               </tr>
 
+              <?php
+if(!empty($_SESSION['sid'])) {
+	foreach($_SESSION['sid'] as $pid) {
+		@$i++;
+		$sum[$pid] = $_SESSION['sprice'][$pid] * $_SESSION['sitem'][$pid] ;
+		@$total += $sum[$pid] ;
+?>
+
+
               <tr>
-                  <td style="vertical-align: top;">1</td>
-                  <td style="vertical-align: top;">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolor excepturi, autem ipsa perspiciatis, laboriosam minus molestiae similique suscipit non maiores necessitatibus sed aliquam quia nisi iure perferendis omnis, explicabo et?<br>
-                  <a class="pc-head-link dropdown-toggle arrow-none m-0" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false"> <i class="ph ph-trash text-danger"></i>
-                </a>
+                  <td style="vertical-align: top;"><?=$i;?></td>
+
+                  <td style="vertical-align: top;"><?=$_SESSION['sname'][$pid];?><br>
+
+                  <!-- <a class="pc-head-link dropdown-toggle arrow-none m-0" data-bs-toggle="dropdown" href="clear_product.php?id=<?=$pid;?>" role="button" aria-haspopup="false" aria-expanded="false"><i class="ph ph-trash text-danger"></i></a> -->
+                  <a href="clear_product.php?id=<?=$pid;?>" class="ph ph-trash text-danger"></a>
                 </td>
-                  <td style="vertical-align: top;">1</td>
-                  <td style="vertical-align: top;">1,000</td>
+
+                  <td style="vertical-align: top;"><?=$_SESSION['sitem'][$pid];?></td>
+                  <td style="vertical-align: top;"><?=number_format($_SESSION['sprice'][$pid],0);?></td>
                 </tr>
+                <?php } // end foreach ?>
 
               <tr>
                   <td>รวม</td>
                   <td></td>
                   <td></td></td>
-                  <td style="vertical-align: top;">1,000</td>
+                  <td style="vertical-align: top;"><?=number_format($total,0);?></td>
                 </tr>
 
+                <?php 
+} else {
+?>
+	<tr>
+		<td colspan="7" height="50" align="center">ไม่มีสินค้าในตะกร้า</td>
+	</tr>
+<?php } // end if ?>
+
+
             </thead>
+
+
+
           </table>
           <p class="d-grid gap-1">
           <button class="btn btn-success" type="button">ชำระเงิน</button>
@@ -615,6 +640,23 @@ top: 0;
               target="_blank">Codedthemes</a></p>
         </div> -->
 
+
+
+
+
+  <?php
+// ดึงข้อมูลการซื้อจากหน้า checkout.php
+$product_name = $_POST['product_name'];
+$product_quantity = $_POST['product_quantity'];
+$product_price = $_POST['product_price'];
+$total_price = $product_quantity * $product_price;
+
+// ส่งข้อมูลการซื้อไปยังหน้า detail.php
+header("Location: detail.php?product_name=$product_name&product_quantity=$product_quantity&product_price=$product_price&total_price=$total_price");
+
+?>
+
+  
         <div class="col-sm-6 ms-auto my-1">
           <ul class="list-inline footer-link mb-0 justify-content-sm-end d-flex">
           <a href="#top" class="text-end">กลับไปบนสุด</a>
