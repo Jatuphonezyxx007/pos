@@ -67,6 +67,32 @@ error_reporting(E_NOTICE);
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 
 
+  <!-- Add jQuery library -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      // Function to fetch and display products
+      function fetchProducts(query) {
+        $.ajax({
+          url: "fetch_products.php",
+          method: "POST",
+          data: { query: query },
+          success: function(data) {
+            $("#product-list").html(data);
+          }
+        });
+      }
+
+      // Event listener for input in search box
+      $(".search-input").on("input", function() {
+        var query = $(this).val();
+        fetchProducts(query);
+      });
+    });
+  </script>
+
+
+
 <style>
     body {
   font-family: "IBM Plex Sans Thai Looped", sans-serif;
@@ -420,10 +446,9 @@ error_reporting(E_NOTICE);
     </div>
 
     <!-- เพิ่ม form control ตรงนี้ -->
-    <form method="post" class="search-form">
+    <form method="post" class="search-form" onsubmit="return false;">
       <input type="text" name="src" placeholder="ค้นหาสินค้า" class="search-input" autofocus>
-      <a class="btn btn-primary" type="submit" name="Submit"><i class="ph ph-magnifying-glass"></i></a>
-      </button>
+      <a class="btn btn-primary"><i class="ph ph-magnifying-glass"></i></a>
     </form>
 
     <div class="ms-auto">
@@ -498,29 +523,30 @@ error_reporting(E_NOTICE);
   <div class="pc-container px-1">
         <div class="pc-content">
           <br> 
-          <div class="row g-2">
-            <?php
-              include("connectdb.php");
-              @$src = $_POST['src'];
-              $sql = "SELECT * FROM `products`  WHERE (`name` LIKE '%{$src}%' OR `detail` LIKE '%{$src}%') ORDER BY `products`.`type` ASC";
-              $rs = mysqli_query($conn, $sql);
-              while ($data = mysqli_fetch_array($rs)){
-            ?>
-            <div class="col-sm-12 col-md-3 col-lg-4">
-              <div class="card">
-                <img src="../assets/images/products/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="350px">
-                <div class="card-body">
-                  <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
-                  <p class="card-text"><?= number_format($data['price'], );?> บาท</p>                  
-                  <a href="sample-page2.php?id=<?=$data['id'];?>" class="btn btn-primary">เพิ่มลงตะกร้า</a>
-                </div>
-              </div>
-            </div>
-            <?php
-              }
-              mysqli_close($conn);
-            ?> 
-          </div>
+<!-- Add an ID to the product list container -->
+<div id="product-list" class="row g-2">
+  <?php
+    include("connectdb.php");
+    @$src = $_POST['src'];
+    $sql = "SELECT * FROM `products` WHERE (`name` LIKE '%{$src}%' OR `detail` LIKE '%{$src}%') ORDER BY `products`.`type` ASC";
+    $rs = mysqli_query($conn, $sql);
+    while ($data = mysqli_fetch_array($rs)){
+  ?>
+  <div class="col-sm-12 col-md-3 col-lg-4">
+    <div class="card">
+      <img src="../assets/images/products/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="350px">
+      <div class="card-body">
+        <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
+        <p class="card-text"><?= number_format($data['price'], );?> บาท</p>                  
+        <a href="sample-page2.php?id=<?=$data['id'];?>" class="btn btn-primary">เพิ่มลงตะกร้า</a>
+      </div>
+    </div>
+  </div>
+  <?php
+    }
+    mysqli_close($conn);
+  ?> 
+</div>
         </div>
       </div>
     </div>
@@ -580,8 +606,8 @@ error_reporting(E_NOTICE);
           <button class="btn btn-success" type="button">ชำระเงิน</button>
           </p>
           <p class="d-inline-flex gap-1">
-            <button type="button" class="btn btn-danger" data-bs-toggle="button">ล้างทั้งหมด</button>
-          </p>
+  <a href="clear.php" class="btn btn-danger">ล้างทั้งหมด</a>
+</p>
         </div>
       </div>
     </div>
