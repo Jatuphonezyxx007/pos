@@ -98,16 +98,18 @@ error_reporting(E_NOTICE);
   font-family: "IBM Plex Sans Thai Looped", sans-serif;
 }
 
-    .fixed-col {
-      position: fixed;
-      top: 70;
-      right: 0;
-      width: 25%;
-      height: 100%;
-      background-color: #f8f9fa;
-      overflow-y: auto;
-      padding: 1rem;
-    }
+.fixed-col {
+  position: fixed;
+  top: 70px; /* เพิ่ม px */
+  right: 0;
+  width: 25%;
+  height: 100%;
+  background-color: #f8f9fa;
+  overflow-y: auto;
+  padding: 1rem;
+  padding-bottom: 5rem; /* เพิ่ม padding ที่ด้านล่าง */
+}
+
     .fixed-col h1 {
       font-size: 1rem;
       color: black;
