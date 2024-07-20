@@ -37,8 +37,8 @@ error_reporting(E_NOTICE);
 
 
 <!-- [Template CSS Files] -->
-<link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" >
-<link rel="stylesheet" href="../assets/css/style-preset.css" >
+<link rel="stylesheet" href="assets/css/style.css" id="main-style-link" >
+<link rel="stylesheet" href="assets/css/style-preset.css" >
 
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -189,9 +189,9 @@ body {
 <nav class="pc-sidebar">
   <div class="navbar-wrapper">
     <div class="m-header">
-      <a href="../dashboard/index.html" class="b-brand text-primary">
+      <a href="dashboard/index.html" class="b-brand text-primary">
         <!-- ========   Change your logo from here   ============ -->
-        <img src="../assets/images/logo-white.svg" alt="logo image" class="logo-lg">
+        <img src="assets/images/logo-white.svg" alt="logo image" class="logo-lg">
       </a>
     </div>
     <div class="navbar-content">
@@ -241,7 +241,7 @@ body {
             <span class="pc-mtext">สินค้า</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span
           ></a>
           <ul class="pc-submenu">
-            <li class="pc-item"><a class="pc-link" href="../products_list.php">รายการสินค้า</a></li>
+            <li class="pc-item"><a class="pc-link" href=".products_list.php">รายการสินค้า</a></li>
             <li class="pc-item"><a class="pc-link" href="#!">เพิ่มรายการสินค้า</a></li>
             <li class="pc-item"><a class="pc-link" href="#!">นำเข้า/รับซื้อ</a></li>
           </ul>
@@ -252,19 +252,19 @@ body {
             <i class="ph ph-compass-tool"></i>
         </li>
         <li class="pc-item">
-          <a href="../elements/bc_typography.html" class="pc-link">
+          <a href="elements/bc_typography.html" class="pc-link">
             <span class="pc-micon"><i class="ph ph-text-aa"></i></span>
             <span class="pc-mtext">Typography</span>
           </a>
         </li>
         <li class="pc-item">
-          <a href="../elements/bc_color.html" class="pc-link">
+          <a href="elements/bc_color.html" class="pc-link">
             <span class="pc-micon"><i class="ph ph-palette"></i></span>
             <span class="pc-mtext">Color</span>
           </a>
         </li>
         <li class="pc-item">
-          <a href="../elements/icon-feather.html" class="pc-link">
+          <a href="elements/icon-feather.html" class="pc-link">
             <span class="pc-micon"><i class="ph ph-flower-lotus"></i></span>
             <span class="pc-mtext">Icons</span>
           </a>
@@ -276,13 +276,13 @@ body {
           <i class="ph ph-devices"></i>
         </li>
         <li class="pc-item">
-          <a href="../pages/login-v1.html" class="pc-link">
+          <a href="pages/login-v1.html" class="pc-link">
             <span class="pc-micon"><i class="ph ph-lock"></i></span>
             <span class="pc-mtext">Login</span>
           </a>
         </li>
         <li class="pc-item">
-          <a href="../pages/register-v1.html" class="pc-link">
+          <a href="pages/register-v1.html" class="pc-link">
             <span class="pc-micon"><i class="ph ph-user-circle-plus"></i></span>
             <span class="pc-mtext">Register</span>
           </a>
@@ -338,7 +338,7 @@ body {
           </ul>
         </li>
         <li class="pc-item"
-          ><a href="../other/sample-page.html" class="pc-link">
+          ><a href="other/sample-page.html" class="pc-link">
             <span class="pc-micon">
               <i class="ph ph-desktop"></i>
             </span>
@@ -348,7 +348,7 @@ body {
 
       </ul>
       <div class="card nav-action-card bg-brand-color-9">
-        <div class="card-body" style="background-image: url('../assets/images/layout/nav-card-bg.svg')">
+        <div class="card-body" style="background-image: url('assets/images/layout/nav-card-bg.svg')">
 
         </div>
       </div>
@@ -360,7 +360,7 @@ body {
 <header class="pc-header">
   <div class="m-header">
     <a href="sale.php" class="b-brand text-primary">
-      <img src="../assets/images/logo/logo_homeware.png" alt="logo image" class="logo-lg" height="45">
+      <img src="assets/images/logo/logo_homeware.png" alt="logo image" class="logo-lg" height="45">
     </a>
   </div>
 
@@ -389,7 +389,7 @@ body {
           <h8 class="text-white text-center" id="date"></h8>
           <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
             aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
-            <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
+            <img src="assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
           </a>
           <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
             <div class="dropdown-body">
@@ -453,7 +453,6 @@ body {
   <div class="pc-container px-1">
         <div class="pc-content">
           <br> 
-<!-- Add an ID to the product list container -->
 <div id="product-list" class="row g-2">
   <?php
     include("connectdb.php");
@@ -462,16 +461,55 @@ body {
     $rs = mysqli_query($conn, $sql);
     while ($data = mysqli_fetch_array($rs)){
   ?>
+
   <div class="col-sm-12 col-md-3 col-lg-4">
     <div class="card">
-      <img src="../assets/images/products_2/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="350px">
+      <img src="assets/images/products_2/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="280px">
       <div class="card-body">
         <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
-        <p class="card-text"><?= number_format($data['price'], );?> บาท</p>                  
+        <p class="card-text"><?= number_format($data['price'], 2 );?> บาท</p>
         <a href="sale.php?id=<?=$data['id'];?>" class="btn btn-primary">เพิ่ม</a>
+
+        <!-- <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="<?=$data['id'];?>" data-name="<?=$data['name'];?>">เพิ่ม</a> -->
+
+<!-- Modal -->
+<!-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">NameProduct</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        
+      <div class="row g-3 align-items-center">
+  <div class="col-auto">
+    <label for="inputPassword6" class="col-form-label">จำนวน</label>
+  </div>
+  <div class="col-auto">
+    <input type="number" id="qty" class="form-control" value="1">
+  </div>
+  <div class="col-auto">
+    <span id="passwordHelpInline" class="form-text">X 
+    <?= number_format($data['price'], );?> บาท
+    </span>
+  </div>
+</div>
+</div>
+      
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+  <a href="sale.php?id=<?=$data['id'];?>" class="btn btn-primary">ตกลง</a>
+    </div>
+    </div>
+  </div>
+</div> -->
+
+
       </div>
     </div>
   </div>
+  
   <?php
     }
     mysqli_close($conn);
@@ -517,7 +555,7 @@ body {
               <tr>
                   <td><strong>รวม</strong></td>
                   <td></td>
-                  <td style="vertical-align: top;"><strong><?= number_format($total, 0); ?></strong></td>
+                  <td style="vertical-align: top;"><strong><?= number_format($total, 2); ?></strong></td>
                   <td><strong> บาท</strong></td>
                   </tr>
                 
@@ -636,12 +674,12 @@ header("Location: detail.php?product_name=$product_name&product_quantity=$produc
   </footer>
 
   <!-- Required Js -->
-<script src="../assets/js/plugins/popper.min.js"></script>
-<script src="../assets/js/plugins/simplebar.min.js"></script>
-<script src="../assets/js/plugins/bootstrap.min.js"></script>
-<script src="../assets/js/fonts/custom-font.js"></script>
-<script src="../assets/js/pcoded.js"></script>
-<script src="../assets/js/plugins/feather.min.js"></script>
+<script src="assets/js/plugins/popper.min.js"></script>
+<script src="assets/js/plugins/simplebar.min.js"></script>
+<script src="assets/js/plugins/bootstrap.min.js"></script>
+<script src="assets/js/fonts/custom-font.js"></script>
+<script src="assets/js/pcoded.js"></script>
+<script src="assets/js/plugins/feather.min.js"></script>
 <script>layout_change('light');</script>
 <script>layout_sidebar_change('light');</script>
 <script>change_box_container('false');</script>
@@ -673,6 +711,20 @@ $("#clock").html(hours + ":" + minutesString + ":" + secondsString);
 });
 moment.locale('th');
 document.getElementById('date').innerHTML = moment().format('dddd D MMMM YYYY');
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  var modal = document.getElementById('exampleModal');
+  modal.addEventListener('show.bs.modal', function (event) {
+    var button = event.relatedTarget; // Button that triggered the modal
+    var productName = button.getAttribute('data-name'); // Extract info from data-* attributes
+
+    var modalTitle = modal.querySelector('.modal-title');
+    modalTitle.textContent = productName; // Update the modal's title with the product name
+  });
+});
+
+
 </script>
 
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
