@@ -94,7 +94,7 @@ error_reporting(E_NOTICE);
 
 
 <style>
-    body {
+body {
   font-family: "IBM Plex Sans Thai Looped", sans-serif;
 }
 
@@ -110,10 +110,10 @@ error_reporting(E_NOTICE);
   padding-bottom: 5rem; /* เพิ่ม padding ที่ด้านล่าง */
 }
 
-    .fixed-col h1 {
-      font-size: 1rem;
-      color: black;
-    }
+.fixed-col h1 {
+  font-size: 1rem;
+  color: black;
+}
 
     /*
 *
@@ -179,7 +179,6 @@ error_reporting(E_NOTICE);
   border-radius: 4px;
 }
 
-
   </style>
 
 
@@ -195,7 +194,7 @@ error_reporting(E_NOTICE);
   </div>
 </div>
 <!-- [ Pre-loader ] End -->
- <!-- [ Sidebar Menu ] start -->
+<!-- [ Sidebar Menu ] start -->
 <nav class="pc-sidebar">
   <div class="navbar-wrapper">
     <div class="m-header">
@@ -282,36 +281,6 @@ error_reporting(E_NOTICE);
             <li class="pc-item"><a class="pc-link" href="#!">นำเข้า/รับซื้อ</a></li>
           </ul>
         </li>
-
-
-
-
-        <!-- <li class="pc-item pc-caption"> -->
-
-
-            <!-- <label>UI Components</label> -->
-            <!-- <i class="ph ph-compass-tool"></i> -->
-        <!-- </li>
-        <li class="pc-item">
-          <a href="../elements/bc_typography.html" class="pc-link">
-            <span class="pc-micon"><i class="ph ph-text-aa"></i></span>
-            <span class="pc-mtext">Typography</span>
-          </a>
-        </li>
-        <li class="pc-item">
-          <a href="../elements/bc_color.html" class="pc-link">
-            <span class="pc-micon"><i class="ph ph-palette"></i></span>
-            <span class="pc-mtext">Color</span>
-          </a>
-        </li>
-        <li class="pc-item">
-          <a href="../elements/icon-feather.html" class="pc-link">
-            <span class="pc-micon"><i class="ph ph-flower-lotus"></i></span>
-            <span class="pc-mtext">Icons</span>
-          </a>
-        </li> -->
-
-
 
         <li class="pc-item pc-caption">
             <label>UI Components</label>
@@ -619,10 +588,6 @@ error_reporting(E_NOTICE);
     <div class="footer-wrapper container-fluid">
       <div class="row">
 
-        <!-- <div class="col-sm-6 my-1">
-          <p class="m-0">Gradient Able &#9829; crafted by Team <a href="https://codedthemes.com/"
-              target="_blank">Codedthemes</a></p>
-        </div> -->
 
 
 
@@ -666,8 +631,8 @@ header("Location: detail.php?product_name=$product_name&product_quantity=$produc
 <script>header_change("header-1");</script>
 
 <!-- <style>
- @import "style.css";
- @import url("style.css");
+@import "style.css";
+@import url("style.css");
 </style> -->
 
 
@@ -693,8 +658,6 @@ $("#clock").html(hours + ":" + minutesString + ":" + secondsString);
 moment.locale('th');
 document.getElementById('date').innerHTML = moment().format('dddd D MMMM YYYY');
 </script>
-
-
 
 
 </body>

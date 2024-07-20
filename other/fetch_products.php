@@ -3,7 +3,7 @@ include("connectdb.php");
 
 if (isset($_POST['query'])) {
   $src = $_POST['query'];
-  $sql = "SELECT * FROM `products` WHERE (`name` LIKE '%{$src}%' OR `detail` LIKE '%{$src}%') ORDER BY `products`.`type` ASC";
+  $sql = "SELECT * FROM `products` WHERE (`barcode` LIKE '%{$src}%' OR `name` LIKE '%{$src}%' OR `detail` LIKE '%{$src}%') ORDER BY `products`.`type` ASC";
   $rs = mysqli_query($conn, $sql);
   $output = '';
 

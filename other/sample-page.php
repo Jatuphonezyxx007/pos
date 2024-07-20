@@ -1,4 +1,4 @@
-<td?php
+<?php
 error_reporting(E_NOTICE);
 
 	@session_start();
@@ -12,8 +12,8 @@ error_reporting(E_NOTICE);
 		$_SESSION['sid'][$id] = $data['id'];
 		$_SESSION['sname'][$id] = $data['name'];
 		$_SESSION['sprice'][$id] = $data['price'];
-		$_SESSION['sdetail'][$id] = $data['detail'];
-		$_SESSION['spicture'][$id] = $data['img'];
+		// $_SESSION['sbarcode'][$id] = $data['barcode'];
+		// $_SESSION['spicture'][$id] = $data['img'];
 		@$_SESSION['sitem'][$id]++;
 	}
 
@@ -67,40 +67,117 @@ error_reporting(E_NOTICE);
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 
 
+  <!-- Add jQuery library -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      // Function to fetch and display products
+      function fetchProducts(query) {
+        $.ajax({
+          url: "fetch_products.php",
+          method: "POST",
+          data: { query: query },
+          success: function(data) {
+            $("#product-list").html(data);
+          }
+        });
+      }
+
+      // Event listener for input in search box
+      $(".search-input").on("input", function() {
+        var query = $(this).val();
+        fetchProducts(query);
+      });
+    });
+  </script>
+
+
+
 <style>
-    body {
+body {
   font-family: "IBM Plex Sans Thai Looped", sans-serif;
 }
 
-    .fixed-col {
-      position: fixed;
-      top: 70;
-      right: 0;
-      width: 25%;
-      height: 100%;
-      background-color: #f8f9fa;
-      overflow-y: auto;
-      padding: 1rem;
-    }
-    .fixed-col h1 {
-      font-size: 1rem;
-      color: black;
-    }
-/* .order{
-position: sticky;
-top: 0;
-} */
-/* .nav-right {
-  background-color: lightgrey;
-  position: sticky;
+.fixed-col {
+  position: fixed;
+  top: 70px; /* เพิ่ม px */
+  right: 0;
+  width: 25%;
+  height: 100%;
+  background-color: #f8f9fa;
+  overflow-y: auto;
+  padding: 1rem;
+  padding-bottom: 5rem; /* เพิ่ม padding ที่ด้านล่าง */
 }
 
-.nav-right div {
-  position: fixed;
-  top: 60px;
+.fixed-col h1 {
+  font-size: 1rem;
+  color: black;
+}
+
+    /*
+*
+* ==========================================
+* CUSTOM UTIL CLASSES
+* ==========================================
+*
+*/
+
+.form-control:focus {
+  box-shadow: none;
+}
+
+.form-control-underlined {
+  border-width: 0;
+  border-bottom-width: 0px;
+  border-radius: 0;
+  padding-left: 0;
+  padding-top: 5px;
+}
+
+/*
+*
+* ==========================================
+* FOR DEMO PURPOSE
+* ==========================================
+*
+*/
+
+/* body {
+  background: #ffd89b;
+  background: -webkit-linear-gradient(to right, #ffd89b, #19547b);
+  background: linear-gradient(to right, #ffd89b, #19547b);
+  min-height: 100vh;
 } */
 
+.form-control::placeholder {
+  font-size: 0.95rem;
+  color: #aaa;
+  font-style: italic;
+}
 
+
+.pc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.search-form {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  margin: 5px 5px 5px 5px; /* เพิ่ม margin ด้านบน ด้านซ้ายและขวา */
+}
+
+.search-input {
+  width: 100%;
+  max-width: 600px; /* กำหนดขนาดสูงสุดตามที่คุณต้องการ */
+  padding: 0.5em;
+  /* padding-top: 5px; */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
 
   </style>
 
@@ -117,7 +194,7 @@ top: 0;
   </div>
 </div>
 <!-- [ Pre-loader ] End -->
- <!-- [ Sidebar Menu ] start -->
+<!-- [ Sidebar Menu ] start -->
 <nav class="pc-sidebar">
   <div class="navbar-wrapper">
     <div class="m-header">
@@ -204,36 +281,6 @@ top: 0;
             <li class="pc-item"><a class="pc-link" href="#!">นำเข้า/รับซื้อ</a></li>
           </ul>
         </li>
-
-
-
-
-        <!-- <li class="pc-item pc-caption"> -->
-
-
-            <!-- <label>UI Components</label> -->
-            <!-- <i class="ph ph-compass-tool"></i> -->
-        <!-- </li>
-        <li class="pc-item">
-          <a href="../elements/bc_typography.html" class="pc-link">
-            <span class="pc-micon"><i class="ph ph-text-aa"></i></span>
-            <span class="pc-mtext">Typography</span>
-          </a>
-        </li>
-        <li class="pc-item">
-          <a href="../elements/bc_color.html" class="pc-link">
-            <span class="pc-micon"><i class="ph ph-palette"></i></span>
-            <span class="pc-mtext">Color</span>
-          </a>
-        </li>
-        <li class="pc-item">
-          <a href="../elements/icon-feather.html" class="pc-link">
-            <span class="pc-micon"><i class="ph ph-flower-lotus"></i></span>
-            <span class="pc-mtext">Icons</span>
-          </a>
-        </li> -->
-
-
 
         <li class="pc-item pc-caption">
             <label>UI Components</label>
@@ -353,208 +400,124 @@ top: 0;
 
 <header class="pc-header">
   <div class="m-header">
-
     <a href="sample-page.php" class="b-brand text-primary">
-      <!-- ========   Change your logo from here   ============ -->
       <img src="../assets/images/logo/logo_homeware.png" alt="logo image" class="logo-lg" height="45">
     </a>
   </div>
 
-  <div class="header-wrapper"> <!-- [Mobile Media Block] start -->
-<div class="me-auto pc-mob-drp">
-  <ul class="list-unstyled">
-    <!-- ======= Menu collapse Icon ===== -->
-    <!-- <li class="pc-h-item pc-sidebar-collapse">
-      <a href="#" class="pc-head-link ms-0" id="sidebar-hide">
-        <i class="ph ph-list"></i>
-      </a>
-    </li> -->
-    
-    <li class="pc-h-item pc-sidebar-popup">
-      <a href="#" class="pc-head-link ms-0" id="mobile-collapse">
-        <i class="ph ph-list"></i>
-      </a>
-    </li>
+  <div class="header-wrapper">
+    <div class="me-auto pc-mob-drp">
+      <ul class="list-unstyled">
+        <li class="pc-h-item pc-sidebar-popup">
+          <a href="#" class="pc-head-link ms-0" id="mobile-collapse">
+            <i class="ph ph-list"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
 
-    <li class="dropdown pc-h-item">
+    <!-- เพิ่ม form control ตรงนี้ -->
+    <form method="post" class="search-form" onsubmit="return false;">
+      <input type="text" name="src" placeholder="ค้นหาสินค้า" class="search-input" autofocus>
+      <a class="btn btn-primary"><i class="ph ph-magnifying-glass"></i></a>
+    </form>
 
-      <a class="pc-head-link dropdown-toggle arrow-none m-0" data-bs-toggle="dropdown" href="#" role="button"
-        aria-haspopup="false" aria-expanded="false">
-        <i class="ph ph-magnifying-glass"></i>
-      </a>
-
-      <!-- <form class="p-2 flex-grow-1 bd-highlight">
-      <input class="form-control" type="text" placeholder="Default input" aria-label="default input example">          
-      <button class="btn btn-outline-success" type="submit">Search</button>
-        </form> -->
-
-
-          <!-- <form class="d-flex">
-            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-success" type="submit">Search</button>
-          </form> -->
-
-
-
-      <div class="dropdown-menu pc-h-dropdown drp-search">
-        <form method="post" action="" class="px-3" role="search">
-          <div class="form-group mb-0 d-flex align-items-center">
-            <input type="search" class="form-control border-0 shadow-none" name="src" placeholder="Search here. . .">
-            <button class="btn btn-light-secondary btn-search">Search</button>
+    <div class="ms-auto">
+      <h7 id="clock" class="text-white text-center">00:00:00</h7>
+      <ul class="list-unstyled">
+        <li class="dropdown pc-h-item header-user-profile">
+          <h8>|</h8>
+          <h8 class="text-white text-center" id="date"></h8>
+          <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
+            aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
+            <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
+          </a>
+          <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
+            <div class="dropdown-body">
+              <div class="profile-notification-scroll position-relative" style="max-height: calc(100vh - 225px)">
+                <ul class="list-group list-group-flush w-100">
+                  <li class="list-group-item">
+                    <a href="https://codedthemes.com/item/gradient-able-admin-template/" class="dropdown-item">
+                      <span class="d-flex align-items-center">
+                        <i class="ph ph-arrow-circle-down"></i>
+                        <span>Download</span>
+                      </span>
+                    </a>
+                  </li>
+                  <li class="list-group-item">
+                    <a href="#" class="dropdown-item">
+                      <span class="d-flex align-items-center">
+                        <i class="ph ph-user-circle"></i>
+                        <span>Edit profile</span>
+                      </span>
+                    </a>
+                    <a href="#" class="dropdown-item">
+                      <span class="d-flex align-items-center">
+                        <i class="ph ph-bell"></i>
+                        <span>Notifications</span>
+                      </span>
+                    </a>
+                    <a href="#" class="dropdown-item">
+                      <span class="d-flex align-items-center">
+                        <i class="ph ph-gear-six"></i>
+                        <span>Settings</span>
+                      </span>
+                    </a>
+                  </li>
+                  <li class="list-group-item">
+                    <a href="#" class="dropdown-item">
+                      <span class="d-flex align-items-center">
+                        <i class="ph ph-plus-circle"></i>
+                        <span>Add account</span>
+                      </span>
+                    </a>
+                    <a href="#" class="dropdown-item">
+                      <span class="d-flex align-items-center">
+                        <i class="ph ph-power"></i>
+                        <span>Logout</span>
+                      </span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
-        </form>
-      </div>
-
-
-    </li>
-
-  </ul>
-</div>
-
-
-<!-- [Mobile Media Block end] -->
-<div class="ms-auto">
-<h7 id="clock" class="text-white text-center">00:00:00</h7>
-  <ul class="list-unstyled">
-    <li class="dropdown pc-h-item header-user-profile">
-
-
-    <h8>|</h8>
-    <h8 class="text-white text-center" id="date"></h8>
-
-
-      <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
-        aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
-        <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
-      </a>
-      <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
-        <div class="dropdown-body">
-          <div class="profile-notification-scroll position-relative" style="max-height: calc(100vh - 225px)">
-            <ul class="list-group list-group-flush w-100">
-              <li class="list-group-item">
-                <a href="https://codedthemes.com/item/gradient-able-admin-template/" class="dropdown-item">
-                  <span class="d-flex align-items-center">
-                    <i class="ph ph-arrow-circle-down"></i>
-                    <span>Download</span>
-                  </span>
-                </a>
-              </li>
-              <li class="list-group-item">
-                <a href="#" class="dropdown-item">
-                  <span class="d-flex align-items-center">
-                    <i class="ph ph-user-circle"></i>
-                    <span>Edit profile</span>
-                  </span>
-                </a>
-                <a href="#" class="dropdown-item">
-                  <span class="d-flex align-items-center">
-                    <i class="ph ph-bell"></i>
-                    <span>Notifications</span>
-                  </span>
-                </a>
-                <a href="#" class="dropdown-item">
-                  <span class="d-flex align-items-center">
-                    <i class="ph ph-gear-six"></i>
-                    <span>Settings</span>
-                  </span>
-                </a>
-              </li>
-              <li class="list-group-item">
-                <a href="#" class="dropdown-item">
-                  <span class="d-flex align-items-center">
-                    <i class="ph ph-plus-circle"></i>
-                    <span>Add account</span>
-                  </span>
-                </a>
-                <a href="#" class="dropdown-item">
-                  <span class="d-flex align-items-center">
-                    <i class="ph ph-power"></i>
-                    <span>Logout</span>
-                  </span>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </li>
-  </ul>
-</div> 
-</div>
+        </li>
+      </ul>
+    </div> 
+  </div>
 </header>
 <!-- [ Header ] end -->
 
-
   <!-- [ Main Content ] start -->
-
-<!-- <div class="col-12 col-md-10">
-  <div class="pc-container px-1">
-    <div class="pc-content">
-      <br> 
-          <div class="row g-2">
-          <?php
-                  include("connectdb.php");
-                  @$src = $_POST['src'];
-                  $sql = "SELECT * FROM `products`  WHERE (`name` LIKE '%{$src}%' OR `detail` LIKE '%{$src}%') ORDER BY `products`.`type` ASC";
-                  $rs = mysqli_query($conn, $sql);
-                  while ($data = mysqli_fetch_array($rs)){
-                    ?>
-            <div class="col-sm-12 col-md-3 col-lg-4">
-              <div class="card">
-                <img src="../assets/images/products/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="350px">
-                <div class="card-body">
-                  <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
-                  <p class="card-text"><?= number_format($data['price'], );?> บาท</p>                  
-                  <a href="checkout.php?id=<?=$data['id'];?>" class="btn btn-primary">เพิ่มลงตะกร้า</a>
-                </div>
-              </div>
-            </div>
-            <?php
-                  }
-                  mysqli_close($conn);
-                  ?> 
-          </div>
-    </div>
-  </div>
-  </div>
-
-  <div class="col-6 col-md-2">
-    <div class="pc-container px-1">
-      <div class="pc-content">
-        <div class="row">
-          <h1>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque, delectus provident a, accusamus labore veritatis dolore consequuntur assumenda, exercitationem eum deserunt temporibus error? Optio totam a magnam laborum minima perspiciatis.</h1>
-        </div>
-      </div>
-    </div>
-  </div> -->
-
 <div class="col-12 col-md-9">
   <div class="pc-container px-1">
         <div class="pc-content">
           <br> 
-          <div class="row g-2">
-            <?php
-              include("connectdb.php");
-              @$src = $_POST['src'];
-              $sql = "SELECT * FROM `products`  WHERE (`name` LIKE '%{$src}%' OR `detail` LIKE '%{$src}%') ORDER BY `products`.`type` ASC";
-              $rs = mysqli_query($conn, $sql);
-              while ($data = mysqli_fetch_array($rs)){
-            ?>
-            <div class="col-sm-12 col-md-3 col-lg-4">
-              <div class="card">
-                <img src="../assets/images/products/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="350px">
-                <div class="card-body">
-                  <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
-                  <p class="card-text"><?= number_format($data['price'], );?> บาท</p>                  
-                  <a href="checkout.php?id=<?=$data['id'];?>" class="btn btn-primary">เพิ่มลงตะกร้า</a>
-                </div>
-              </div>
-            </div>
-            <?php
-              }
-              mysqli_close($conn);
-            ?> 
-          </div>
+<!-- Add an ID to the product list container -->
+<div id="product-list" class="row g-2">
+  <?php
+    include("connectdb.php");
+    @$src = $_POST['src'];
+    $sql = "SELECT * FROM `products` WHERE (`barcode` LIKE '%{$src}%' OR `name` LIKE '%{$src}%' OR `detail` LIKE '%{$src}%' ) ORDER BY `products`.`type` ASC";
+    $rs = mysqli_query($conn, $sql);
+    while ($data = mysqli_fetch_array($rs)){
+  ?>
+  <div class="col-sm-12 col-md-3 col-lg-4">
+    <div class="card">
+      <img src="../assets/images/products/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="350px">
+      <div class="card-body">
+        <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
+        <p class="card-text"><?= number_format($data['price'], );?> บาท</p>                  
+        <a href="sample-page.php?id=<?=$data['id'];?>" class="btn btn-primary">เพิ่มลงตะกร้า</a>
+      </div>
+    </div>
+  </div>
+  <?php
+    }
+    mysqli_close($conn);
+  ?> 
+</div>
         </div>
       </div>
     </div>
@@ -573,48 +536,76 @@ top: 0;
                   <td width="10%" class="text-center">จำนวน</td>
                   <td width="10%" class="text-center">ราคา</td>
               </tr>
+              
+              <?php
+              if(!empty($_SESSION['sid'])) {
+                foreach($_SESSION['sid'] as $pid) {
+                  @$i++;
+                  $sum[$pid] = $_SESSION['sprice'][$pid] * $_SESSION['sitem'][$pid] ;
+                  @$total += $sum[$pid] ;
+                  ?>
 
               <tr>
-                  <td style="vertical-align: top;">1</td>
-                  <td style="vertical-align: top;">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolor excepturi, autem ipsa perspiciatis, laboriosam minus molestiae similique suscipit non maiores necessitatibus sed aliquam quia nisi iure perferendis omnis, explicabo et?<br>
-                  <a class="pc-head-link dropdown-toggle arrow-none m-0" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false"> <i class="ph ph-trash text-danger"></i>
-                </a>
+                  <td style="vertical-align: top;"><?=$i;?></td>
+                  <td style="vertical-align: top;"><?=$_SESSION['sname'][$pid];?><br>
+                  <a href="clear_product.php?id=<?=$pid;?>" class="ph ph-trash text-danger"></a>
                 </td>
-                  <td style="vertical-align: top;">1</td>
-                  <td style="vertical-align: top;">1,000</td>
+                  <td style="vertical-align: top;"><?=$_SESSION['sitem'][$pid];?></td>
+                  <td style="vertical-align: top;"><?=number_format($_SESSION['sprice'][$pid],0);?></td>
                 </tr>
+                <?php } // end foreach ?>
 
               <tr>
-                  <td>รวม</td>
+                  <td><strong>รวม</strong></td>
                   <td></td>
-                  <td></td></td>
-                  <td style="vertical-align: top;">1,000</td>
-                </tr>
-
+                  <td style="vertical-align: top;"><strong><?= number_format($total, 0); ?></strong></td>
+                  <td><strong> บาท</strong></td>
+                  </tr>
+                
+                <?php 
+                } else {
+                  ?>
+                  
+                  <tr>
+                    <td colspan="7" height="50" align="center">ไม่มีสินค้าในตะกร้า</td>
+                  </tr>
+                  <?php } // end if ?>
             </thead>
+
           </table>
           <p class="d-grid gap-1">
           <button class="btn btn-success" type="button">ชำระเงิน</button>
           </p>
           <p class="d-inline-flex gap-1">
-            <button type="button" class="btn btn-danger" data-bs-toggle="button">ล้างทั้งหมด</button>
-          </p>
+  <a href="clear.php" class="btn btn-danger">ล้างทั้งหมด</a>
+</p>
         </div>
       </div>
     </div>
-
-
 
   <!-- [ Main Content ] end -->
   <footer class="pc-footer">
     <div class="footer-wrapper container-fluid">
       <div class="row">
 
-        <!-- <div class="col-sm-6 my-1">
-          <p class="m-0">Gradient Able &#9829; crafted by Team <a href="https://codedthemes.com/"
-              target="_blank">Codedthemes</a></p>
-        </div> -->
 
+
+
+
+
+  <?php
+// ดึงข้อมูลการซื้อจากหน้า checkout.php
+$product_name = $_POST['product_name'];
+$product_quantity = $_POST['product_quantity'];
+$product_price = $_POST['product_price'];
+$total_price = $product_quantity * $product_price;
+
+// ส่งข้อมูลการซื้อไปยังหน้า detail.php
+header("Location: detail.php?product_name=$product_name&product_quantity=$product_quantity&product_price=$product_price&total_price=$total_price");
+
+?>
+
+  
         <div class="col-sm-6 ms-auto my-1">
           <ul class="list-inline footer-link mb-0 justify-content-sm-end d-flex">
           <a href="#top" class="text-end">กลับไปบนสุด</a>
@@ -640,8 +631,8 @@ top: 0;
 <script>header_change("header-1");</script>
 
 <!-- <style>
- @import "style.css";
- @import url("style.css");
+@import "style.css";
+@import url("style.css");
 </style> -->
 
 
@@ -667,8 +658,6 @@ $("#clock").html(hours + ":" + minutesString + ":" + secondsString);
 moment.locale('th');
 document.getElementById('date').innerHTML = moment().format('dddd D MMMM YYYY');
 </script>
-
-
 
 
 </body>
