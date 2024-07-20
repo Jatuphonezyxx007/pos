@@ -1,4 +1,5 @@
 <?php
+/*
 error_reporting(E_NOTICE);
 
 	@session_start();
@@ -12,12 +13,11 @@ error_reporting(E_NOTICE);
 		$_SESSION['sid'][$id] = $data['id'];
 		$_SESSION['sname'][$id] = $data['name'];
 		$_SESSION['sprice'][$id] = $data['price'];
-		// $_SESSION['sbarcode'][$id] = $data['barcode'];
-		// $_SESSION['spicture'][$id] = $data['img'];
+		$_SESSION['sbarcode'][$id] = $data['barcode'];
+		$_SESSION['spicture'][$id] = $data['img'];
 		@$_SESSION['sitem'][$id]++;
 	}
-
-
+    */
 ?>
 
 
@@ -47,6 +47,23 @@ error_reporting(E_NOTICE);
 
 
   <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+
+  <!-- [Favicon] icon -->
+  <link rel="icon" href="assets/images/favicon.svg" type="image/x-icon"> <!-- [Google Font : Poppins] icon -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- [Tabler Icons] https://tablericons.com -->
+<link rel="stylesheet" href="assets/fonts/tabler-icons.min.css" >
+<!-- [Feather Icons] https://feathericons.com -->
+<link rel="stylesheet" href="assets/fonts/feather.css" >
+<!-- [Font Awesome Icons] https://fontawesome.com/icons -->
+<link rel="stylesheet" href="assets/fonts/fontawesome.css" >
+<!-- [Material Icons] https://fonts.google.com/icons -->
+<link rel="stylesheet" href="assets/fonts/material.css" >
+<!-- [Template CSS Files] -->
+<link rel="stylesheet" href="assets/css/style.css" id="main-style-link" >
+<link rel="stylesheet" href="assets/css/style-preset.css" >
+
 
 
 <!-- Script -->
@@ -210,7 +227,7 @@ body {
         <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sale.php' ? 'active' : '') ?>" href="sale.php">หน้าขาย</a>
     </li>
     <li class="pc-item">
-        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sample-page2.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == 'sale_history.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
     </li>
 </ul>
 
@@ -449,227 +466,304 @@ body {
 <!-- [ Header ] end -->
 
   <!-- [ Main Content ] start -->
-<div class="col-12 col-md-9">
-  <div class="pc-container px-1">
-        <div class="pc-content">
-          <br> 
-<div id="product-list" class="row g-2">
-  <?php
-    include("connectdb.php");
-    @$src = $_POST['src'];
-    $sql = "SELECT * FROM `products` WHERE (`barcode` LIKE '%{$src}%' OR `name` LIKE '%{$src}%') ORDER BY `products`.`type_id` ASC";
-    $rs = mysqli_query($conn, $sql);
-    while ($data = mysqli_fetch_array($rs)){
-  ?>
 
-  <div class="col-sm-12 col-md-3 col-lg-4">
-    <div class="card">
-      <img src="assets/images/products_2/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="280px">
-      <div class="card-body">
-        <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
-        <p class="card-text"><?= number_format($data['price'], 2 );?> บาท</p>
-        <a href="sale.php?id=<?=$data['id'];?>" class="btn btn-primary">เพิ่ม</a>
+  <!-- [ Main Content ] start -->
+  <div class="pc-container">
+    <div class="pc-content">
+      <!-- [ breadcrumb ] start -->
+      <div class="page-header">
+        <div class="page-block card mb-0">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md-12">
 
-        <!-- <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="<?=$data['id'];?>" data-name="<?=$data['name'];?>">เพิ่ม</a> -->
-
-<!-- Modal -->
-<!-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">NameProduct</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        
-      <div class="row g-3 align-items-center">
-  <div class="col-auto">
-    <label for="inputPassword6" class="col-form-label">จำนวน</label>
-  </div>
-  <div class="col-auto">
-    <input type="number" id="qty" class="form-control" value="1">
-  </div>
-  <div class="col-auto">
-    <span id="passwordHelpInline" class="form-text">X 
-    <?= number_format($data['price'], );?> บาท
-    </span>
+              <div class="col-md-12">
+  <div class="page-header-title border-bottom pb-2 mb-2 d-flex align-items-center">
+    <a href="sale_history.php" class="breadcrumb-item me-2">
+      <i class="ph ph-arrow-left fs-3"></i>
+    </a>
+    <h4 class="mb-0">รายละเอียดคำสั่งซื้อ เลขที่ <?=$_GET['a'];?></h4>
   </div>
 </div>
-</div>
-      
-<div class="modal-footer">
-  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
-  <a href="sale.php?id=<?=$data['id'];?>" class="btn btn-primary">ตกลง</a>
-    </div>
-    </div>
-  </div>
-</div> -->
+
+                <!-- <div class="page-header-title border-bottom pb-2 mb-2">
+                  
+                <l class="breadcrumb-item"><a href="sale_history.php"><i class="ph ph-arrow-left fs-3"></i></a></l>
+
+                  <h4 class="mb-0">รายละเอียดคำสั่งซื้อ เลขที่ <?=$_GET['a'];?></h4>
+                </div> -->
+              
+              </div>
 
 
-      </div>
-    </div>
-  </div>
-  
-  <?php
-    }
-    mysqli_close($conn);
-  ?> 
-</div>
-        </div>
-      </div>
-    </div>
+              <!-- <div class="col-md-12">
+                <ul class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="sale_history.php"><i class="ph ph-arrow-left fs-3"></i></a></li>
+                </ul>
+              </div> -->
 
-    <div class="col-6 col-md-3 fixed-col">
-          <div class="row">
-            <center>
-            <h1>รายการสินค้า</h1>
-            </center>
 
-            <table class="table">
-              <thead>
-                <tr>
-                  <td width="5%" class="text-center">ที่</td>
-                  <td width="75%" class="text-center">สินค้า</td>
-                  <td width="10%" class="text-center">จำนวน</td>
-                  <td width="10%" class="text-center">ราคา</td>
+              <table width="100%" class="table table-striped table-sm-gap">
+              <tr>
+                <td width="5%" class="text-center">ที่</td>
+                <td width="10%" class="text-center">รหัสสินค้า</td>
+                <td width="40%">สินค้า</td>
+                <td width="5%" class="text-center">จำนวน</td>
+                <td width="20%" class="text-center">ราคา/ชิ้น</td>
+                <td width="20%" class="text-center">รวม (บาท)</td>
               </tr>
               
               <?php
-              if(!empty($_SESSION['sid'])) {
-                foreach($_SESSION['sid'] as $pid) {
-                  @$i++;
-                  $sum[$pid] = $_SESSION['sprice'][$pid] * $_SESSION['sitem'][$pid] ;
-                  @$total += $sum[$pid] ;
-                  ?>
-
-              <tr>
-                  <td style="vertical-align: top;"><?=$i;?></td>
-                  <td style="vertical-align: top;"><?=$_SESSION['sname'][$pid];?><br>
-                  <a href="clear_product.php?id=<?=$pid;?>" class="ph ph-trash text-danger"></a>
-                </td>
-                  <td style="vertical-align: top;"><?=$_SESSION['sitem'][$pid];?></td>
-                  <td style="vertical-align: top;"><?=number_format($_SESSION['sprice'][$pid],0);?></td>
+              include("connectdb.php");
+              $sql = "SELECT  *  FROM  orders_detail
+              INNER JOIN products ON orders_detail.p_id = products.id
+              WHERE orders_detail.order_id = '".$_GET['a']."'  ";
+              $rs = mysqli_query($conn, $sql) ;
+              $i = 0;
+              while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
+                $i++;
+                $sum = $data['price'] * $data['item'] ;
+                @$total += $sum;
+                ?>
+                <tr>
+                  <td class="text-center"><?=$i;?></td>
+                  <!-- <td><img src="images/<?=$data['p_picture'];?>" width="80"> <br> -->
+                  <td class="text-center"><?=@$data['id'];?></td>
+                  <td><?=$data['name'];?></td>
+                  <td class="text-center"><?=$data['item'];?></td>
+                  <td class="text-center"><?=number_format($data['price'], 2);?></td>
+                  <td class="text-center"><?=number_format($sum, 2);?></td>
                 </tr>
-                <?php } // end foreach ?>
-
-              <tr>
-                  <td><strong>รวม</strong></td>
-                  <td></td>
-                  <td style="vertical-align: top;"><strong><?= number_format($total, 2); ?></strong></td>
-                  <td><strong> บาท</strong></td>
-                  </tr>
                 
-                <?php 
-                } else {
-                  ?>
-                  
-                  <tr>
-                    <td colspan="7" height="50" align="center">ไม่มีสินค้าในตะกร้า</td>
-                  </tr>
-                  <?php } // end if ?>
-            </thead>
-
-          </table>
-
+                <?php } ?>
+                <tr>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td class="text-center"><strong>ราคารวม</strong></td>
+                  <td class="text-center"><strong><?=number_format($total, 2);?> บาท</strong></td>
+                </tr>
+              </table>
 
 
-          <!-- ปุ่มที่กดเพื่อเปิด Modal -->
-<p class="d-grid gap-1">
-  <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    ชำระเงิน
-  </button>
-</p>
-
-
-
-
-          <p class="d-inline-flex gap-1">
-  <a href="clear.php" class="btn btn-danger">ล้างทั้งหมด</a>
-</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">การชำระเงิน</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-
-      <!-- <form method="post" action="">
-      <div class="modal-body">
-        <div class="col-md">
-          <div class="form-floating">
-
-            <select class="form-select" id="payment" aria-label="payment" name="payments">
-            <?php
-                            include("connectdb.php");
-                            $sql2 = "SELECT * FROM `paymethod`";
-                            $rs2 = mysqli_query($conn, $sql2);
-                            while ($data2 = mysqli_fetch_array($rs2)){
-                              ?>
-                              <option value="<?=$data2['PayMethod_id'];?>"<?=($data2['PayMethod_id']==$data['paymethod'])?"selected":"";?>>
-                              <?=$data2['PayMethod_name'];?></option>  
-                              <?php } ?>
-                            </select>
-                          
-
-            <label for="payment">ประเภทการชำระ</label>
+            </div>
           </div>
         </div>
       </div>
-      </form>
+      <!-- [ breadcrumb ] end -->
 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ย้อนกลับ</button>
-        
-        <p class="d-grid gap-1">
-        <a href="record.php" class="btn btn-primary">ชำระเงิน</a>
-        </p> -->
-        <!-- </form> -->
+      <!-- [ Main Content ] start -->
+      <div class="row">
+        <!-- [ Typography ] start -->
+        <!-- <div class="col-sm-12">
+          <div class="card">
+            <div class="card-header">
+              <h5>Headings</h5>
+              <p><span class="badges">.h1</span> through .h6 classes are also available, for when you want to match
+                the font styling of a heading
+                but cannot use the associated HTML element.</p>
+            </div>
+            <div class="card-body pc-component">
+              <h1>h1. Heading</h1>
+              <div class="clearfix"></div>
+              <h2>h2. Heading</h2>
+              <div class="clearfix"></div>
+              <h3>This is a H3</h3>
+              <div class="clearfix"></div>
+              <h4>This is a H4</h4>
+              <div class="clearfix"></div>
+              <h5>This is a H5</h5>
+              <div class="clearfix"></div>
+              <h6>This is a H6</h6>
+            </div>
+          </div>
+        </div> -->
+        <!-- <div class="col-sm-12">
+          <div class="card">
+            <div class="card-header">
+              <h5>Display Headings</h5>
+            </div>
+            <div class="card-body pc-component">
+              <h1 class="display-1">Display 1</h1>
+              <h1 class="display-2">Display 2</h1>
+              <h1 class="display-3">Display 3</h1>
+              <h1 class="display-4">Display 4</h1>
+              <h1 class="display-5">Display 5</h1>
+              <h1 class="display-6">Display 6</h1>
+            </div>
+          </div>
+        </div> -->
+        <!-- <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Inline Text Elements</h5>
+            </div>
+            <div class="card-body pc-component">
+              <p class="lead m-t-0">Your title goes here</p>
+              You can use the mark tag to
+              <mark>highlight</mark> text.
+              <br>
+              <del>This line of text is meant to be treated as deleted text.</del>
+              <br>
+              <ins>This line of text is meant to be treated as an addition to the document.</ins>
+              <br>
+              <strong>rendered as bold text</strong>
+              <br>
+              <em>rendered as italicized text</em>
+            </div>
+          </div>
+        </div> -->
+        <!-- <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Contextual Text Colors</h5>
+            </div>
+            <div class="card-body pc-component">
+              <p class="text-muted mb-1"> Fusce dapibus, tellus ac cursus commodo, tortor mauris nibh. </p>
+              <p class="text-primary mb-1"> Nullam id dolor id nibh ultricies vehicula ut id elit. </p>
+              <p class="text-success mb-1"> Duis mollis, est non commodo luctus, nisi erat porttitor ligula. </p>
+              <p class="text-info mb-1"> Maecenas sed diam eget risus varius blandit sit amet non magna. </p>
+              <p class="text-warning mb-1"> Etiam porta sem malesuada magna mollis euismod. </p>
+              <p class="text-danger mb-1"> Donec ullamcorper nulla non metus auctor fringilla. </p>
+              <p class="text-dark mb-1"> Nullam id dolor id nibh ultricies vehicula ut id elit. </p>
+            </div>
+          </div>
+        </div> -->
+        <!-- <div class="col-md-6 col-lg-4">
+          <div class="card">
+            <div class="card-header">
+              <h5>Unordered</h5>
+            </div>
+            <div class="card-body pc-component">
+              <ul>
+                <li>Lorem ipsum dolor sit amet</li>
+                <li>Consectetur adipiscing elit</li>
+                <li>Integer molestie lorem at massa</li>
+                <li>Facilisis in pretium nisl aliquet</li>
+                <li>Nulla volutpat aliquam velit
+                  <ul>
+                    <li>Phasellus iaculis neque</li>
+                    <li>Purus sodales ultricies</li>
+                    <li>Vestibulum laoreet porttitor sem</li>
+                    <li>Ac tristique libero volutpat at</li>
+                  </ul>
+                </li>
+                <li>Faucibus porta lacus fringilla vel</li>
+                <li>Aenean sit amet erat nunc</li>
+                <li>Eget porttitor lorem</li>
+              </ul>
+            </div>
+          </div>
+        </div> -->
+        <!-- <div class="col-md-6 col-lg-4">
+          <div class="card">
+            <div class="card-header">
+              <h5>Ordered</h5>
+            </div>
+            <div class="card-body pc-component">
+              <ol>
+                <li>Lorem ipsum dolor sit amet</li>
+                <li>Consectetur adipiscing elit</li>
+                <li>Integer molestie lorem at massa</li>
+                <li>Facilisis in pretium nisl aliquet</li>
+                <li>Nulla volutpat aliquam velit
+                  <ul>
+                    <li>Phasellus iaculis neque</li>
+                    <li>Purus sodales ultricies</li>
+                    <li>Vestibulum laoreet porttitor sem</li>
+                    <li>Ac tristique libero volutpat at</li>
+                  </ul>
+                </li>
+                <li>Faucibus porta lacus fringilla vel</li>
+                <li>Aenean sit amet erat nunc</li>
+                <li>Eget porttitor lorem</li>
+              </ol>
+            </div>
+          </div>
+        </div> -->
+        <!-- <div class="col-md-12 col-lg-4">
+          <div class="card">
+            <div class="card-header">
+              <h5>Unstyled</h5>
+            </div>
+            <div class="card-body pc-component">
+              <ul class="list-unstyled">
+                <li>Lorem ipsum dolor sit amet</li>
+                <li>Integer molestie lorem at massa
+                  <ul>
+                    <li>Phasellus iaculis neque</li>
+                  </ul>
+                </li>
+                <li>Faucibus porta lacus fringilla vel</li>
+                <li>Eget porttitor lorem</li>
+              </ul>
+              <h5>Inline</h5>
+              <hr>
+              <ul class="list-inline m-b-0">
+                <li class="list-inline-item">Lorem ipsum</li>
+                <li class="list-inline-item">Phasellus iaculis</li>
+                <li class="list-inline-item">Nulla volutpat</li>
+              </ul>
+            </div>
+          </div>
+        </div> -->
+        <!-- <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Blockquotes</h5>
+            </div>
+            <div class="card-body pc-component">
+              <p class="text-muted mb-1"> Your awesome text goes here. </p>
+              <blockquote class="blockquote">
+                <p class="mb-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a
+                  ante.</p>
+                <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite>
+                </footer>
+              </blockquote>
+              <p class="text-muted m-b-15 m-t-20"> Add <code>.text-end</code> for a blockquote with right-aligned
+                content. </p>
+              <blockquote class="blockquote text-end">
+                <p class="mb-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a
+                  ante.</p>
+                <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite>
+                </footer>
+              </blockquote>
+            </div>
+          </div>
+        </div> -->
+        <!-- <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Horizontal Description</h5>
+            </div>
+            <div class="card-body pc-component">
+              <dl class="dl-horizontal row">
+                <dt class="col-sm-3">Description lists</dt>
+                <dd class="col-sm-9">A description list is perfect for defining terms.</dd>
 
+                <dt class="col-sm-3">Euismod</dt>
+                <dd class="col-sm-9">Vestibulum id ligula porta felis euismod semper eget lacinia odio sem nec elit.
+                </dd>
+                <dd class="col-sm-9">Donec id elit non mi porta gravida at eget metus.</dd>
 
-        <form method="post" action="record.php">
-  <div class="modal-body">
-    <div class="col-md">
-      <div class="form-floating">
-        <select class="form-select" id="payment" aria-label="payment" name="payments">
-          <?php
-            include("connectdb.php");
-            $sql2 = "SELECT * FROM `paymethod`";
-            $rs2 = mysqli_query($conn, $sql2);
-            while ($data2 = mysqli_fetch_array($rs2)) {
-          ?>
-            <option value="<?=$data2['PayMethod_id'];?>"<?=($data2['PayMethod_id'] == $data['paymethod']) ? "selected" : ""; ?>>
-              <?=$data2['PayMethod_name'];?>
-            </option>
-          <?php } ?>
-        </select>
-        <label for="payment">ประเภทการชำระ</label>
+                <dt class="col-sm-3">Malesuada porta</dt>
+                <dd class="col-sm-9">Etiam porta sem malesuada magna mollis euismod.</dd>
+
+                <dt class="col-sm-3 text-truncate">Truncated term is truncated</dt>
+                <dd class="col-sm-9">Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut
+                  fermentum massa justo sit amet risus.</dd>
+              </dl>
+            </div>
+          </div>
+        </div> -->
+        <!-- [ Typography ] end -->
       </div>
+      <!-- [ Main Content ] end -->
     </div>
   </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ย้อนกลับ</button>
-    <button type="submit" class="btn btn-primary">ชำระเงิน</button>
-  </div>
-</form>
-
-        
-
-
-        <!-- <button type="button" class="btn btn-primary">เลือก</button> -->
-        
-      </div>
-    </div>
-  </div>
-</div>
-
-
   <!-- [ Main Content ] end -->
+
   <footer class="pc-footer">
     <div class="footer-wrapper container-fluid">
       <div class="row">
@@ -681,13 +775,13 @@ body {
 
   <?php
 // ดึงข้อมูลการซื้อจากหน้า checkout.php
-$product_name = $_POST['product_name'];
-$product_quantity = $_POST['product_quantity'];
-$product_price = $_POST['product_price'];
-$total_price = $product_quantity * $product_price;
+// $product_name = $_POST['product_name'];
+// $product_quantity = $_POST['product_quantity'];
+// $product_price = $_POST['product_price'];
+// $total_price = $product_quantity * $product_price;
 
 // ส่งข้อมูลการซื้อไปยังหน้า detail.php
-header("Location: detail.php?product_name=$product_name&product_quantity=$product_quantity&product_price=$product_price&total_price=$total_price");
+// header("Location: detail.php?product_name=$product_name&product_quantity=$product_quantity&product_price=$product_price&total_price=$total_price");
 
 ?>
 
@@ -756,9 +850,49 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-</body>
+
+
+
+<script src="../assets/js/plugins/popper.min.js"></script>
+<script src="../assets/js/plugins/simplebar.min.js"></script>
+<script src="../assets/js/plugins/bootstrap.min.js"></script>
+<script src="../assets/js/fonts/custom-font.js"></script>
+<script src="../assets/js/pcoded.js"></script>
+<script src="../assets/js/plugins/feather.min.js"></script>
+
+
+
+
+
+<script>layout_change('light');</script>
+
+
+
+
+<script>layout_sidebar_change('light');</script>
+
+
+
+<script>change_box_container('false');</script>
+
+
+<script>layout_caption_change('true');</script>
+
+
+
+
+<script>layout_rtl_change('false');</script>
+
+
+<script>preset_change("preset-1");</script>
+
+
+<script>header_change("header-1");</script>
+
 
 </body>
+
+
 <!-- [Body] end -->
 
 </html>
