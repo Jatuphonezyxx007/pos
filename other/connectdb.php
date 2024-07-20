@@ -2,8 +2,8 @@
 <?php
 $host = "localhost";
 $user = "root";
-$pwd = "admin12345";
-$db = "itshop";
+$pwd = "";
+$db = "shop";
 
 $conn = mysqli_connect($host, $user, $pwd) or die ("เชื่อต่อฐานข้อมูลไม่ได้");
 mysqli_select_db($conn, $db) or die ("เลือกฐานข้อมูลไม่ได้");

@@ -12,7 +12,7 @@ error_reporting(E_NOTICE);
 		$_SESSION['sid'][$id] = $data['id'];
 		$_SESSION['sname'][$id] = $data['name'];
 		$_SESSION['sprice'][$id] = $data['price'];
-		// $_SESSION['sbarcode'][$id] = $data['barcode'];
+		// $_SESSION['sdetail'][$id] = $data['detail'];
 		// $_SESSION['spicture'][$id] = $data['img'];
 		@$_SESSION['sitem'][$id]++;
 	}
@@ -499,7 +499,7 @@ body {
   <?php
     include("connectdb.php");
     @$src = $_POST['src'];
-    $sql = "SELECT * FROM `products` WHERE (`barcode` LIKE '%{$src}%' OR `name` LIKE '%{$src}%' OR `detail` LIKE '%{$src}%' ) ORDER BY `products`.`type` ASC";
+    $sql = "SELECT * FROM `products` WHERE (`name` LIKE '%{$src}%' OR `detail` LIKE '%{$src}%') ORDER BY `products`.`type` ASC";
     $rs = mysqli_query($conn, $sql);
     while ($data = mysqli_fetch_array($rs)){
   ?>
@@ -509,7 +509,7 @@ body {
       <div class="card-body">
         <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
         <p class="card-text"><?= number_format($data['price'], );?> บาท</p>                  
-        <a href="sample-page.php?id=<?=$data['id'];?>" class="btn btn-primary">เพิ่มลงตะกร้า</a>
+        <a href="sample-page2.php?id=<?=$data['id'];?>" class="btn btn-primary">เพิ่มลงตะกร้า</a>
       </div>
     </div>
   </div>
@@ -556,11 +556,11 @@ body {
                 <?php } // end foreach ?>
 
               <tr>
-                  <td><strong>รวม</strong></td>
+                  <td>รวม</td>
                   <td></td>
-                  <td style="vertical-align: top;"><strong><?= number_format($total, 0); ?></strong></td>
-                  <td><strong> บาท</strong></td>
-                  </tr>
+                  <td></td></td>
+                  <td style="vertical-align: top;"><?=number_format($total,0);?></td>
+                </tr>
                 
                 <?php 
                 } else {

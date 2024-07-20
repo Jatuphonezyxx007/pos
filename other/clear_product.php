@@ -8,6 +8,6 @@
 	unset($_SESSION['sdetail'][$id2]) ;
 	unset($_SESSION['spicture'][$id2]) ;
 	unset($_SESSION['sitem'][$id2]) ;
-	echo "<meta http-equiv=\"refresh\" content=\"0;URL=sample-page2.php\">";
+	echo "<meta http-equiv=\"refresh\" content=\"0;URL=sale.php\">";
 
 ?>

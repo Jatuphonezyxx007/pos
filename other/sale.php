@@ -35,19 +35,6 @@ error_reporting(E_NOTICE);
   <meta name="keywords" content="Bootstrap admin template, Dashboard UI Kit, Dashboard Template, Backend Panel, react dashboard, angular dashboard">
   <meta name="author" content="codedthemes">
 
-  <!-- [Favicon] icon -->
-  <!-- <link rel="icon" href="../assets/images/favicon.svg" type="image/x-icon">  -->
-  <!-- [Google Font : Poppins] icon -->
-<!-- <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet"> -->
-
-<!-- [Tabler Icons] https://tablericons.com -->
-<!-- <link rel="stylesheet" href="../assets/fonts/tabler-icons.min.css" > -->
-<!-- [Feather Icons] https://feathericons.com -->
-<!-- <link rel="stylesheet" href="../assets/fonts/feather.css" > -->
-<!-- [Font Awesome Icons] https://fontawesome.com/icons -->
-<!-- <link rel="stylesheet" href="../assets/fonts/fontawesome.css" > -->
-<!-- [Material Icons] https://fonts.google.com/icons -->
-<!-- <link rel="stylesheet" href="../assets/fonts/material.css" > -->
 
 <!-- [Template CSS Files] -->
 <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" >
@@ -143,12 +130,6 @@ body {
 *
 */
 
-/* body {
-  background: #ffd89b;
-  background: -webkit-linear-gradient(to right, #ffd89b, #19547b);
-  background: linear-gradient(to right, #ffd89b, #19547b);
-  min-height: 100vh;
-} */
 
 .form-control::placeholder {
   font-size: 0.95rem;
@@ -223,56 +204,10 @@ body {
             ><span class="pc-mtext">หน้าร้าน</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span
           ></a>
 
-          <!-- <ul class="pc-submenu">
-            <li class="pc-item"><a class="pc-link" href="sample-page.php">หน้าขาย</a></li>
-
-            <li class="pc-item"><a class="pc-link" href="sample-page.php">ประวัติการขาย</a></li>
-
-
-
-
-            <li class="pc-item pc-hasmenu">
-              <a href="#!" class="pc-link"
-                >ประวัติการขาย<span class="pc-arrow"><i data-feather="chevron-right"></i></span
-              ></a>
-              <ul class="pc-submenu">
-                <li class="pc-item"><a class="pc-link" href="#!">Level 3.1</a></li>
-                <li class="pc-item"><a class="pc-link" href="#!">Level 3.2</a></li>
-                <li class="pc-item pc-hasmenu">
-                  <a href="#!" class="pc-link"
-                    >Level 3.3<span class="pc-arrow"><i data-feather="chevron-right"></i></span
-                  ></a>
-                  <ul class="pc-submenu">
-                    <li class="pc-item"><a class="pc-link" href="#!">Level 4.1</a></li>
-                    <li class="pc-item"><a class="pc-link" href="#!">Level 4.2</a></li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-
-            <li class="pc-item pc-hasmenu">
-              <a href="#!" class="pc-link"
-                >Level 2.3<span class="pc-arrow"><i data-feather="chevron-right"></i></span
-              ></a>
-              <ul class="pc-submenu">
-                <li class="pc-item"><a class="pc-link" href="#!">Level 3.1</a></li>
-                <li class="pc-item"><a class="pc-link" href="#!">Level 3.2</a></li>
-                <li class="pc-item pc-hasmenu">
-                  <a href="#!" class="pc-link"
-                    >Level 3.3<span class="pc-arrow"><i data-feather="chevron-right"></i></span
-                  ></a>
-                  <ul class="pc-submenu">
-                    <li class="pc-item"><a class="pc-link" href="#!">Level 4.1</a></li>
-                    <li class="pc-item"><a class="pc-link" href="#!">Level 4.2</a></li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-          </ul> -->
 
           <ul class="pc-submenu">
     <li class="pc-item">
-        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sample-page.php' ? 'active' : '') ?>" href="sample-page.php">หน้าขาย</a>
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sale.php' ? 'active' : '') ?>" href="sale.php">หน้าขาย</a>
     </li>
     <li class="pc-item">
         <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sample-page2.php' ? 'active' : '') ?>" href="sample-page2.php">ประวัติการขาย</a>
@@ -415,12 +350,6 @@ body {
       <div class="card nav-action-card bg-brand-color-9">
         <div class="card-body" style="background-image: url('../assets/images/layout/nav-card-bg.svg')">
 
-        <!-- <h5 id="clock" class="text-white text-center">00:00:00</h5>
-        <h8 class="text-white text-center" id="date"></h8> -->
-
-          <!-- <h5 class="text-white">Upgrade to Pro</h5>
-          <p class="text-white text-opacity-75">To get more features and components</p>
-          <a href="https://codedthemes.com/item/gradient-able-admin-template/" class="btn btn-light" target="_blank">Buy now</a> -->
         </div>
       </div>
     </div>
@@ -430,7 +359,7 @@ body {
 
 <header class="pc-header">
   <div class="m-header">
-    <a href="sample-page.php" class="b-brand text-primary">
+    <a href="sale.php" class="b-brand text-primary">
       <img src="../assets/images/logo/logo_homeware.png" alt="logo image" class="logo-lg" height="45">
     </a>
   </div>
@@ -539,7 +468,7 @@ body {
       <div class="card-body">
         <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
         <p class="card-text"><?= number_format($data['price'], );?> บาท</p>                  
-        <a href="sample-page.php?id=<?=$data['id'];?>" class="btn btn-primary">เพิ่ม</a>
+        <a href="sale.php?id=<?=$data['id'];?>" class="btn btn-primary">เพิ่ม</a>
       </div>
     </div>
   </div>
@@ -604,9 +533,6 @@ body {
 
           </table>
 
-          <!-- <p class="d-grid gap-1">
-          <button class="btn btn-success" type="button">ชำระเงิน</button>
-          </p> -->
 
 
           <!-- ปุ่มที่กดเพื่อเปิด Modal -->
@@ -639,10 +565,6 @@ body {
         <div class="col-md">
           <div class="form-floating">
 
-            <!-- <select class="form-select" id="payment" aria-label="payment" name="payments">
-              <option value="cash">เงินสด</option>
-              <option value="promptpay">PromtPay</option>
-            </select> -->
 
             <select class="form-select" id="payment" aria-label="payment" name="payments">
             <?php
@@ -728,10 +650,6 @@ header("Location: detail.php?product_name=$product_name&product_quantity=$produc
 <script>preset_change("preset-1");</script>
 <script>header_change("header-1");</script>
 
-<!-- <style>
-@import "style.css";
-@import url("style.css");
-</style> -->
 
 
 <script>
