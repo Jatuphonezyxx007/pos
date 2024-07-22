@@ -238,7 +238,7 @@ body {
 
 
 
-        <li class="pc-item pc-hasmenu">
+        <!-- <li class="pc-item pc-hasmenu">
           <a href="#!" class="pc-link"
             ><span class="pc-micon">
             <i class="ph ph-folder"></i> </span>
@@ -249,19 +249,23 @@ body {
             <li class="pc-item"><a class="pc-link" href="#!">เอกสาร</a></li>
             <li class="pc-item"><a class="pc-link" href="#!">ประวัติการขาย</a></li>
           </ul>
-        </li>
+        </li> -->
 
-                <li class="pc-item pc-hasmenu">
+        <li class="pc-item pc-hasmenu">
           <a href="#!" class="pc-link"
             ><span class="pc-micon">
             <i class="ph ph-package"></i> </span>
             <span class="pc-mtext">สินค้า</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span
           ></a>
+
           <ul class="pc-submenu">
-            <li class="pc-item"><a class="pc-link" href=".products_list.php">รายการสินค้า</a></li>
-            <li class="pc-item"><a class="pc-link" href="#!">เพิ่มรายการสินค้า</a></li>
-            <li class="pc-item"><a class="pc-link" href="#!">นำเข้า/รับซื้อ</a></li>
-          </ul>
+    <li class="pc-item">
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/products_list.php' ? 'active' : '') ?>" href="products_list.php">รายการสินค้า</a>
+    </li>
+    <!-- <li class="pc-item">
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sample-page2.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
+    </li> -->
+</ul>
         </li>
 
         <li class="pc-item pc-caption">
@@ -394,9 +398,12 @@ body {
 
     <!-- เพิ่ม form control ตรงนี้ -->
     <form method="post" class="search-form" onsubmit="return false;">
-      <input type="text" name="src" placeholder="ค้นหาสินค้า" class="search-input" autofocus>
+      <input type="text" name="src2" placeholder="ค้นหาเลขที่ใบสั่งซื้อ" class="search-input" autofocus>
       <a class="btn btn-primary"><i class="ph ph-magnifying-glass"></i></a>
     </form>
+
+
+
 
     <div class="ms-auto">
       <h7 id="clock" class="text-white text-center">00:00:00</h7>
@@ -468,9 +475,19 @@ body {
   <!-- [ Main Content ] start -->
 
   <!-- [ Main Content ] start -->
+
   <div class="pc-container">
     <div class="pc-content">
       <!-- [ breadcrumb ] start -->
+
+      <?php
+    include("connectdb.php");
+    @$src = $_POST['src2'];
+    $sql = "SELECT * FROM `orders` WHERE (`order_id` LIKE '%{$src}%')";
+    $rs = mysqli_query($conn, $sql);
+    while ($data = mysqli_fetch_array($rs)){
+  ?>
+
       <div class="page-header">
         <div class="page-block card mb-0">
           <div class="card-body">
@@ -484,12 +501,13 @@ body {
               <table class="table table-striped table-sm-gap" width="100%">
   <thead>
   <tr>
-                    <td width="10%" class="text-center">&nbsp;</td>
+                    <td width="10%" class="text-center"></td>
                     <td width="10%" class="text-center">เลขที่ใบสั่งซื้อ</td>
                     <td width="15%" class="text-start">วันที่ (สร้าง)</td>
-                    <td width="10%" class="text-end">ราคารวม (บาท)</td>
-                    <td width="20%" class="text-center">พนักงาน</td>
-                    <td width="15%" class="text-center">ชำระโดย</td>
+                    <td width="12%" class="text-end">ราคารวม (บาท)</td>
+                    <td width="10%" class="text-center">พนักงาน</td>
+                    <td width="13%" class="text-center">ชำระโดย</td>
+                    <td width="10%" class="text-center">สถานะ</td>
                     <td width="20%" class="text-center">รายการ</td>
 
 
@@ -501,9 +519,10 @@ body {
   <?php
   include("connectdb.php");
   
-  $sql = "SELECT o.*, pm.paymethod_name 
+  $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
           FROM orders o 
-          JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id 
+          JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
+          JOIN employees ep ON  o.emp_id = ep.emp_id
           ORDER BY o.order_id DESC";
   
   $rs = mysqli_query($conn, $sql);
@@ -517,10 +536,16 @@ body {
       <td class="text-center"><?=$data['order_id'];?></td>
       <td class="text-start"><?=$data['order_date'];?></td>
       <td class="text-end"><?=number_format($data['order_total'], 2);?></td>
-      <td class="text-center">&nbsp;</td>
+      <td class="text-center"><?=$data['emp_name'];?></td>
       <td class="text-center"><?=$data['paymethod_name'];?></td>
+      <td class="text-center">&nbsp;</td>
       <td class="text-center">
         <a href="delete.php?id=<?=$data['order_id'];?>" type="button" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?');">คืนสินค้า</a>
+
+        <a type="button" class="btn btn-success" onClick="window.open('bill_print.php?b=<?=$data['order_id'];?>', '_blank', 'width=760,height=560')">ใบเสร็จ</a>
+
+        <!-- <a type="button" class="btn btn-success" onClick="window.open('bill_print.php?id=<?=$data['order_id'];?>, '_blank', 'width=760,height=560px')">ใบเสร็จ</a> -->
+
       </td>
     </tr>
   <?php  
@@ -530,6 +555,7 @@ body {
 
 
 </table>
+
 
 
             </div>
@@ -746,6 +772,12 @@ body {
       </div>
       <!-- [ Main Content ] end -->
     </div>
+
+    <?php
+    }
+    mysqli_close($conn);
+  ?> 
+
   </div>
   <!-- [ Main Content ] end -->
 
@@ -757,18 +789,6 @@ body {
 
 
 
-
-  <?php
-// ดึงข้อมูลการซื้อจากหน้า checkout.php
-// $product_name = $_POST['product_name'];
-// $product_quantity = $_POST['product_quantity'];
-// $product_price = $_POST['product_price'];
-// $total_price = $product_quantity * $product_price;
-
-// ส่งข้อมูลการซื้อไปยังหน้า detail.php
-// header("Location: detail.php?product_name=$product_name&product_quantity=$product_quantity&product_price=$product_price&total_price=$total_price");
-
-?>
 
   
         <div class="col-sm-6 ms-auto my-1">

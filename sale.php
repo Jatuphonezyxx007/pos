@@ -26,7 +26,7 @@ error_reporting(E_NOTICE);
 <!-- [Head] start -->
 
 <head>
-  <title>Sample Page | Gradient Able Dashboard Template</title>
+  <title>POS | Point of Sale</title>
   <!-- [Meta] -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -217,11 +217,7 @@ body {
 
         </li>
 
-
-
-
-
-        <li class="pc-item pc-hasmenu">
+        <!-- <li class="pc-item pc-hasmenu">
           <a href="#!" class="pc-link"
             ><span class="pc-micon">
             <i class="ph ph-folder"></i> </span>
@@ -232,19 +228,23 @@ body {
             <li class="pc-item"><a class="pc-link" href="#!">เอกสาร</a></li>
             <li class="pc-item"><a class="pc-link" href="#!">ประวัติการขาย</a></li>
           </ul>
-        </li>
+        </li> -->
 
-                <li class="pc-item pc-hasmenu">
+        <li class="pc-item pc-hasmenu">
           <a href="#!" class="pc-link"
             ><span class="pc-micon">
             <i class="ph ph-package"></i> </span>
             <span class="pc-mtext">สินค้า</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span
           ></a>
+
           <ul class="pc-submenu">
-            <li class="pc-item"><a class="pc-link" href=".products_list.php">รายการสินค้า</a></li>
-            <li class="pc-item"><a class="pc-link" href="#!">เพิ่มรายการสินค้า</a></li>
-            <li class="pc-item"><a class="pc-link" href="#!">นำเข้า/รับซื้อ</a></li>
-          </ul>
+    <li class="pc-item">
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/products_list.php' ? 'active' : '') ?>" href="products_list.php">รายการสินค้า</a>
+    </li>
+    <!-- <li class="pc-item">
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sample-page2.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
+    </li> -->
+</ul>
         </li>
 
         <li class="pc-item pc-caption">
@@ -449,76 +449,41 @@ body {
 <!-- [ Header ] end -->
 
   <!-- [ Main Content ] start -->
-<div class="col-12 col-md-9">
-  <div class="pc-container px-1">
-        <div class="pc-content">
-          <br> 
-<div id="product-list" class="row g-2">
-  <?php
-    include("connectdb.php");
-    @$src = $_POST['src'];
-    $sql = "SELECT * FROM `products` WHERE (`barcode` LIKE '%{$src}%' OR `name` LIKE '%{$src}%') ORDER BY `products`.`type_id` ASC";
-    $rs = mysqli_query($conn, $sql);
-    while ($data = mysqli_fetch_array($rs)){
-  ?>
-
-  <div class="col-sm-12 col-md-3 col-lg-4">
-    <div class="card">
-      <img src="assets/images/products_2/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="280px">
-      <div class="card-body">
-        <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
-        <p class="card-text"><?= number_format($data['price'], 2 );?> บาท</p>
-        <a href="sale.php?id=<?=$data['id'];?>" class="btn btn-primary">เพิ่ม</a>
-
-        <!-- <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="<?=$data['id'];?>" data-name="<?=$data['name'];?>">เพิ่ม</a> -->
-
-<!-- Modal -->
-<!-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">NameProduct</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        
-      <div class="row g-3 align-items-center">
-  <div class="col-auto">
-    <label for="inputPassword6" class="col-form-label">จำนวน</label>
-  </div>
-  <div class="col-auto">
-    <input type="number" id="qty" class="form-control" value="1">
-  </div>
-  <div class="col-auto">
-    <span id="passwordHelpInline" class="form-text">X 
-    <?= number_format($data['price'], );?> บาท
-    </span>
-  </div>
-</div>
-</div>
-      
-<div class="modal-footer">
-  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
-  <a href="sale.php?id=<?=$data['id'];?>" class="btn btn-primary">ตกลง</a>
-    </div>
-    </div>
-  </div>
-</div> -->
-
-
-      </div>
-    </div>
-  </div>
-  
-  <?php
-    }
-    mysqli_close($conn);
-  ?> 
-</div>
+  <div class="col-12 col-md-9">
+        <div class="pc-container px-1">
+            <div class="pc-content">
+                <br> 
+                <div id="product-list" class="row g-2">
+                    <?php
+                    include("connectdb.php");
+                    @$src = $_POST['src'];
+                    $sql = "SELECT * FROM `products` WHERE (`barcode` LIKE '%{$src}%' OR `name` LIKE '%{$src}%') ORDER BY `products`.`type_id` ASC";
+                    $rs = mysqli_query($conn, $sql);
+                    while ($data = mysqli_fetch_array($rs)){
+                    ?>
+                    <div class="col-sm-12 col-md-3 col-lg-4">
+                        <div class="card">
+                            <img src="assets/images/products_2/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="280px">
+                            <div class="card-body">
+                                <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
+                                <p class="card-text"><?= number_format($data['price'], 2 );?> บาท</p>
+                                <a href="#" class="btn btn-primary" onclick="addItem(<?=$data['id'];?>)">เพิ่ม</a>
+                            </div>
+                        </div>
+                    </div>
+                    <?php
+                    }
+                    mysqli_close($conn);
+                    ?> 
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
+
+
+
+    
     <div class="col-6 col-md-3 fixed-col">
           <div class="row">
             <center>
@@ -545,7 +510,7 @@ body {
               <tr>
                   <td style="vertical-align: top;"><?=$i;?></td>
                   <td style="vertical-align: top;"><?=$_SESSION['sname'][$pid];?><br>
-                  <a href="clear_product.php?id=<?=$pid;?>" class="ph ph-trash text-danger"></a>
+                  <a href="clear_product.php?id=<?=$pid;?>" class="ph ph-trash text-danger" onclick="refreshPage()"></a>
                 </td>
                   <td style="vertical-align: top;"><?=$_SESSION['sitem'][$pid];?></td>
                   <td style="vertical-align: top;"><?=number_format($_SESSION['sprice'][$pid],0);?></td>
@@ -564,7 +529,7 @@ body {
                   ?>
                   
                   <tr>
-                    <td colspan="7" height="50" align="center">ไม่มีสินค้าในตะกร้า</td>
+                    <td colspan="7" height="50" align="center">ไม่มีสินค้าในรายการ</td>
                   </tr>
                   <?php } // end if ?>
             </thead>
@@ -584,10 +549,16 @@ body {
 
 
           <p class="d-inline-flex gap-1">
-  <a href="clear.php" class="btn btn-danger">ล้างทั้งหมด</a>
+
+  <!-- <a href="clear.php" class="btn btn-danger">ล้างทั้งหมด</a> -->
+
+  <a href="clear.php" class="btn btn-danger" onclick="refreshPage()">ล้างทั้งหมด</a>
+
 </p>
         </div>
       </div>
+    
+    
     </div>
 
     <!-- Modal -->
@@ -687,7 +658,7 @@ $product_price = $_POST['product_price'];
 $total_price = $product_quantity * $product_price;
 
 // ส่งข้อมูลการซื้อไปยังหน้า detail.php
-header("Location: detail.php?product_name=$product_name&product_quantity=$product_quantity&product_price=$product_price&total_price=$total_price");
+// header("Location: detail.php?product_name=$product_name&product_quantity=$product_quantity&product_price=$product_price&total_price=$total_price");
 
 ?>
 
@@ -751,6 +722,35 @@ document.addEventListener('DOMContentLoaded', function() {
     modalTitle.textContent = productName; // Update the modal's title with the product name
   });
 });
+
+function addItem(productId) {
+    // บันทึกสัญญาณรีเฟรชใน localStorage
+    localStorage.setItem('refreshTable', 'true');
+
+    // ส่งข้อความไปยังหน้าต่างที่เปิดอยู่ของ table_sale.php
+    const openTableSaleWindow = window.open('', 'tableSale');
+    if (openTableSaleWindow) {
+        openTableSaleWindow.postMessage('refreshTable', '*');
+    }
+
+    // รีเฟรชหน้า sale.php พร้อมส่ง productId
+    window.location.href = 'sale.php?id=' + encodeURIComponent(productId);
+}
+
+function refreshPage(btn_clear){
+    // บันทึกสัญญาณรีเฟรชใน localStorage
+    localStorage.setItem('refreshTable', 'true');
+
+    // ส่งข้อความไปยังหน้าต่างที่เปิดอยู่ของ table_sale.php
+    const openTableSaleWindow = window.open('', 'tableSale');
+    if (openTableSaleWindow) {
+        openTableSaleWindow.postMessage('refreshTable', '*');
+    }
+
+    // รีเฟรชหน้า sale.php พร้อมส่ง productId
+    // window.location.href = 'sale.php?id=' + encodeURIComponent(productId);
+  
+};
 
 
 </script>
