@@ -61,7 +61,7 @@ error_reporting(E_NOTICE);
       // Function to fetch and display products
       function fetchProducts(query) {
         $.ajax({
-          url: "fetch_products.php",
+          url: "fetch_products2.php",
           method: "POST",
           data: { query: query },
           success: function(data) {
@@ -453,11 +453,20 @@ body {
 <!-- [ Header ] end -->
 
   <!-- [ Main Content ] start -->
-  <div class="col-12 col-md-9">
+  <div class="col-12 col-sm-8 col-md-12">
         <div class="pc-container px-1">
             <div class="pc-content">
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <!-- <button class="btn btn-success" type="button">เพิ่มรายการสินค้า</button> -->
+                                     <a href="add_product.php" class="btn btn-success">เพิ่มรายการสินค้า</a>
+                                </div>
+
                 <br> 
                 <div id="product-list" class="row g-2">
+
+
+
                     <?php
                     include("connectdb.php");
                     @$src = $_POST['src'];
@@ -465,13 +474,19 @@ body {
                     $rs = mysqli_query($conn, $sql);
                     while ($data = mysqli_fetch_array($rs)){
                     ?>
-                    <div class="col-sm-12 col-md-3 col-lg-4">
+                    <div class="col-sm-12 col-md-4 col-lg-3">
                         <div class="card">
                             <img src="assets/images/products_2/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="280px">
                             <div class="card-body">
                                 <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
                                 <p class="card-text"><?= number_format($data['price'], 2 );?> บาท</p>
-                                <a href="#" class="btn btn-primary" onclick="addItem(<?=$data['id'];?>)">เพิ่ม</a>
+
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button class="btn btn-primary me-md-2" type="button">แก้ไข</button>
+                                    <button class="btn btn-danger" type="button">ลบ</button>
+                                </div>
+
+
                             </div>
                         </div>
                     </div>
@@ -486,161 +501,9 @@ body {
 
 
 
-
-    
-    <div class="col-6 col-md-3 fixed-col">
-          <div class="row">
-            <center>
-            <h1>รายการสินค้า</h1>
-            </center>
-
-            <table class="table">
-              <thead>
-                <tr>
-                  <td width="5%" class="text-center">ที่</td>
-                  <td width="75%" class="text-center">สินค้า</td>
-                  <td width="10%" class="text-center">จำนวน</td>
-                  <td width="10%" class="text-center">ราคา</td>
-              </tr>
-              
-              <?php
-              if(!empty($_SESSION['sid'])) {
-                foreach($_SESSION['sid'] as $pid) {
-                  @$i++;
-                  $sum[$pid] = $_SESSION['sprice'][$pid] * $_SESSION['sitem'][$pid] ;
-                  @$total += $sum[$pid] ;
-                  ?>
-
-              <tr>
-                  <td style="vertical-align: top;"><?=$i;?></td>
-                  <td style="vertical-align: top;"><?=$_SESSION['sname'][$pid];?><br>
-                  <a href="clear_product.php?id=<?=$pid;?>" class="ph ph-trash text-danger" onclick="refreshPage()"></a>
-                </td>
-                  <td style="vertical-align: top;"><?=$_SESSION['sitem'][$pid];?></td>
-                  <td style="vertical-align: top;"><?=number_format($_SESSION['sprice'][$pid],0);?></td>
-                </tr>
-                <?php } // end foreach ?>
-
-              <tr>
-                  <td><strong>รวม</strong></td>
-                  <td></td>
-                  <td style="vertical-align: top;"><strong><?= number_format($total, 2); ?></strong></td>
-                  <td><strong> บาท</strong></td>
-                  </tr>
-                
-                <?php 
-                } else {
-                  ?>
-                  
-                  <tr>
-                    <td colspan="7" height="50" align="center">ไม่มีสินค้าในรายการ</td>
-                  </tr>
-                  <?php } // end if ?>
-            </thead>
-
-          </table>
-
-
-
-          <!-- ปุ่มที่กดเพื่อเปิด Modal -->
-<p class="d-grid gap-1">
-  <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    ชำระเงิน
-  </button>
-</p>
-
-
-
-
-          <p class="d-inline-flex gap-1">
-
-  <!-- <a href="clear.php" class="btn btn-danger">ล้างทั้งหมด</a> -->
-
-  <a href="clear.php" class="btn btn-danger" onclick="refreshPage()">ล้างทั้งหมด</a>
-
-</p>
-        </div>
-      </div>
-    
-    
     </div>
-
-    <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">การชำระเงิน</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-
-      <!-- <form method="post" action="">
-      <div class="modal-body">
-        <div class="col-md">
-          <div class="form-floating">
-
-            <select class="form-select" id="payment" aria-label="payment" name="payments">
-            <?php
-                            include("connectdb.php");
-                            $sql2 = "SELECT * FROM `paymethod`";
-                            $rs2 = mysqli_query($conn, $sql2);
-                            while ($data2 = mysqli_fetch_array($rs2)){
-                              ?>
-                              <option value="<?=$data2['PayMethod_id'];?>"<?=($data2['PayMethod_id']==$data['paymethod'])?"selected":"";?>>
-                              <?=$data2['PayMethod_name'];?></option>  
-                              <?php } ?>
-                            </select>
-                          
-
-            <label for="payment">ประเภทการชำระ</label>
-          </div>
-        </div>
-      </div>
-      </form>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ย้อนกลับ</button>
-        
-        <p class="d-grid gap-1">
-        <a href="record.php" class="btn btn-primary">ชำระเงิน</a>
-        </p> -->
-        <!-- </form> -->
-
-
-        <form method="post" action="record.php">
-  <div class="modal-body">
-    <div class="col-md">
-      <div class="form-floating">
-        <select class="form-select" id="payment" aria-label="payment" name="payments">
-          <?php
-            include("connectdb.php");
-            $sql2 = "SELECT * FROM `paymethod`";
-            $rs2 = mysqli_query($conn, $sql2);
-            while ($data2 = mysqli_fetch_array($rs2)) {
-          ?>
-            <option value="<?=$data2['PayMethod_id'];?>"<?=($data2['PayMethod_id'] == $data['paymethod']) ? "selected" : ""; ?>>
-              <?=$data2['PayMethod_name'];?>
-            </option>
-          <?php } ?>
-        </select>
-        <label for="payment">ประเภทการชำระ</label>
-      </div>
+    </div>  
     </div>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ย้อนกลับ</button>
-    <button type="submit" class="btn btn-primary">ชำระเงิน</button>
-  </div>
-</form>
-
-        
-
-
-        <!-- <button type="button" class="btn btn-primary">เลือก</button> -->
-        
-      </div>
-    </div>
-  </div>
 </div>
 
 
@@ -726,33 +589,6 @@ document.addEventListener('DOMContentLoaded', function() {
     modalTitle.textContent = productName; // Update the modal's title with the product name
   });
 });
-
-function addItem(productId) {
-    // บันทึกสัญญาณรีเฟรชใน localStorage
-    localStorage.setItem('refreshTable', 'true');
-
-    // ส่งข้อความไปยังหน้าต่างที่เปิดอยู่ของ table_sale.php
-    const openTableSaleWindow = window.open('', 'tableSale');
-    if (openTableSaleWindow) {
-        openTableSaleWindow.postMessage('refreshTable', '*');
-    }
-
-    // รีเฟรชหน้า sale.php พร้อมส่ง productId
-    window.location.href = 'sale.php?id=' + encodeURIComponent(productId);
-}
-
-function refreshPage(btn_clear){
-    // บันทึกสัญญาณรีเฟรชใน localStorage
-    localStorage.setItem('refreshTable', 'true');
-
-    // ส่งข้อความไปยังหน้าต่างที่เปิดอยู่ของ table_sale.php
-    const openTableSaleWindow = window.open('', 'tableSale');
-    if (openTableSaleWindow) {
-        openTableSaleWindow.postMessage('refreshTable', '*');
-    }
-
-  
-};
 
 
 </script>
