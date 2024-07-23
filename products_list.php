@@ -245,7 +245,7 @@ body {
         <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sale.php' ? 'active' : '') ?>" href="sale.php">หน้าขาย</a>
     </li>
     <li class="pc-item">
-        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sample-page2.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == 'sale_history.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
     </li>
 </ul>
 
