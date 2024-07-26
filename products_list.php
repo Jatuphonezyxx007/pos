@@ -103,7 +103,7 @@ body {
 }
 
 
-.status-ready {
+/* .status-ready {
   color: green;
 }
 .status-almost {
@@ -111,7 +111,9 @@ body {
 }
 .status-out {
   color: red;
-}
+} */
+
+
 
 
 .fixed-col {
@@ -526,16 +528,17 @@ body {
                 </div>
               </div>
 
-              <table class="table table-striped table-sm-gap" width="100%">
+              <div class="table-responsive">
+              <table class="table" width="100%">
   <thead>
   <tr>
                     <td width="8%" class="text-center">รหัสสินค้า</td>
-                    <td width="17%" class="text-center">คิดไม่ออก</td>
+                    <td width="17%" class="text-center">&nbsp;</td>
                     <td width="25%" class="text-start">ชื่อสินค้า</td>
                     <td width="10%" class="text-center">จำนวน</td>
                     <td width="10%" class="text-end">ราคา (บาท)</td>
                     <td width="20%" class="text-center">หมวดหมู่</td>
-                    <td width="10%" class="text-center">สถานะ</td>
+                    <td width="10%" class="text-start">สถานะ</td>
 
 
                     <!-- <th width="5%">&nbsp;</th> -->
@@ -565,11 +568,11 @@ body {
         while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
             $status_class = '';
             if ($data['status'] == 'พร้อมขาย') {
-                $status_class = 'status-ready';
+                $status_class = 'badge bg-success';
             } elseif ($data['status'] == 'ใกล้หมด') {
-                $status_class = 'status-almost';
+                $status_class = 'badge bg-warning';
             } else {
-                $status_class = 'status-out';
+                $status_class = 'badge bg-danger';
             }
         ?>
             <tr>
@@ -581,7 +584,7 @@ body {
                 <td class="text-center"><?=$data['qty'];?></td>
                 <td class="text-end"><?=number_format($data['price'], 2);?></td>
                 <td class="text-center"><?=$data['type_name'];?></td>
-                <td class="text-center <?=$status_class;?>"><?=$data['status'];?></td>
+                <td><span class="text-center <?=$status_class;?>"><?=$data['status'];?></span></td>
             </tr>
         <?php  
         }  
@@ -589,6 +592,7 @@ body {
         </tbody>
 
 </table>
+</div>
 
 
 
