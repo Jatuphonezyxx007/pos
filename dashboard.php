@@ -1,8 +1,23 @@
 <?php
 include('connectdb.php');
 
+// รับ emp_id และ paymethod_id จากฟอร์ม
+$selected_emp_id = isset($_POST['emp_id']) ? $_POST['emp_id'] : 0;
+$selected_paymethod_id = isset($_POST['paymethod_id']) ? $_POST['paymethod_id'] : 0;
+
 // ดึงข้อมูลจากตาราง orders และจัดรูปแบบวันที่
-$sql = "SELECT DATE_FORMAT(order_date, '%d-%m-%Y') as formatted_date, SUM(order_total) as total_sales FROM orders GROUP BY formatted_date ORDER BY order_date";
+$sql = "SELECT DATE_FORMAT(order_date, '%d-%m-%Y') as formatted_date, SUM(order_total) as total_sales FROM orders WHERE 1=1";
+
+if ($selected_emp_id != 0) {
+  $sql .= " AND emp_id = $selected_emp_id";
+}
+
+if ($selected_paymethod_id != 0) {
+  $sql .= " AND paymethod_id = $selected_paymethod_id";
+}
+
+$sql .= " GROUP BY formatted_date ORDER BY order_date";
+
 $result = $conn->query($sql);
 
 $dates = [];
@@ -474,12 +489,56 @@ body {
 
                 
                 <div class="col-12 col-md-12">
-                <h5>ยอดขาย</h5>
+                <h5>Dashboard</h5>
                 </div>
 
+                <div class="row">
+        <div class="col-md-6 col-xl-3">
+          <div class="card bg-grd-primary order-card">
+            <div class="card-body">
+              <h6 class="text-white">Orders Received</h6>
+              <h2 class="text-end text-white"><i class="feather icon-shopping-cart float-start"></i><span>486</span>
+              </h2>
+              <p class="m-b-0">Completed Orders<span class="float-end">351</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="card bg-grd-success order-card">
+            <div class="card-body">
+              <h6 class="text-white">Total Sales</h6>
+              <h2 class="text-end text-white"><i class="feather icon-tag float-start"></i><span>1641</span>
+              </h2>
+              <p class="m-b-0">This Month<span class="float-end">213</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="card bg-grd-warning order-card">
+            <div class="card-body">
+              <h6 class="text-white">Revenue</h6>
+              <h2 class="text-end text-white"><i class="feather icon-repeat float-start"></i><span>$42,562</span></h2>
+              <p class="m-b-0">This Month<span class="float-end">$5,032</span></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+          <div class="card bg-grd-danger order-card">
+            <div class="card-body">
+              <h6 class="text-white">Total Profit</h6>
+              <h2 class="text-end text-white"><i class="feather icon-award float-start"></i><span>$9,562</span></h2>
+              <p class="m-b-0">This Month<span class="float-end">$542</span></p>
+            </div>
+          </div>
+        </div>
+        <!-- Recent Orders end -->
+      </div>
+
+      
                 <br>
 
-                <form>
+                <form action="" method="post">
 
                 <div class="row">
 
@@ -493,37 +552,58 @@ body {
                 </div>
 
                 <div class="col-2 col-md-2">
-                  <select class="form-select" aria-label="Default select example">
-                    <option selected>Open this select menu</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
-                  </select>
+                <select class="form-select" name="paymethod_id" aria-label="Default select example">
+        <option value="0">การชำระเงิน</option>
+        <?php
+        include("connectdb.php");
+
+        // ดึงชื่อพนักงานจากตาราง employees
+        $sql = "SELECT paymethod_id, paymethod_name FROM paymethod";
+        $result = mysqli_query($conn, $sql);
+
+        while ($row = mysqli_fetch_array($result)) {
+          $paymethod_id = $row['paymethod_id'];
+          ?>
+          <option value="<?=$paymethod_id;?>" <?=($selected_paymethod_id == $paymethod_id) ? 'selected' : '';?>>
+            <?=$row['paymethod_name'];?>
+          </option>
+        <?php } ?>
+      </select>
                 </div>
 
                 <div class="col-2 col-md-2">
-                  <select class="form-select" aria-label="Default select example">
-                    <option selected>Open this select menu</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
-                  </select>
+                
+                <select class="form-select" name="emp_id" aria-label="Default select example">
+        <option value="0">พนักงานทั้งหมด</option>
+        <?php
+        include("connectdb.php");
+
+        // ดึงชื่อพนักงานจากตาราง employees
+        $sql = "SELECT emp_id, emp_name FROM employees";
+        $result = mysqli_query($conn, $sql);
+
+        while ($row = mysqli_fetch_array($result)) {
+          $emp_id = $row['emp_id'];
+          ?>
+          <option value="<?=$emp_id;?>" <?=($selected_emp_id == $emp_id) ? 'selected' : '';?>>
+            <?=$row['emp_name'];?>
+          </option>
+        <?php } ?>
+      </select>
                 </div>
 
                 <div class="col-2 col-md-2">
                   <input class="form-control" type="date" placeholder="เลือกวัน">
                 </div>
 
-
                 <div class="col-4 col-md-4 d-flex justify-content-end">
-                  <a class="btn btn-primary text-white" type="button">ค้นหา</a>
-                </div>
+      <button class="btn btn-primary text-white" type="submit">ค้นหา</button>
+    </div>
 
                 </div>
                 </form>
 
                 <br>
-
 
 
 
@@ -554,24 +634,6 @@ body {
     <div class="footer-wrapper container-fluid">
       <div class="row">
 
-
-
-
-
-
-  <?php
-// ดึงข้อมูลการซื้อจากหน้า checkout.php
-// $product_name = $_POST['product_name'];
-// $product_quantity = $_POST['product_quantity'];
-// $product_price = $_POST['product_price'];
-// $total_price = $product_quantity * $product_price;
-
-// ส่งข้อมูลการซื้อไปยังหน้า detail.php
-// header("Location: detail.php?product_name=$product_name&product_quantity=$product_quantity&product_price=$product_price&total_price=$total_price");
-
-?>
-
-  
         <div class="col-sm-6 ms-auto my-1">
           <ul class="list-inline footer-link mb-0 justify-content-sm-end d-flex">
           <a href="#top" class="text-end">กลับไปบนสุด</a>
@@ -662,31 +724,26 @@ function refreshPage(btn_clear){
   
 };
 
-const salesData = {
-    labels: <?php echo json_encode($dates); ?>,
-    datasets: [{
-      label: 'ยอดขายรวม',
-      data: <?php echo json_encode($sales); ?>,
-      borderColor: 'rgba(75, 192, 192, 1)',
-      fill: false,
-      borderWidth: 1
-    }]
-  };
+const labels = <?php echo json_encode($dates); ?>;
+    const data = {
+      labels: labels,
+      datasets: [{
+        label: 'ยอดขายรวม',
+        data: <?php echo json_encode($sales); ?>,
+        fill: false,
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.1
+      }]
+    };
 
-  const ctx = document.getElementById('myChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'line',
-    data: salesData,
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
+    const config = {
+      type: 'line',
+      data: data,
+    };
+
+    const ctx = document.getElementById('myChart').getContext('2d');
+    new Chart(ctx, config);
+
 
 
 </script>

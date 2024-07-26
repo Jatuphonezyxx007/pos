@@ -13,7 +13,7 @@ if (isset($_POST['payments'])) {
 
     // สร้างคำสั่ง SQL สำหรับการแทรกข้อมูลลงในตาราง orders
     $paymethod_id = $_POST['payments']; // รับค่าจากฟอร์ม
-    $sql = "INSERT INTO `orders` (order_id, order_total, order_date, emp_id, paymethod_id) VALUES ('', '$total', CURRENT_TIMESTAMP, '001', '$paymethod_id')";
+    $sql = "INSERT INTO `orders` (order_id, order_total, order_date, emp_id, paymethod_id) VALUES ('', '$total', CURRENT_TIMESTAMP, '002', '$paymethod_id')";
     mysqli_query($conn, $sql) or die("Insert error");
 
     // รับค่า ID ของการแทรกคำสั่งซื้อที่เพิ่มเข้ามา
