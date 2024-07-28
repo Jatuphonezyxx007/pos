@@ -540,6 +540,7 @@ body {
       <td class="text-center"><?=$data['paymethod_name'];?></td>
       <td class="text-center">&nbsp;</td>
       <td class="text-center">
+        
         <a href="delete.php?id=<?=$data['order_id'];?>" type="button" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?');">คืนสินค้า</a>
 
         <a type="button" class="btn btn-success" onClick="window.open('bill_print.php?b=<?=$data['order_id'];?>', '_blank', 'width=760,height=560')">ใบเสร็จ</a>
