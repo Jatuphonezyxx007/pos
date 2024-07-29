@@ -454,38 +454,70 @@ body {
 
   <!-- [ Main Content ] start -->
   <div class="col-12 col-md-9">
-        <div class="pc-container px-1">
-            <div class="pc-content">
-                <br> 
-                <div id="product-list" class="row g-2">
-                    <?php
-                    include("connectdb.php");
-                    @$src = $_POST['src'];
-                    $sql = "SELECT * FROM `products` WHERE (`barcode` LIKE '%{$src}%' OR `name` LIKE '%{$src}%') ORDER BY `products`.`type_id` ASC";
-                    $rs = mysqli_query($conn, $sql);
-                    while ($data = mysqli_fetch_array($rs)){
-                    ?>
-                    <div class="col-sm-12 col-md-3 col-lg-4">
-                        <div class="card">
-                            <img src="assets/images/products_2/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="280px">
-                            <div class="card-body">
-                                <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
-                                <p class="card-text"><?= number_format($data['price'], 2 );?> บาท</p>
-                                <a href="#" class="btn btn-primary" onclick="addItem(<?=$data['id'];?>)">เพิ่ม</a>
+    <div class="pc-container px-1">
+        <div class="pc-content">
+            <br> 
+            <div id="product-list" class="row g-2">
+                <?php
+                include("connectdb.php");
+                @$src = $_POST['src'];
+                $sql = "SELECT products.*, MIN(size.price) AS min_price, MAX(size.price) AS max_price 
+                FROM `products`
+                JOIN `size` ON products.id = size.id
+                WHERE (`products`.`barcode` LIKE '%{$src}%' OR `products`.`name` LIKE '%{$src}%')
+                GROUP BY products.id
+                ORDER BY `products`.`type_id` ASC";
+        
+                $rs = mysqli_query($conn, $sql);
+                while ($data = mysqli_fetch_array($rs)){
+                ?>
+                <div class="col-sm-12 col-md-3 col-lg-4">
+                    <div class="card">
+                        <img src="assets/images/products_2/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="280px">
+                        <div class="card-body">
+                            <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
+                            <p class="card-text">
+                                <?php if ($data['min_price'] == $data['max_price']) { ?>
+                                    <?= number_format($data['min_price'],); ?> บาท
+                                <?php } else { ?>
+                                    <?= number_format($data['min_price'],); ?> - <?= number_format($data['max_price'],); ?> บาท
+                                <?php } ?>
+                            </p>
+
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-product-name="<?=$data['name'];?>">
+                                เพิ่ม
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">ชื่อรายการสินค้า</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ...
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                                            <button type="button" class="btn btn-primary">Save changes</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <?php
-                    }
-                    mysqli_close($conn);
-                    ?> 
                 </div>
+                <?php
+                }
+                mysqli_close($conn);
+                ?> 
             </div>
         </div>
     </div>
-
-
-
+</div>
 
     
     <div class="col-6 col-md-3 fixed-col">
@@ -751,9 +783,24 @@ function refreshPage(btn_clear){
         openTableSaleWindow.postMessage('refreshTable', '*');
     }
 
+
+    function updateModalTitle(productName) {
+    document.getElementById('exampleModalLabel').textContent = productName;
+}
+
   
 };
 
+
+document.addEventListener('DOMContentLoaded', function() {
+    const exampleModal = document.getElementById('exampleModal');
+    exampleModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const productName = button.getAttribute('data-product-name');
+        const modalTitle = exampleModal.querySelector('.modal-title');
+        modalTitle.textContent = productName;
+    });
+});
 
 </script>
 
