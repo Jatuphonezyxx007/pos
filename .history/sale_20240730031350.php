@@ -543,7 +543,7 @@ body {
                                   <div class="col-4">
     <div class="input-group input-group-sm">
       <button class="btn btn-outline-secondary btn-sm" type="button" onclick="decreaseQuantity()"><i class="ph ph-minus-circle"></i></button>
-      <input class="form-control form-control-sm mx-2" type="number" id="quantity" min="1" value="1" readonly>
+      <input class="form-control form-control-sm mx-2 text-center" type="number" id="quantity" min="1" value="1" readonly>
       <button class="btn btn-outline-secondary btn-sm" type="button" onclick="increaseQuantity()"><i class="ph ph-plus-circle"></i></button>
     </div>
   </div>

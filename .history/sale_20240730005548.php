@@ -54,8 +54,6 @@ error_reporting(E_NOTICE);
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 
 
-
-
   <!-- Add jQuery library -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
@@ -176,28 +174,18 @@ body {
 
 
 .size-button {
-    padding: 10px;
-    margin: 5px;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    cursor: pointer;
+  padding: 10px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
 }
 
 .size-button.selected {
-    background-color: #007bff;
-    color: #fff;
-    border-color: #007bff;
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
 }
-
-
-
-
-
-
-
-
-
-
 
 
   </style>
@@ -534,39 +522,14 @@ body {
 
                                 <br><br>
 
-
                                 <div class="row align-items-center">
-                                <div class="col-2">
-                                    <p class="mb-0">จำนวน</p>
-                                  </div>
-                                  
-                                  <div class="col-4">
-    <div class="input-group input-group-sm">
-      <button class="btn btn-outline-secondary btn-sm" type="button" onclick="decreaseQuantity()"><i class="ph ph-minus-circle"></i></button>
-      <input class="form-control form-control-sm mx-2" type="number" id="quantity" min="1" value="1" readonly>
-      <button class="btn btn-outline-secondary btn-sm" type="button" onclick="increaseQuantity()"><i class="ph ph-plus-circle"></i></button>
-    </div>
-  </div>
-</div>
-
-                                <!-- <div class="row align-items-center">
-                                  <div class="col-2">
-                                    <p class="mb-0">จำนวน</p>
-                                  </div>
-                                  <div class="col-4 d-flex align-items-center input-group">
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="decreaseQuantity()">-</button>
-                                    <input class="form-control form-control-sm mx-2" type="number" id="quantity" min="1" value="1">
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="increaseQuantity()">+</button>
-                                  </div>
-                                </div> -->
-
-                                <div class="input-group">
-  <button id="decrement">-</button>
-  <input type="number" id="input" value="0" readonly>
-  <button id="increment">+</button>
-</div>
-
-
+                                    <div class="col-2">
+                                        <p class="mb-0">จำนวน</p>
+                                    </div>
+                                    <div class="col-2">
+                                        <input class="form-control form-control-sm" type="number" aria-label=".form-control-sm example" min="1" value="1">
+                                    </div>
+                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
@@ -583,7 +546,6 @@ body {
     mysqli_close($conn);
     ?> 
 </div>
-
 
         </div>
     </div>
@@ -793,8 +755,6 @@ $total_price = $product_quantity * $product_price;
 <script>preset_change("preset-1");</script>
 <script>header_change("header-1");</script>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 
 
 <script>
@@ -864,44 +824,22 @@ function refreshPage(btn_clear){
 };
 
 
-
-
-
-
-function decreaseQuantity() {
-    let quantityInput = document.getElementById("quantity");
-    let quantity = parseInt(quantityInput.value);
-    if (quantity > 1) {
-      quantityInput.value = quantity - 1;
-    }
-  }
-
-  function increaseQuantity() {
-    let quantityInput = document.getElementById("quantity");
-    let quantity = parseInt(quantityInput.value);
-    quantityInput.value = quantity + 1;   
-
-  }
-
-
-
-
-
-
+document.addEventListener('DOMContentLoaded', function() {
+    const exampleModal = document.getElementById('exampleModal');
+    exampleModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const productName = button.getAttribute('data-product-name');
+        const modalTitle = exampleModal.querySelector('.modal-title');
+        modalTitle.textContent = productName;
+    });
+});
 
 
 document.addEventListener('DOMContentLoaded', function() {
-    // เมื่อ modal แสดง
     var modal = document.getElementById('exampleModal');
-
     modal.addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget;
+        var button = event.relatedTarget; // Button that triggered the modal
         var productId = button.getAttribute('data-product-id'); // Extract info from data-* attributes
-        var productName = button.getAttribute('data-product-name'); // Extract product name
-
-        // Update modal title
-        var modalTitle = modal.querySelector('.modal-title');
-        modalTitle.textContent = productName;
 
         // Fetch sizes for the selected product
         fetch('fetch_sizes.php', {
@@ -909,7 +847,7 @@ document.addEventListener('DOMContentLoaded', function() {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: 'id=' + productId
+            body: 'product_id=' + productId
         })
         .then(response => response.text())
         .then(data => {
@@ -919,14 +857,34 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Error:', error));
     });
-
-    // เมื่อคลิกที่ปุ่มขนาดใน modal
-    $(document).on('click', '.size-button', function() {
-        // เปลี่ยนสถานะของปุ่มขนาด
-        $('.size-button').removeClass('selected');
-        $(this).addClass('selected');
-    });
 });
+
+
+// $(document).ready(function() {
+//     // เมื่อคลิกที่ปุ่มขนาด
+//     $('.size-button').on('click', function() {
+//         // ดึงค่า id ของขนาดที่เลือก
+//         var selectedSize = $(this).data('size');
+
+//         // ส่งคำขอ AJAX ไปยัง fetch_size.php
+//         $.ajax({
+//             url: 'fetch_sizes.php',
+//             type: 'POST',
+//             data: { id: selectedSize },
+//             success: function(response) {
+//                 // แสดงผลลัพธ์ในพื้นที่ที่กำหนด
+//                 $('#sizes-container').html(response);
+                
+//                 // เปลี่ยนสถานะของปุ่มขนาด
+//                 $('.size-button').removeClass('selected');
+//                 $(this).addClass('selected');
+//             }.bind(this),
+//             error: function() {
+//                 alert('Error fetching size data.');
+//             }
+//         });
+//     });
+// });
 
 
 

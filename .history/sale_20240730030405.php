@@ -197,7 +197,51 @@ body {
 
 
 
+.input-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  box-shadow: 2px 3px 4px rgba(0, 0, 0, 0.3), 4px 7px 15px rgba(0, 0, 0, 0.2),
+    9px 15px 25px rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+  max-width: 360px;
+}
 
+button,
+input {
+  outline: none;
+  border: none;
+  padding: 16px;
+  font-size: 18px;
+}
+
+input {
+  width: 100%;
+  text-align: center;
+}
+
+button {
+  cursor: pointer;
+}
+button:nth-last-child(1) {
+  border-bottom-right-radius: 15px;
+  border-top-right-radius: 15px;
+}
+button:nth-child(1) {
+  border-bottom-left-radius: 15px;
+  border-top-left-radius: 15px;
+}
+
+button:hover {
+  background-color: #e6e6e6;
+}
+button:nth-last-child(1):active {
+  box-shadow: inset -4px 5px 10px rgba(0, 0, 0, 0.5);
+}
+button:nth-child(1):active {
+  box-shadow: inset 4px 5px 10px rgba(0, 0, 0, 0.5);
+}
 
 
   </style>
@@ -542,9 +586,9 @@ body {
                                   
                                   <div class="col-4">
     <div class="input-group input-group-sm">
-      <button class="btn btn-outline-secondary btn-sm" type="button" onclick="decreaseQuantity()"><i class="ph ph-minus-circle"></i></button>
-      <input class="form-control form-control-sm mx-2" type="number" id="quantity" min="1" value="1" readonly>
-      <button class="btn btn-outline-secondary btn-sm" type="button" onclick="increaseQuantity()"><i class="ph ph-plus-circle"></i></button>
+      <button class="btn btn-outline-secondary btn-sm" type="button" onclick="decreaseQuantity()">-</button>
+      <input class="form-control form-control-sm mx-2" type="number" id="quantity" min="1" value="1">
+      <button class="btn btn-outline-secondary btn-sm" type="button" onclick="increaseQuantity()">+</button>
     </div>
   </div>
 </div>

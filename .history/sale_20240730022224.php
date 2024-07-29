@@ -54,8 +54,6 @@ error_reporting(E_NOTICE);
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 
 
-
-
   <!-- Add jQuery library -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
@@ -188,14 +186,6 @@ body {
     color: #fff;
     border-color: #007bff;
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -540,16 +530,16 @@ body {
                                     <p class="mb-0">จำนวน</p>
                                   </div>
                                   
-                                  <div class="col-4">
+                                  <div class="col-3">
     <div class="input-group input-group-sm">
-      <button class="btn btn-outline-secondary btn-sm" type="button" onclick="decreaseQuantity()"><i class="ph ph-minus-circle"></i></button>
-      <input class="form-control form-control-sm mx-2" type="number" id="quantity" min="1" value="1" readonly>
-      <button class="btn btn-outline-secondary btn-sm" type="button" onclick="increaseQuantity()"><i class="ph ph-plus-circle"></i></button>
+      <button class="btn btn-outline-secondary btn-sm" type="button" onclick="decreaseQuantity()">-</button>
+      <input class="form-control form-control-sm mx-2" type="number" id="quantity" min="1" value="1">
+      <button class="btn btn-outline-secondary btn-sm" type="button" onclick="increaseQuantity()">+</button>
     </div>
   </div>
 </div>
 
-                                <!-- <div class="row align-items-center">
+                                <div class="row align-items-center">
                                   <div class="col-2">
                                     <p class="mb-0">จำนวน</p>
                                   </div>
@@ -558,13 +548,7 @@ body {
                                     <input class="form-control form-control-sm mx-2" type="number" id="quantity" min="1" value="1">
                                     <button class="btn btn-sm btn-outline-secondary" onclick="increaseQuantity()">+</button>
                                   </div>
-                                </div> -->
-
-                                <div class="input-group">
-  <button id="decrement">-</button>
-  <input type="number" id="input" value="0" readonly>
-  <button id="increment">+</button>
-</div>
+                                </div>
 
 
                             </div>

@@ -54,8 +54,6 @@ error_reporting(E_NOTICE);
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 
 
-
-
   <!-- Add jQuery library -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
@@ -188,14 +186,6 @@ body {
     color: #fff;
     border-color: #007bff;
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -534,39 +524,14 @@ body {
 
                                 <br><br>
 
-
                                 <div class="row align-items-center">
-                                <div class="col-2">
-                                    <p class="mb-0">จำนวน</p>
-                                  </div>
-                                  
-                                  <div class="col-4">
-    <div class="input-group input-group-sm">
-      <button class="btn btn-outline-secondary btn-sm" type="button" onclick="decreaseQuantity()"><i class="ph ph-minus-circle"></i></button>
-      <input class="form-control form-control-sm mx-2" type="number" id="quantity" min="1" value="1" readonly>
-      <button class="btn btn-outline-secondary btn-sm" type="button" onclick="increaseQuantity()"><i class="ph ph-plus-circle"></i></button>
-    </div>
-  </div>
-</div>
-
-                                <!-- <div class="row align-items-center">
-                                  <div class="col-2">
-                                    <p class="mb-0">จำนวน</p>
-                                  </div>
-                                  <div class="col-4 d-flex align-items-center input-group">
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="decreaseQuantity()">-</button>
-                                    <input class="form-control form-control-sm mx-2" type="number" id="quantity" min="1" value="1">
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="increaseQuantity()">+</button>
-                                  </div>
-                                </div> -->
-
-                                <div class="input-group">
-  <button id="decrement">-</button>
-  <input type="number" id="input" value="0" readonly>
-  <button id="increment">+</button>
-</div>
-
-
+                                    <div class="col-2">
+                                        <p class="mb-0">จำนวน</p>
+                                    </div>
+                                    <div class="col-2">
+                                        <input class="form-control form-control-sm" type="number" aria-label=".form-control-sm example" min="1" value="1">
+                                    </div>
+                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
@@ -868,36 +833,13 @@ function refreshPage(btn_clear){
 
 
 
-function decreaseQuantity() {
-    let quantityInput = document.getElementById("quantity");
-    let quantity = parseInt(quantityInput.value);
-    if (quantity > 1) {
-      quantityInput.value = quantity - 1;
-    }
-  }
-
-  function increaseQuantity() {
-    let quantityInput = document.getElementById("quantity");
-    let quantity = parseInt(quantityInput.value);
-    quantityInput.value = quantity + 1;   
-
-  }
-
-
-
-
-
-
-
-
 document.addEventListener('DOMContentLoaded', function() {
-    // เมื่อ modal แสดง
     var modal = document.getElementById('exampleModal');
 
     modal.addEventListener('show.bs.modal', function (event) {
         var button = event.relatedTarget;
-        var productId = button.getAttribute('data-product-id'); // Extract info from data-* attributes
-        var productName = button.getAttribute('data-product-name'); // Extract product name
+        var productId = button.getAttribute('data-product-id');
+        var productName = button.getAttribute('data-product-name');
 
         // Update modal title
         var modalTitle = modal.querySelector('.modal-title');
@@ -913,21 +855,18 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.text())
         .then(data => {
-            // Update the size buttons container in the modal
             var sizeButtonsContainer = modal.querySelector('#size-buttons-container');
             sizeButtonsContainer.innerHTML = data;
         })
         .catch(error => console.error('Error:', error));
     });
 
-    // เมื่อคลิกที่ปุ่มขนาดใน modal
+    // Handling the selection and deselection of size buttons
     $(document).on('click', '.size-button', function() {
-        // เปลี่ยนสถานะของปุ่มขนาด
-        $('.size-button').removeClass('selected');
-        $(this).addClass('selected');
+        // Toggle the 'selected' class
+        $(this).toggleClass('selected');
     });
 });
-
 
 
 </script>
