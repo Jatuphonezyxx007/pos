@@ -503,7 +503,7 @@ body {
       <div>
 
 
-      <!-- <div class="col-md-6 col-xl-3">
+      <div class="col-md-6 col-xl-3">
           <div class="card bg-grd-primary order-card">
             <div class="card-body">
               <h6 class="text-white">สินค้าทั้งหมด</h6>
@@ -513,7 +513,7 @@ body {
             </div>
           </div>
         </div>
-        </div> -->
+        </div>
 
 
       <div class="page-header">
@@ -537,8 +537,8 @@ body {
                     <td width="35%" class="text-start">ชื่อสินค้า</td>
                     <td width="12%" class="text-start">ขนาด</td>
                     <td width="10%" class="text-center">จำนวน</td>
-                    <td width="10%" class="text-center">ราคา (บาท)</td>
-                    <td width="15%" class="text-start">หมวดหมู่</td>
+                    <td width="10%" class="text-end">ราคา (บาท)</td>
+                    <td width="15%" class="text-center">หมวดหมู่</td>
                     <td width="10%" class="text-start">สถานะ</td>
 
 
@@ -698,7 +698,7 @@ body {
                         <!-- <td class="text-start">&nbsp;</td>
                         <td class="text-center">&nbsp;</td>
                         <td class="text-end">&nbsp;</td> -->
-                        <td colspan="2" class="text-start"><?=$data['type_name'];?></td>
+                        <td class="text-center"><?=$data['type_name'];?></td>
                         <td class="text-start">&nbsp;</td>
                     </tr>
                     <?php
@@ -712,10 +712,10 @@ body {
                     <!-- <td>&nbsp;</td> -->
                     <td class="text-start"><?=$data['size_name'];?></td>
                     <td class="text-center"><?=$data['qty'];?></td>
-                    <td class="text-center"><?=number_format($data['price']);?></td>
+                    <td class="text-end"><?=number_format($data['price']);?></td>
                     <td class="text-center">&nbsp;</td>
-                    <td class="text-start"><span class="badge <?=$status_class;?>"><?=$data['status'];?></span></td>                
-                  </tr>
+                    <td class="text-start"><?=$data['status'];?></td>
+                </tr>
                 <?php
             }
 

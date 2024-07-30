@@ -503,7 +503,7 @@ body {
       <div>
 
 
-      <!-- <div class="col-md-6 col-xl-3">
+      <div class="col-md-6 col-xl-3">
           <div class="card bg-grd-primary order-card">
             <div class="card-body">
               <h6 class="text-white">สินค้าทั้งหมด</h6>
@@ -513,7 +513,7 @@ body {
             </div>
           </div>
         </div>
-        </div> -->
+        </div>
 
 
       <div class="page-header">

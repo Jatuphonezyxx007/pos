@@ -503,7 +503,7 @@ body {
       <div>
 
 
-      <!-- <div class="col-md-6 col-xl-3">
+      <div class="col-md-6 col-xl-3">
           <div class="card bg-grd-primary order-card">
             <div class="card-body">
               <h6 class="text-white">สินค้าทั้งหมด</h6>
@@ -513,7 +513,7 @@ body {
             </div>
           </div>
         </div>
-        </div> -->
+        </div>
 
 
       <div class="page-header">
@@ -533,12 +533,12 @@ body {
   <thead>
   <tr>
                     <td width="8%" class="text-center">รหัสสินค้า</td>
-                    <!-- <td width="15%" class="text-center">&nbsp;</td> -->
-                    <td width="35%" class="text-start">ชื่อสินค้า</td>
+                    <td width="15%" class="text-center">&nbsp;</td>
+                    <td width="20%" class="text-start">ชื่อสินค้า</td>
                     <td width="12%" class="text-start">ขนาด</td>
                     <td width="10%" class="text-center">จำนวน</td>
-                    <td width="10%" class="text-center">ราคา (บาท)</td>
-                    <td width="15%" class="text-start">หมวดหมู่</td>
+                    <td width="10%" class="text-end">ราคา (บาท)</td>
+                    <td width="15%" class="text-center">หมวดหมู่</td>
                     <td width="10%" class="text-start">สถานะ</td>
 
 
@@ -546,12 +546,11 @@ body {
                   </tr>
   </thead>
 
-
-<!-- old code -->
-  <!-- <tbody>
+  <tbody>
     <?php
     include("connectdb.php");
 
+    // Prepare SQL query to fetch all products with sizes
     $sql = "SELECT 
         products.id, 
         products.name, 
@@ -576,6 +575,7 @@ body {
     ORDER BY 
         products.id, size.id";
 
+    // Prepare and execute the query
     if ($stmt = mysqli_prepare($conn, $sql)) {
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
@@ -585,14 +585,18 @@ body {
             $product_row_started = false;
 
             while ($data = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+                // Check if we're starting a new product
                 if ($data['id'] != $current_product_id) {
+                    // If there's an existing product row, finish it
                     if ($product_row_started) {
                         echo '</tr>';
                     }
 
+                    // Start a new product row
                     $current_product_id = $data['id'];
                     $product_row_started = true;
 
+                    // Output the product row
                     ?>
                     <tr>
                         <td class="text-center"><?=$data['id'];?></td>
@@ -614,11 +618,13 @@ body {
                     <?php
                 }
 
+                // Output size row
                 ?>
                 
                 <?php
             }
 
+            // Close the last product row if it was started
             if ($product_row_started) {
                 echo '</tr>';
             }
@@ -631,74 +637,56 @@ body {
         die("Query preparation failed: " . mysqli_error($conn));
     }
     ?>
-</tbody> -->
+</tbody>
 
 
 <tbody>
-<?php
+    <?php
     include("connectdb.php");
 
     // Prepare SQL query
     $sql = "SELECT 
-        products.id AS id, 
-        products.name AS name, 
-        type.type_name AS type_name,
+        products.id AS product_id, 
+        products.name AS product_name, 
         size.size_name, 
         size.qty, 
-        size.price,
-        CASE 
-            WHEN size.qty > 7 THEN 'พร้อมขาย'
-            WHEN size.qty > 0 AND size.qty <= 7 THEN 'ใกล้หมด'
-            ELSE 'สินค้าหมด'
-        END AS status
+        size.price
     FROM 
         size
     JOIN 
-        products ON size.id = products.id
-    JOIN 
-        type ON products.type_id = type.type_id
+        products ON size.product_id = products.id
     ORDER BY 
         products.id, size.size_name";
 
     // Prepare and execute the query
     if ($stmt = mysqli_prepare($conn, $sql)) {
-      mysqli_stmt_execute($stmt);
-      $result = mysqli_stmt_get_result($stmt);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
 
-      if ($result) {
-          $current_product_id = null;
+        if ($result) {
+            $current_product_id = null;
 
-          while ($data = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-              // Determine status class
-              $status_class = '';
-              if ($data['status'] == 'พร้อมขาย') {
-                  $status_class = 'badge bg-success';
-              } elseif ($data['status'] == 'ใกล้หมด') {
-                  $status_class = 'badge bg-warning';
-              } else {
-                  $status_class = 'badge bg-danger';
-              }
+            while ($data = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+                // Check if we need to start a new product row
+                if ($data['product_id'] != $current_product_id) {
+                    // If we were displaying a product, close its row
+                    if ($current_product_id !== null) {
+                        echo '</tr>';
+                    }
 
-              // Check if we need to start a new product row
-              if ($data['id'] != $current_product_id) {
-                  // If we were displaying a product, close its row
-                  if ($current_product_id !== null) {
-                      echo '</tr>';
-                  }
+                    // Start a new product row
+                    $current_product_id = $data['product_id'];
 
-                  // Start a new product row
-                  $current_product_id = $data['id'];
-
-                  // Output the product row
-                  ?>
-                    <tr class="table-light">
-                        <td class="text-center"><?=$data['id'];?></td>
-                        <!-- <td class="text-center">&nbsp;</td> -->
-                        <td colspan="4" class="text-start"><?=$data['name'];?></td>
-                        <!-- <td class="text-start">&nbsp;</td>
+                    // Output the product row
+                    ?>
+                    <tr>
+                        <td class="text-center"><?=$data['product_id'];?></td>
                         <td class="text-center">&nbsp;</td>
-                        <td class="text-end">&nbsp;</td> -->
-                        <td colspan="2" class="text-start"><?=$data['type_name'];?></td>
+                        <td class="text-start"><?=$data['product_name'];?></td>
+                        <td class="text-start">&nbsp;</td>
+                        <td class="text-center">&nbsp;</td>
+                        <td class="text-end">&nbsp;</td>
+                        <td class="text-center">&nbsp;</td>
                         <td class="text-start">&nbsp;</td>
                     </tr>
                     <?php
@@ -709,13 +697,13 @@ body {
                 <tr>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
-                    <!-- <td>&nbsp;</td> -->
+                    <td>&nbsp;</td>
                     <td class="text-start"><?=$data['size_name'];?></td>
                     <td class="text-center"><?=$data['qty'];?></td>
-                    <td class="text-center"><?=number_format($data['price']);?></td>
+                    <td class="text-end"><?=number_format($data['price']);?></td>
                     <td class="text-center">&nbsp;</td>
-                    <td class="text-start"><span class="badge <?=$status_class;?>"><?=$data['status'];?></span></td>                
-                  </tr>
+                    <td class="text-start">&nbsp;</td>
+                </tr>
                 <?php
             }
 

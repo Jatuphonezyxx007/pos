@@ -503,7 +503,7 @@ body {
       <div>
 
 
-      <!-- <div class="col-md-6 col-xl-3">
+      <div class="col-md-6 col-xl-3">
           <div class="card bg-grd-primary order-card">
             <div class="card-body">
               <h6 class="text-white">สินค้าทั้งหมด</h6>
@@ -513,7 +513,7 @@ body {
             </div>
           </div>
         </div>
-        </div> -->
+        </div>
 
 
       <div class="page-header">
@@ -712,7 +712,7 @@ body {
                     <!-- <td>&nbsp;</td> -->
                     <td class="text-start"><?=$data['size_name'];?></td>
                     <td class="text-center"><?=$data['qty'];?></td>
-                    <td class="text-center"><?=number_format($data['price']);?></td>
+                    <td class="text-end"><?=number_format($data['price']);?></td>
                     <td class="text-center">&nbsp;</td>
                     <td class="text-start"><span class="badge <?=$status_class;?>"><?=$data['status'];?></span></td>                
                   </tr>
