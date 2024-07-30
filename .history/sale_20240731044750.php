@@ -610,11 +610,13 @@ body {
 
 
           <!-- ปุ่มที่กดเพื่อเปิด Modal -->
-<p class="d-grid gap-1">
-  <button class="btn btn-success" type="button" id="pay-button">
+<!-- <p class="d-grid gap-1">
+  <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
     ชำระเงิน
   </button>
-</p>
+</p> -->
+
+<a href="#" class="btn btn-success" id="pay-button">ชำระเงิน</a>
 
 
 
@@ -997,11 +999,6 @@ function updateTotalPrice() {
     document.getElementById('total-price').textContent = total.toLocaleString();
 }
 
-document.getElementById('pay-button').addEventListener('click', function(event) {
-    event.preventDefault(); // ป้องกันการรีเฟรชหน้า
-    var paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
-    paymentModal.show(); // แสดง modal
-});
 
 
 });

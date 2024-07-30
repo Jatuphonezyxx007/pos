@@ -611,7 +611,7 @@ body {
 
           <!-- ปุ่มที่กดเพื่อเปิด Modal -->
 <p class="d-grid gap-1">
-  <button class="btn btn-success" type="button" id="pay-button">
+  <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
     ชำระเงิน
   </button>
 </p>
@@ -623,7 +623,7 @@ body {
 
   <!-- <a href="clear.php" class="btn btn-danger">ล้างทั้งหมด</a> -->
 
-  <a href="#" class="btn btn-danger" onclick="window.location.reload(); return false;">ล้างทั้งหมด</a>
+  <a href="clear.php" class="btn btn-danger" onclick="refreshPage()">ล้างทั้งหมด</a>
 
 </p>
         </div>
@@ -632,43 +632,46 @@ body {
     
     </div>
 
-<!-- Modal for Payment -->
-<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <!-- Modal -->
+<!-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="paymentModalLabel">การชำระเงิน</h1>
+        <h1 class="modal-title fs-5" id="exampleModalLabel">การชำระเงิน</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
+      </div> -->
 
-      <form method="post" action="">
-        <div class="modal-body">
-          <div class="col-md">
-            <div class="form-floating">
-              <select class="form-select" id="payment" aria-label="payment" name="payments">
-                <?php
-                include("connectdb.php");
-                $sql2 = "SELECT * FROM `paymethod`";
-                $rs2 = mysqli_query($conn, $sql2);
-                while ($data2 = mysqli_fetch_array($rs2)){
-                ?>
-                <option value="<?=$data2['PayMethod_id'];?>">
-                  <?=$data2['PayMethod_name'];?>
-                </option>
-                <?php } ?>
-              </select>
-              <label for="payment">ประเภทการชำระ</label>
-            </div>
+      <!-- <form method="post" action="">
+      <div class="modal-body">
+        <div class="col-md">
+          <div class="form-floating">
+
+            <select class="form-select" id="payment" aria-label="payment" name="payments">
+            <?php
+                            include("connectdb.php");
+                            $sql2 = "SELECT * FROM `paymethod`";
+                            $rs2 = mysqli_query($conn, $sql2);
+                            while ($data2 = mysqli_fetch_array($rs2)){
+                              ?>
+                              <option value="<?=$data2['PayMethod_id'];?>"<?=($data2['PayMethod_id']==$data['paymethod'])?"selected":"";?>>
+                              <?=$data2['PayMethod_name'];?></option>  
+                              <?php } ?>
+                            </select>
+                          
+
+            <label for="payment">ประเภทการชำระ</label>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ย้อนกลับ</button>
-          <a href="record.php" class="btn btn-primary">ชำระเงิน</a>
-        </div>
+      </div>
       </form>
-    </div>
-  </div>
-</div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ย้อนกลับ</button>
+        
+        <p class="d-grid gap-1">
+        <a href="record.php" class="btn btn-primary">ชำระเงิน</a>
+        </p> -->
+        <!-- </form> -->
 
 
         <!-- <form method="post" action="record.php">
@@ -870,7 +873,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var modalTitle = modal.querySelector('.modal-title');
         modalTitle.textContent = productName;
 
-        priceContainer.textContent = '0';
+        priceContainer.textContent = '0 บาท';
         pricePerUnit = 0;
         maxQuantity = 0;
 
@@ -923,87 +926,43 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-// ฟังก์ชันเพื่อเพิ่มรายการใหม่ในตาราง
-document.getElementById('add-to-order-button').addEventListener('click', function() {
-    let quantityInput = document.getElementById('quantity'); // ค่าของจำนวน
-    let quantity = parseInt(quantityInput.value);
-    let totalPrice = pricePerUnit * quantity;
+    document.getElementById('add-to-order-button').addEventListener('click', function() {
+        let quantity = parseInt(quantityInput.value);
+        let totalPrice = pricePerUnit * quantity;
 
-    if (maxQuantity === 0 || pricePerUnit === 0) {
-        alert("สินค้านี้หมด");
-        return;
-    }
+        if (maxQuantity === 0 || pricePerUnit === 0) {
+            alert("สินค้านี้หมด");
+            return;
+        }
 
-    let orderList = document.getElementById('order-list');
-    let existingRow = orderList.querySelector(`tr[data-product-name="${productName}"][data-product-size="${productSize}"]`);
-
-    if (existingRow) {
-        // ถ้ามีสินค้านี้อยู่ในตารางแล้ว
-        let existingQuantity = parseInt(existingRow.querySelector('.quantity').textContent);
-        let newQuantity = existingQuantity + quantity;
-        existingRow.querySelector('.quantity').textContent = newQuantity;
-
-        let existingPrice = parseFloat(existingRow.querySelector('.price').textContent.replace(/[^0-9.-]+/g, ""));
-        let newPrice = (existingPrice / existingQuantity) * newQuantity;
-        existingRow.querySelector('.price').textContent = newPrice.toLocaleString() + ' บาท';
-    } else {
-        // ถ้าไม่มีสินค้านี้ในตาราง
+        let orderList = document.getElementById('order-list');
         let newRow = document.createElement('tr');
-        newRow.setAttribute('data-product-name', productName);
-        newRow.setAttribute('data-product-size', productSize);
+
         newRow.innerHTML = `
             <td class="text-center">${orderList.rows.length + 1}</td>
-            <td class="text-start fst-normal">${productName}<br><small class="text-muted">${productSize}</small>
-                <a href="#" class="ph ph-trash text-danger delete-button"></a>
-            </td>
-            <td class="text-center quantity">${quantity}</td>
-            <td class="text-end price">${totalPrice.toLocaleString()}</td>
+            <td class="text-start fst-normal">${productName}<br><small class="text-muted">${productSize}</small></td>
+            <td class="text-center">${quantity}</td>
+            <td class="text-end fst-normal">${totalPrice.toLocaleString()}</td>
         `;
+        
         orderList.appendChild(newRow);
+        updateTotalPrice();
+
+        $('#exampleModal').modal('hide');
+    });
+
+    function updateTotalPrice() {
+        let orderList = document.getElementById('order-list');
+        let total = 0;
+
+        for (let row of orderList.rows) {
+            let priceText = row.cells[3].textContent;
+            let price = parseFloat(priceText.replace(/[^0-9.-]+/g, ""));
+            total += price;
+        }
+
+        document.getElementById('total-price').textContent = total.toLocaleString();
     }
-
-    updateTotalPrice();
-    $('#exampleModal').modal('hide');
-});
-
-// ใช้ event delegation เพื่อให้สามารถลบได้จากปุ่ม delete-button
-document.getElementById('order-list').addEventListener('click', function(event) {
-    if (event.target.classList.contains('delete-button')) {
-        removeRow(event);
-    }
-});
-
-// ฟังก์ชันลบแถวจากตาราง
-function removeRow(event) {
-    event.preventDefault(); // ป้องกันการรีเฟรชหน้า
-    let row = event.target.closest('tr'); // หาตำแหน่งของแถว
-    if (row) {
-        row.remove(); // ลบแถวออกจากตาราง
-        updateTotalPrice(); // อัปเดตราคารวม
-    }
-}
-
-// ฟังก์ชันอัปเดตราคารวม
-function updateTotalPrice() {
-    let orderList = document.getElementById('order-list');
-    let total = 0;
-
-    for (let row of orderList.rows) {
-        let priceText = row.cells[3].textContent;
-        let price = parseFloat(priceText.replace(/[^0-9.-]+/g, ""));
-        total += price;
-    }
-
-    document.getElementById('total-price').textContent = total.toLocaleString();
-}
-
-document.getElementById('pay-button').addEventListener('click', function(event) {
-    event.preventDefault(); // ป้องกันการรีเฟรชหน้า
-    var paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
-    paymentModal.show(); // แสดง modal
-});
-
-
 });
 
 

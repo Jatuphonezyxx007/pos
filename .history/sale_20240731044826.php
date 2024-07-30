@@ -997,11 +997,6 @@ function updateTotalPrice() {
     document.getElementById('total-price').textContent = total.toLocaleString();
 }
 
-document.getElementById('pay-button').addEventListener('click', function(event) {
-    event.preventDefault(); // ป้องกันการรีเฟรชหน้า
-    var paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
-    paymentModal.show(); // แสดง modal
-});
 
 
 });

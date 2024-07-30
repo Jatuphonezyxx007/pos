@@ -14,11 +14,6 @@ if (isset($_POST['id'])) {
 
     $count = 0;
     while ($data = mysqli_fetch_array($rs)) {
-        // Set price to 0 if qty is 0
-        if ($data['qty'] == 0) {
-            $data['price'] = 0;
-        }
-        
         if ($count > 0 && $count % 2 == 0) {
             $output .= '</div><div class="row">';
         }

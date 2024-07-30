@@ -12,7 +12,7 @@ error_reporting(E_NOTICE);
 		$_SESSION['sid'][$id] = $data['id'];
 		$_SESSION['sname'][$id] = $data['name'];
 		$_SESSION['sprice'][$id] = $data['price'];
-		// $_SESSION['ssize'][$id] = $data['size'];
+		// $_SESSION['sbarcode'][$id] = $data['barcode'];
 		// $_SESSION['spicture'][$id] = $data['img'];
 		@$_SESSION['sitem'][$id]++;
 	}
@@ -495,7 +495,7 @@ body {
     JOIN `size` ON products.id = size.id
     WHERE (`products`.`barcode` LIKE '%{$src}%' OR `products`.`name` LIKE '%{$src}%')
     GROUP BY products.id
-    ORDER BY `id` ASC";
+    ORDER BY `products`.`type_id` ASC";
 
     $rs = mysqli_query($conn, $sql);
     while ($data = mysqli_fetch_array($rs)){
@@ -557,7 +557,7 @@ body {
 
 </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-primary w-100" id="add-to-order-button">
+                                <button type="button" class="btn btn-primary w-100">
                                   <i class="ph ph-check"></i>
                                 </button>
                             </div>
@@ -585,33 +585,57 @@ body {
             <h1>รายการสินค้า</h1>
             </center>
 
-            <div class="table-responsive">
-    <table class="table table-sm">
-        <thead>
-            <tr>
-                <th width="5%" class="text-center fst-normal">ที่</th>
-                <th width="55%" class="text-start fst-normal">สินค้า</th>
-                <th width="20%" class="text-center fst-normal">จำนวน</th>
-                <th width="20%" class="text-center fst-normal">ราคา</th>
-            </tr>
-        </thead>
-        <tbody id="order-list">
-            <!-- สินค้าจะถูกเพิ่มที่นี่ -->
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="3" class="text-end"><strong>รวม</strong></td>
-                <td class="text-center" id="total-price"><strong>0</strong></td>
-            </tr>
-        </tfoot>
-    </table>
-</div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <td width="5%" class="text-center">ที่</td>
+                  <td width="75%" class="text-center">สินค้า</td>
+                  <td width="10%" class="text-center">จำนวน</td>
+                  <td width="10%" class="text-center">ราคา</td>
+              </tr>
+              
+              <?php
+              if(!empty($_SESSION['sid'])) {
+                foreach($_SESSION['sid'] as $pid) {
+                  @$i++;
+                  $sum[$pid] = $_SESSION['sprice'][$pid] * $_SESSION['sitem'][$pid] ;
+                  @$total += $sum[$pid] ;
+                  ?>
+
+              <tr>
+                  <td style="vertical-align: top;"><?=$i;?></td>
+                  <td style="vertical-align: top;"><?=$_SESSION['sname'][$pid];?><br>
+                  <a href="clear_product.php?id=<?=$pid;?>" class="ph ph-trash text-danger" onclick="refreshPage()"></a>
+                </td>
+                  <td style="vertical-align: top;"><?=$_SESSION['sitem'][$pid];?></td>
+                  <td style="vertical-align: top;"><?=number_format($_SESSION['sprice'][$pid],0);?></td>
+                </tr>
+                <?php } // end foreach ?>
+
+              <tr>
+                  <td><strong>รวม</strong></td>
+                  <td></td>
+                  <td style="vertical-align: top;"><strong><?= number_format($total, 2); ?></strong></td>
+                  <td><strong> บาท</strong></td>
+                  </tr>
+                
+                <?php 
+                } else {
+                  ?>
+                  
+                  <tr>
+                    <td colspan="7" height="50" align="center">ไม่มีสินค้าในรายการ</td>
+                  </tr>
+                  <?php } // end if ?>
+            </thead>
+
+          </table>
 
 
 
           <!-- ปุ่มที่กดเพื่อเปิด Modal -->
 <p class="d-grid gap-1">
-  <button class="btn btn-success" type="button" id="pay-button">
+  <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
     ชำระเงิน
   </button>
 </p>
@@ -623,7 +647,7 @@ body {
 
   <!-- <a href="clear.php" class="btn btn-danger">ล้างทั้งหมด</a> -->
 
-  <a href="#" class="btn btn-danger" onclick="window.location.reload(); return false;">ล้างทั้งหมด</a>
+  <a href="clear.php" class="btn btn-danger" onclick="refreshPage()">ล้างทั้งหมด</a>
 
 </p>
         </div>
@@ -632,43 +656,46 @@ body {
     
     </div>
 
-<!-- Modal for Payment -->
-<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <!-- Modal -->
+<!-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="paymentModalLabel">การชำระเงิน</h1>
+        <h1 class="modal-title fs-5" id="exampleModalLabel">การชำระเงิน</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
+      </div> -->
 
-      <form method="post" action="">
-        <div class="modal-body">
-          <div class="col-md">
-            <div class="form-floating">
-              <select class="form-select" id="payment" aria-label="payment" name="payments">
-                <?php
-                include("connectdb.php");
-                $sql2 = "SELECT * FROM `paymethod`";
-                $rs2 = mysqli_query($conn, $sql2);
-                while ($data2 = mysqli_fetch_array($rs2)){
-                ?>
-                <option value="<?=$data2['PayMethod_id'];?>">
-                  <?=$data2['PayMethod_name'];?>
-                </option>
-                <?php } ?>
-              </select>
-              <label for="payment">ประเภทการชำระ</label>
-            </div>
+      <!-- <form method="post" action="">
+      <div class="modal-body">
+        <div class="col-md">
+          <div class="form-floating">
+
+            <select class="form-select" id="payment" aria-label="payment" name="payments">
+            <?php
+                            include("connectdb.php");
+                            $sql2 = "SELECT * FROM `paymethod`";
+                            $rs2 = mysqli_query($conn, $sql2);
+                            while ($data2 = mysqli_fetch_array($rs2)){
+                              ?>
+                              <option value="<?=$data2['PayMethod_id'];?>"<?=($data2['PayMethod_id']==$data['paymethod'])?"selected":"";?>>
+                              <?=$data2['PayMethod_name'];?></option>  
+                              <?php } ?>
+                            </select>
+                          
+
+            <label for="payment">ประเภทการชำระ</label>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ย้อนกลับ</button>
-          <a href="record.php" class="btn btn-primary">ชำระเงิน</a>
-        </div>
+      </div>
       </form>
-    </div>
-  </div>
-</div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ย้อนกลับ</button>
+        
+        <p class="d-grid gap-1">
+        <a href="record.php" class="btn btn-primary">ชำระเงิน</a>
+        </p> -->
+        <!-- </form> -->
 
 
         <!-- <form method="post" action="record.php">
@@ -834,46 +861,42 @@ function refreshPage(btn_clear){
 
 document.addEventListener('DOMContentLoaded', function() {
     var modal = document.getElementById('exampleModal');
-    var priceContainer = modal.querySelector('#price-display');
-    var quantityInput = document.getElementById("quantity");
-    var pricePerUnit = 0;
-    var maxQuantity = 0;
-    var productName = '';
-    var productSize = '';
+    var priceContainer = modal.querySelector('#price-display'); // Container for displaying price
+    var quantityInput = document.getElementById("quantity"); // Quantity input field
+    var pricePerUnit = 0; // Initialize with default price per unit
+    var maxQuantity = 0; // Initialize with default max quantity
 
+    // Function to set the base price per unit and update the display
     function setPricePerUnit(price, qty) {
         pricePerUnit = price;
         maxQuantity = qty;
-        quantityInput.max = maxQuantity;
-
-        if (maxQuantity === 0) {
-            pricePerUnit = 0;
-            quantityInput.value = 0;
-        } else {
-            quantityInput.value = 1;
-        }
-
+        quantityInput.max = maxQuantity; // Update the max value of the quantity input
         updatePriceDisplay();
     }
 
+    // Function to update price display based on quantity
     function updatePriceDisplay() {
         let quantity = parseInt(quantityInput.value);
         let totalPrice = pricePerUnit * quantity;
         priceContainer.textContent = totalPrice.toLocaleString() + ' บาท';
     }
 
+    // When the modal is shown
     modal.addEventListener('show.bs.modal', function (event) {
         var button = event.relatedTarget;
         var productId = button.getAttribute('data-product-id');
-        productName = button.getAttribute('data-product-name');
+        var productName = button.getAttribute('data-product-name');
 
+        // Update modal title
         var modalTitle = modal.querySelector('.modal-title');
         modalTitle.textContent = productName;
 
-        priceContainer.textContent = '0';
-        pricePerUnit = 0;
-        maxQuantity = 0;
+        // Reset the price display
+        priceContainer.textContent = '0 บาท';
+        pricePerUnit = 0; // Reset price per unit
+        maxQuantity = 0; // Reset max quantity
 
+        // Fetch sizes for the selected product
         fetch('fetch_sizes.php', {
             method: 'POST',
             headers: {
@@ -883,130 +906,53 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.text())
         .then(data => {
+            // Update the size buttons container in the modal
             var sizeButtonsContainer = modal.querySelector('#size-buttons-container');
             sizeButtonsContainer.innerHTML = data;
         })
         .catch(error => console.error('Error:', error));
     });
 
+    // When the modal is hidden
     modal.addEventListener('hide.bs.modal', function () {
+        // Reset the price display
         priceContainer.textContent = '0 บาท';
-        pricePerUnit = 0;
-        maxQuantity = 0;
-        quantityInput.value = 1;
-        quantityInput.max = 1;
+        pricePerUnit = 0; // Reset price per unit
+        maxQuantity = 0; // Reset max quantity
+        quantityInput.value = 1; // Reset quantity to 1
+        quantityInput.max = 1; // Reset max quantity in input field
     });
 
+    // When a size button is clicked
     $(document).on('click', '.size-button', function() {
+        // Change the selected state of the size button
         $('.size-button').removeClass('selected');
         $(this).addClass('selected');
 
+        // Set the price per unit and max quantity based on the selected size
         var price = $(this).data('price');
         var qty = $(this).data('qty');
-        productSize = $(this).data('size-name');
         setPricePerUnit(price, qty);
     });
 
+    // Decrease quantity
     window.decreaseQuantity = function() {
         let quantity = parseInt(quantityInput.value);
-        if (quantity > 1 && maxQuantity > 0) {
+        if (quantity > 1) {
             quantityInput.value = quantity - 1;
             updatePriceDisplay();
         }
     };
 
+    // Increase quantity
     window.increaseQuantity = function() {
         let quantity = parseInt(quantityInput.value);
-        if (quantity < maxQuantity) {
+        if (quantity < maxQuantity) { // Check against max quantity
             quantityInput.value = quantity + 1;
             updatePriceDisplay();
         }
     };
-
-// ฟังก์ชันเพื่อเพิ่มรายการใหม่ในตาราง
-document.getElementById('add-to-order-button').addEventListener('click', function() {
-    let quantityInput = document.getElementById('quantity'); // ค่าของจำนวน
-    let quantity = parseInt(quantityInput.value);
-    let totalPrice = pricePerUnit * quantity;
-
-    if (maxQuantity === 0 || pricePerUnit === 0) {
-        alert("สินค้านี้หมด");
-        return;
-    }
-
-    let orderList = document.getElementById('order-list');
-    let existingRow = orderList.querySelector(`tr[data-product-name="${productName}"][data-product-size="${productSize}"]`);
-
-    if (existingRow) {
-        // ถ้ามีสินค้านี้อยู่ในตารางแล้ว
-        let existingQuantity = parseInt(existingRow.querySelector('.quantity').textContent);
-        let newQuantity = existingQuantity + quantity;
-        existingRow.querySelector('.quantity').textContent = newQuantity;
-
-        let existingPrice = parseFloat(existingRow.querySelector('.price').textContent.replace(/[^0-9.-]+/g, ""));
-        let newPrice = (existingPrice / existingQuantity) * newQuantity;
-        existingRow.querySelector('.price').textContent = newPrice.toLocaleString() + ' บาท';
-    } else {
-        // ถ้าไม่มีสินค้านี้ในตาราง
-        let newRow = document.createElement('tr');
-        newRow.setAttribute('data-product-name', productName);
-        newRow.setAttribute('data-product-size', productSize);
-        newRow.innerHTML = `
-            <td class="text-center">${orderList.rows.length + 1}</td>
-            <td class="text-start fst-normal">${productName}<br><small class="text-muted">${productSize}</small>
-                <a href="#" class="ph ph-trash text-danger delete-button"></a>
-            </td>
-            <td class="text-center quantity">${quantity}</td>
-            <td class="text-end price">${totalPrice.toLocaleString()}</td>
-        `;
-        orderList.appendChild(newRow);
-    }
-
-    updateTotalPrice();
-    $('#exampleModal').modal('hide');
 });
-
-// ใช้ event delegation เพื่อให้สามารถลบได้จากปุ่ม delete-button
-document.getElementById('order-list').addEventListener('click', function(event) {
-    if (event.target.classList.contains('delete-button')) {
-        removeRow(event);
-    }
-});
-
-// ฟังก์ชันลบแถวจากตาราง
-function removeRow(event) {
-    event.preventDefault(); // ป้องกันการรีเฟรชหน้า
-    let row = event.target.closest('tr'); // หาตำแหน่งของแถว
-    if (row) {
-        row.remove(); // ลบแถวออกจากตาราง
-        updateTotalPrice(); // อัปเดตราคารวม
-    }
-}
-
-// ฟังก์ชันอัปเดตราคารวม
-function updateTotalPrice() {
-    let orderList = document.getElementById('order-list');
-    let total = 0;
-
-    for (let row of orderList.rows) {
-        let priceText = row.cells[3].textContent;
-        let price = parseFloat(priceText.replace(/[^0-9.-]+/g, ""));
-        total += price;
-    }
-
-    document.getElementById('total-price').textContent = total.toLocaleString();
-}
-
-document.getElementById('pay-button').addEventListener('click', function(event) {
-    event.preventDefault(); // ป้องกันการรีเฟรชหน้า
-    var paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
-    paymentModal.show(); // แสดง modal
-});
-
-
-});
-
-
 
 
 
