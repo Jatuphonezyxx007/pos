@@ -632,8 +632,7 @@ body {
     
     </div>
 
-<!-- Modal for Payment -->
-<!-- Modal -->
+<!-- Modal เลือกวิธีการชำระเงิน -->
 <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -662,11 +661,14 @@ body {
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ย้อนกลับ</button>
-        <button type="button" class="btn btn-primary" id="paymentButton">ชำระเงิน</button>
+        <button type="button" class="btn btn-primary" id="confirmPaymentButton">ตกลง</button>
       </div>
     </div>
   </div>
 </div>
+
+<!-- ปุ่มชำระเงิน -->
+<button type="button" class="btn btn-success" id="paymentButton">ชำระเงิน</button>
 
 
         <!-- <form method="post" action="record.php">
@@ -995,65 +997,42 @@ function updateTotalPrice() {
     document.getElementById('total-price').textContent = total.toLocaleString();
 }
 
-document.getElementById('pay-button').addEventListener('click', function(event) {
-    event.preventDefault(); // ป้องกันการรีเฟรชหน้า
-    var paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
-    paymentModal.show(); // แสดง modal
-});
-
-
-
 document.getElementById('paymentButton').addEventListener('click', function() {
-    // รับค่าจากตาราง
-    var orderList = document.getElementById('order-list');
-    var orderDetails = [];
-    
-    for (let row of orderList.rows) {
-        var productName = row.getAttribute('data-product-name');
-        var productSize = row.getAttribute('data-product-size');
-        var quantity = row.querySelector('.quantity').textContent;
-        var price = row.querySelector('.price').textContent.replace(/[^0-9.-]+/g, "");
-        
-        orderDetails.push({
-            productName: productName,
-            productSize: productSize,
-            quantity: quantity,
-            price: price
-        });
-    }
-
-    // รับค่าจากวิธีการชำระเงินที่เลือก
-    var paymentMethod = document.getElementById('paymentMethod').value;
-
-    if (paymentMethod) {
-        // สร้างฟอร์มแบบไดนามิก
-        var form = document.createElement('form');
-        form.method = 'POST';
-        form.action = 'record.php';
-        
-        // เพิ่มข้อมูลการชำระเงิน
-        var paymentInput = document.createElement('input');
-        paymentInput.type = 'hidden';
-        paymentInput.name = 'payments';
-        paymentInput.value = paymentMethod;
-        form.appendChild(paymentInput);
-
-        // เพิ่มข้อมูลการสั่งซื้อ
-        var orderDetailsInput = document.createElement('input');
-        orderDetailsInput.type = 'hidden';
-        orderDetailsInput.name = 'orderDetails';
-        orderDetailsInput.value = JSON.stringify(orderDetails);
-        form.appendChild(orderDetailsInput);
-        
-        document.body.appendChild(form);
-        form.submit();
-    } else {
-        alert('กรุณาเลือกวิธีการชำระเงิน');
-    }
+    var paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'), {
+        keyboard: false
+    });
+    paymentModal.show();
 });
 
+document.getElementById('confirmPaymentButton').addEventListener('click', function() {
+    let paymentMethod = document.getElementById('paymentMethod').value;
 
+    // สมมติว่าคุณมีข้อมูล order_id, emp_id และ itemList (ข้อมูลสินค้า) จากที่อื่น
+    let orderData = {
+        order_id: orderId,
+        emp_id: empId,
+        paymethod_id: paymentMethod,
+        items: itemList
+    };
 
+    fetch('record.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('การชำระเงินสำเร็จ');
+            window.location.reload();
+        } else {
+            alert('การชำระเงินล้มเหลว');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
 
 
 });

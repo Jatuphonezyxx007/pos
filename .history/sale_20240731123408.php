@@ -633,7 +633,6 @@ body {
     </div>
 
 <!-- Modal for Payment -->
-<!-- Modal -->
 <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -641,6 +640,7 @@ body {
         <h1 class="modal-title fs-5" id="paymentModalLabel">การชำระเงิน</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+
       <div class="modal-body">
         <div class="col-md">
           <div class="form-floating">
@@ -660,10 +660,11 @@ body {
           </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ย้อนกลับ</button>
-        <button type="button" class="btn btn-primary" id="paymentButton">ชำระเงิน</button>
-      </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ย้อนกลับ</button>
+          <a href="#" class="btn btn-primary" id="paymentButton">ชำระเงิน</a>
+        </div>
+
     </div>
   </div>
 </div>
@@ -1023,7 +1024,7 @@ document.getElementById('paymentButton').addEventListener('click', function() {
     }
 
     // รับค่าจากวิธีการชำระเงินที่เลือก
-    var paymentMethod = document.getElementById('paymentMethod').value;
+    var paymentMethod = prompt('กรุณาใส่รหัสวิธีการชำระเงิน:');
 
     if (paymentMethod) {
         // สร้างฟอร์มแบบไดนามิก

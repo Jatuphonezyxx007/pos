@@ -22,18 +22,16 @@ if (isset($_POST['payments']) && isset($_POST['orderDetails'])) {
 
     // แทรกข้อมูลลงในตาราง orders_detail และอัปเดตจำนวนสินค้าในตาราง Products
     foreach ($orderDetails as $item) {
-        // หา product_id และ size_id จากชื่อและขนาดสินค้า
+        // หา product_id และ size_id จากชื่อและขนาดสินค้า (ปรับตามฐานข้อมูลของคุณ)
+        // สมมติว่า `Products` มี `name` และ `size`
         $productName = $item['productName'];
         $productSize = $item['productSize'];
         $quantity = $item['quantity'];
 
-        $sqlProduct = "SELECT p.id AS product_id, s.size_id AS size_id 
-                       FROM products p 
-                       JOIN size s ON p.id = s.id 
-                       WHERE p.name='$productName' AND s.size_name='$productSize'";
+        $sqlProduct = "SELECT id, size_id FROM Products WHERE name='$productName' AND size='$productSize'";
         $resultProduct = mysqli_query($conn, $sqlProduct);
         $product = mysqli_fetch_assoc($resultProduct);
-        $productId = $product['product_id'];
+        $productId = $product['id'];
         $sizeId = $product['size_id'];
 
         // แทรกข้อมูลลงในตาราง orders_detail
@@ -41,7 +39,7 @@ if (isset($_POST['payments']) && isset($_POST['orderDetails'])) {
         mysqli_query($conn, $sql2);
 
         // อัปเดตจำนวนสินค้าในตาราง Products
-        $sql3 = "UPDATE size SET qty = qty - '$quantity' WHERE size_id = '$sizeId'";
+        $sql3 = "UPDATE Products SET qty = qty - '$quantity' WHERE id = '$productId'";
         mysqli_query($conn, $sql3) or die("Update error: " . mysqli_error($conn));
     }
 

@@ -1023,7 +1023,7 @@ document.getElementById('paymentButton').addEventListener('click', function() {
     }
 
     // รับค่าจากวิธีการชำระเงินที่เลือก
-    var paymentMethod = document.getElementById('paymentMethod').value;
+    var paymentMethod = prompt('กรุณาใส่รหัสวิธีการชำระเงิน:');
 
     if (paymentMethod) {
         // สร้างฟอร์มแบบไดนามิก

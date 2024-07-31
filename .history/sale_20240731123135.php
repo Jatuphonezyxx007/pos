@@ -633,7 +633,6 @@ body {
     </div>
 
 <!-- Modal for Payment -->
-<!-- Modal -->
 <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -641,6 +640,7 @@ body {
         <h1 class="modal-title fs-5" id="paymentModalLabel">การชำระเงิน</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+
       <div class="modal-body">
         <div class="col-md">
           <div class="form-floating">
@@ -660,10 +660,11 @@ body {
           </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ย้อนกลับ</button>
-        <button type="button" class="btn btn-primary" id="paymentButton">ชำระเงิน</button>
-      </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ย้อนกลับ</button>
+          <a href="#" class="btn btn-primary" id="paymentButton">ชำระเงิน</a>
+        </div>
+
     </div>
   </div>
 </div>
@@ -1004,6 +1005,15 @@ document.getElementById('pay-button').addEventListener('click', function(event) 
 
 
 document.getElementById('paymentButton').addEventListener('click', function() {
+    // เปิด modal การชำระเงิน
+    var paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+    paymentModal.show();
+});
+
+document.getElementById('confirmPaymentButton').addEventListener('click', function() {
+    // รับค่าจากฟอร์ม
+    var paymentMethod = document.getElementById('paymentMethod').value;
+    
     // รับค่าจากตาราง
     var orderList = document.getElementById('order-list');
     var orderDetails = [];
@@ -1022,34 +1032,27 @@ document.getElementById('paymentButton').addEventListener('click', function() {
         });
     }
 
-    // รับค่าจากวิธีการชำระเงินที่เลือก
-    var paymentMethod = document.getElementById('paymentMethod').value;
+    // สร้างฟอร์มแบบไดนามิก
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'record.php';
+    
+    // เพิ่มข้อมูลการชำระเงิน
+    var paymentInput = document.createElement('input');
+    paymentInput.type = 'hidden';
+    paymentInput.name = 'payments';
+    paymentInput.value = paymentMethod;
+    form.appendChild(paymentInput);
 
-    if (paymentMethod) {
-        // สร้างฟอร์มแบบไดนามิก
-        var form = document.createElement('form');
-        form.method = 'POST';
-        form.action = 'record.php';
-        
-        // เพิ่มข้อมูลการชำระเงิน
-        var paymentInput = document.createElement('input');
-        paymentInput.type = 'hidden';
-        paymentInput.name = 'payments';
-        paymentInput.value = paymentMethod;
-        form.appendChild(paymentInput);
-
-        // เพิ่มข้อมูลการสั่งซื้อ
-        var orderDetailsInput = document.createElement('input');
-        orderDetailsInput.type = 'hidden';
-        orderDetailsInput.name = 'orderDetails';
-        orderDetailsInput.value = JSON.stringify(orderDetails);
-        form.appendChild(orderDetailsInput);
-        
-        document.body.appendChild(form);
-        form.submit();
-    } else {
-        alert('กรุณาเลือกวิธีการชำระเงิน');
-    }
+    // เพิ่มข้อมูลการสั่งซื้อ
+    var orderDetailsInput = document.createElement('input');
+    orderDetailsInput.type = 'hidden';
+    orderDetailsInput.name = 'orderDetails';
+    orderDetailsInput.value = JSON.stringify(orderDetails);
+    form.appendChild(orderDetailsInput);
+    
+    document.body.appendChild(form);
+    form.submit();
 });
 
 
