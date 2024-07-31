@@ -574,24 +574,9 @@ body {
 </div>
 
 
-
         </div>
     </div>
 </div>
-
-
-  <!-- <footer class="pc-footer">
-    <div class="footer-wrapper container-fluid">
-      <div class="row">
-  
-        <div class="col-sm-6 ms-auto my-1">
-          <ul class="list-inline footer-link mb-0 justify-content-sm-end d-flex">
-          <a href="#top" class="text-end">กลับไปบนสุด</a>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </footer> -->
 
     
     <div class="col-6 col-md-3 fixed-col">
@@ -657,29 +642,32 @@ body {
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
-      <div class="modal-body">
-        <div class="col-md">
-          <div class="form-floating">
-            <select class="form-select" id="paymentMethod" aria-label="payment" name="payments">
-              <?php
-              include("connectdb.php");
-              $sql2 = "SELECT * FROM `paymethod`";
-              $rs2 = mysqli_query($conn, $sql2);
-              while ($data2 = mysqli_fetch_array($rs2)){
-              ?>
-                <option value="<?=$data2['PayMethod_id'];?>">
-                  <?=$data2['PayMethod_name'];?>
-                </option>  
-              <?php } ?>
-            </select>
-            <label for="payment">ประเภทการชำระ</label>
-          </div>
-        </div>
 
-        <div id="qrCodeContainer" style="display: none;">
-          <img class="rounded mx-auto d-block" id="qrCodeImage" src="" alt="QR Code" />
-        </div>
-      </div>
+      <div class="modal-body">
+  <div class="col-md">
+    <div class="form-floating">
+      <select class="form-select" id="paymentMethod" aria-label="payment" name="payments">
+        <?php
+        include("connectdb.php");
+        $sql2 = "SELECT * FROM `paymethod`";
+        $rs2 = mysqli_query($conn, $sql2);
+        while ($data2 = mysqli_fetch_array($rs2)){
+        ?>
+          <option value="<?=$data2['PayMethod_id'];?>">
+            <?=$data2['PayMethod_name'];?>
+          </option>  
+        <?php } ?>
+      </select>
+      <label for="payment">ประเภทการชำระ</label>
+    </div>
+  </div>
+
+  <div id="qrCodeContainer" style="display: none;">
+    <img id="qrCodeImage" src="" alt="QR Code" />
+</div>
+  
+</div>
+
 
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ย้อนกลับ</button>
@@ -728,9 +716,27 @@ body {
 
 
   <!-- [ Main Content ] end -->
-  <!-- <footer class="pc-footer">
+  <footer class="pc-footer">
     <div class="footer-wrapper container-fluid">
       <div class="row">
+
+
+
+
+
+
+  <?php
+// ดึงข้อมูลการซื้อจากหน้า checkout.php
+$product_name = $_POST['product_name'];
+$product_quantity = $_POST['product_quantity'];
+$product_price = $_POST['product_price'];
+$total_price = $product_quantity * $product_price;
+
+// ส่งข้อมูลการซื้อไปยังหน้า detail.php
+// header("Location: detail.php?product_name=$product_name&product_quantity=$product_quantity&product_price=$product_price&total_price=$total_price");
+
+?>
+
   
         <div class="col-sm-6 ms-auto my-1">
           <ul class="list-inline footer-link mb-0 justify-content-sm-end d-flex">
@@ -739,7 +745,7 @@ body {
         </div>
       </div>
     </div>
-  </footer> -->
+  </footer>
 
   <!-- Required Js -->
 <script src="assets/js/plugins/popper.min.js"></script>
@@ -1089,11 +1095,12 @@ document.getElementById('paymentMethod').addEventListener('change', function() {
 });
 
 // ฟังก์ชันที่เรียกเมื่อปิดหรือออกจาก modal
-document.getElementById('paymentModal').addEventListener('hide.bs.modal', function() {
+document.querySelector('.btn-close').addEventListener('click', function() {
     document.getElementById('paymentMethod').value = '1'; // ตั้งค่า select เป็น id 1
     document.getElementById('qrCodeImage').src = ''; // เคลียร์ QR Code
     document.getElementById('qrCodeContainer').style.display = 'none'; // ซ่อน QR Code
 });
+
 
 
 

@@ -574,24 +574,9 @@ body {
 </div>
 
 
-
         </div>
     </div>
 </div>
-
-
-  <!-- <footer class="pc-footer">
-    <div class="footer-wrapper container-fluid">
-      <div class="row">
-  
-        <div class="col-sm-6 ms-auto my-1">
-          <ul class="list-inline footer-link mb-0 justify-content-sm-end d-flex">
-          <a href="#top" class="text-end">กลับไปบนสุด</a>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </footer> -->
 
     
     <div class="col-6 col-md-3 fixed-col">

@@ -506,7 +506,7 @@ body {
               <table width="100%" class="table table-striped table-sm-gap">
     <tr>
         <td width="5%" class="text-center">ที่</td>
-        <td width="10%" class="text-center">เลขที่บาร์โค้ด</td>
+        <td width="10%" class="text-center">รหัสสินค้า</td>
         <td width="40%">สินค้า</td>
         <td width="5%" class="text-center">จำนวน</td>
         <td width="20%" class="text-center">ราคา/ชิ้น</td>

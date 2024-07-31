@@ -121,68 +121,58 @@ if (isset($_GET['b'])) {
 
 
     <br>
+    <table class="table" width="100%">
+        <thead>
+          <tr>
+            <td width="5%" class="text-center">ที่</td>
+            <td width="50%" class="text-start">ชื่อสินค้า</td>
+            <td width="15%" class="text-center">จำนวน</td>
+            <td width="15%" class="text-center">ราคา / หน่วย</td>
+            <td width="15%" class="text-center">รวม</td>
+          </tr>
+        </thead>
 
+        <?php
+include("connectdb.php");
 
-<table class="table" width="100%">
-    <thead>
-        <tr>
-            <td width="5%" class="text-center small">ที่</td>
-            <td width="50%" class="text-start small">ชื่อสินค้า</td>
-            <td width="15%" class="text-center small">จำนวน</td>
-            <td width="15%" class="text-center small">ราคา / หน่วย</td>
-            <td width="15%" class="text-center small">รวม</td>
-        </tr>
-    </thead>
-    <tbody>
-    <?php
-    include("connectdb.php");
+function convert_number_to_words($number) {
+    $fmt = new NumberFormatter('th', NumberFormatter::SPELLOUT);
+    return $fmt->format($number);
+}
 
-    function convert_number_to_words($number) {
-        $fmt = new NumberFormatter('th', NumberFormatter::SPELLOUT);
-        return $fmt->format($number);
-    }
+$sql = "SELECT  *  FROM  orders_detail
+            INNER JOIN products ON orders_detail.p_id = products.id
+            WHERE orders_detail.order_id = '".$_GET['b']."'";
 
-    $order_id = $_GET['b']; // รับค่า order_id จาก URL
+$rs = mysqli_query($conn, $sql);
+$i = 0;
+$total = 0; // Initialize total
 
-    // ดึงข้อมูลจาก orders_detail และ products พร้อมข้อมูลจาก size
-    $sql = "
-        SELECT 
-            od.*,
-            p.name,
-            s.price
-        FROM orders_detail od
-        INNER JOIN products p ON od.p_id = p.id
-        INNER JOIN size s ON p.id = s.id
-        WHERE od.order_id = '$order_id'
-    ";
-    $rs = mysqli_query($conn, $sql);
-    
-    $i = 0;
-    $total = 0; // Initialize total
-
-    while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
-        $i++;
-        $sum = $data['price'] * $data['item'];
-        $total += $sum;
-    ?>
-        <tr>
-            <td class="text-center small"><?=$i;?></td>
-            <td class="small"><?=$data['name'];?></td>
-            <td class="text-center small"><?=$data['item'];?></td>
-            <td class="text-center small"><?=number_format($data['price'], 2);?></td>
-            <td class="text-center small"><?=number_format($sum, 2);?></td>
-        </tr>
-    <?php } ?>
-    <tr>
-        <td colspan="2" class="text-start small"><?= convert_number_to_words($total); ?> บาทถ้วน</td>
-        <td colspan="2" class="text-center small">รวมเงินทั้งสิ้น</td>
-        <td class="text-center small"><strong><?=number_format($total, 2);?></strong> บาท</td>
-    </tr>
-    </tbody>
-</table>
-
-
-
+while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
+    $i++;
+    $sum = $data['price'] * $data['item'];
+    $total += $sum;
+?>
+<tbody>
+  <tr>
+    <td class="text-center font-table"><?=$i;?></td>
+    <td class="font-table"><?=$data['name'];?></td>
+    <td class="text-center font-table"><?=$data['item'];?></td>
+    <td class="text-center font-table"><?=number_format($data['price'], 2);?></td>
+    <td class="text-center font-table"><?=number_format($sum, 2);?></td>
+  </tr>
+<?php  
+}
+?>
+<tr>
+  <!-- <td>&nbsp;</td> -->
+  <td colspan="2" class="text-start small"><?= convert_number_to_words($total); ?>บาทถ้วน</td>
+  <!-- <td>&nbsp;</td> -->
+  <td colspan="2" class="text-center">รวมเงินทั้งสิ้น</td>
+  <td class="text-center"><strong><?=number_format($total, 2); ?></strong> บาท</td>
+</tr>
+</tbody>
+      </table>
 
       <br><br>
       <div class="row">

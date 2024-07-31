@@ -580,7 +580,7 @@ body {
 </div>
 
 
-  <!-- <footer class="pc-footer">
+  <footer class="pc-footer">
     <div class="footer-wrapper container-fluid">
       <div class="row">
   
@@ -591,7 +591,7 @@ body {
         </div>
       </div>
     </div>
-  </footer> -->
+  </footer>
 
     
     <div class="col-6 col-md-3 fixed-col">

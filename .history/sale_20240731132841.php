@@ -574,24 +574,9 @@ body {
 </div>
 
 
-
         </div>
     </div>
 </div>
-
-
-  <!-- <footer class="pc-footer">
-    <div class="footer-wrapper container-fluid">
-      <div class="row">
-  
-        <div class="col-sm-6 ms-auto my-1">
-          <ul class="list-inline footer-link mb-0 justify-content-sm-end d-flex">
-          <a href="#top" class="text-end">กลับไปบนสุด</a>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </footer> -->
 
     
     <div class="col-6 col-md-3 fixed-col">
@@ -677,7 +662,7 @@ body {
         </div>
 
         <div id="qrCodeContainer" style="display: none;">
-          <img class="rounded mx-auto d-block" id="qrCodeImage" src="" alt="QR Code" />
+          <img id="qrCodeImage" src="" alt="QR Code" />
         </div>
       </div>
 
@@ -688,7 +673,6 @@ body {
     </div>
   </div>
 </div>
-
 
         <!-- <form method="post" action="record.php">
   <div class="modal-body">
@@ -728,9 +712,27 @@ body {
 
 
   <!-- [ Main Content ] end -->
-  <!-- <footer class="pc-footer">
+  <footer class="pc-footer">
     <div class="footer-wrapper container-fluid">
       <div class="row">
+
+
+
+
+
+
+  <?php
+// ดึงข้อมูลการซื้อจากหน้า checkout.php
+$product_name = $_POST['product_name'];
+$product_quantity = $_POST['product_quantity'];
+$product_price = $_POST['product_price'];
+$total_price = $product_quantity * $product_price;
+
+// ส่งข้อมูลการซื้อไปยังหน้า detail.php
+// header("Location: detail.php?product_name=$product_name&product_quantity=$product_quantity&product_price=$product_price&total_price=$total_price");
+
+?>
+
   
         <div class="col-sm-6 ms-auto my-1">
           <ul class="list-inline footer-link mb-0 justify-content-sm-end d-flex">
@@ -739,7 +741,7 @@ body {
         </div>
       </div>
     </div>
-  </footer> -->
+  </footer>
 
   <!-- Required Js -->
 <script src="assets/js/plugins/popper.min.js"></script>
@@ -1089,11 +1091,12 @@ document.getElementById('paymentMethod').addEventListener('change', function() {
 });
 
 // ฟังก์ชันที่เรียกเมื่อปิดหรือออกจาก modal
-document.getElementById('paymentModal').addEventListener('hide.bs.modal', function() {
+document.querySelector('.btn-close').addEventListener('click', function() {
     document.getElementById('paymentMethod').value = '1'; // ตั้งค่า select เป็น id 1
     document.getElementById('qrCodeImage').src = ''; // เคลียร์ QR Code
     document.getElementById('qrCodeContainer').style.display = 'none'; // ซ่อน QR Code
 });
+
 
 
 

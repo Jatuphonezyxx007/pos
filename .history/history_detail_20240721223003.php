@@ -504,61 +504,47 @@ body {
 
 
               <table width="100%" class="table table-striped table-sm-gap">
-    <tr>
-        <td width="5%" class="text-center">ที่</td>
-        <td width="10%" class="text-center">เลขที่บาร์โค้ด</td>
-        <td width="40%">สินค้า</td>
-        <td width="5%" class="text-center">จำนวน</td>
-        <td width="20%" class="text-center">ราคา/ชิ้น</td>
-        <td width="20%" class="text-center">รวม (บาท)</td>
-    </tr>
-    
-    <?php
-    include("connectdb.php");
-    $order_id = $_GET['a']; // รับค่า order_id จาก URL
-    
-    // ดึงข้อมูลจาก orders_detail และ products พร้อมข้อมูลจาก size
-    $sql = "
-        SELECT 
-            od.*,
-            p.barcode,
-            p.name,
-            s.price,
-            s.size_name
-        FROM orders_detail od
-        INNER JOIN products p ON od.p_id = p.id
-        INNER JOIN size s ON p.id = s.id
-        WHERE od.order_id = '$order_id'
-    ";
-    $rs = mysqli_query($conn, $sql);
-    
-    $i = 0;
-    $total = 0;
-    
-    while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
-        $i++;
-        $sum = $data['price'] * $data['item'];
-        $total += $sum;
-    ?>
-        <tr>
-            <td class="text-center"><?=$i;?></td>
-            <td class="text-center"><?=@$data['barcode'];?></td>
-            <td><?=$data['name'];?> (<?=$data['size_name'];?>)</td>
-            <td class="text-center"><?=$data['item'];?></td>
-            <td class="text-center"><?=number_format($data['price'], 2);?></td>
-            <td class="text-center"><?=number_format($sum, 2);?></td>
-        </tr>
-    <?php } ?>
-    
-    <tr>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td class="text-center"><strong>ราคารวม</strong></td>
-        <td class="text-center"><strong><?=number_format($total, 2);?> บาท</strong></td>
-    </tr>
-</table>
+              <tr>
+                <td width="5%" class="text-center">ที่</td>
+                <td width="10%" class="text-center">รหัสสินค้า</td>
+                <td width="40%">สินค้า</td>
+                <td width="5%" class="text-center">จำนวน</td>
+                <td width="20%" class="text-center">ราคา/ชิ้น</td>
+                <td width="20%" class="text-center">รวม (บาท)</td>
+              </tr>
+              
+              <?php
+              include("connectdb.php");
+              $sql = "SELECT  *  FROM  orders_detail
+              INNER JOIN products ON orders_detail.p_id = products.id
+              WHERE orders_detail.order_id = '".$_GET['a']."'  ";
+              $rs = mysqli_query($conn, $sql) ;
+              $i = 0;
+              while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
+                $i++;
+                $sum = $data['price'] * $data['item'] ;
+                @$total += $sum;
+                ?>
+                <tr>
+                  <td class="text-center"><?=$i;?></td>
+                  <!-- <td><img src="images/<?=$data['p_picture'];?>" width="80"> <br> -->
+                  <td class="text-center"><?=@$data['id'];?></td>
+                  <td><?=$data['name'];?></td>
+                  <td class="text-center"><?=$data['item'];?></td>
+                  <td class="text-center"><?=number_format($data['price'], 2);?></td>
+                  <td class="text-center"><?=number_format($sum, 2);?></td>
+                </tr>
+                
+                <?php } ?>
+                <tr>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td class="text-center"><strong>ราคารวม</strong></td>
+                  <td class="text-center"><strong><?=number_format($total, 2);?> บาท</strong></td>
+                </tr>
+              </table>
 
 
             </div>

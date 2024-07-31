@@ -121,16 +121,14 @@ if (isset($_GET['b'])) {
 
 
     <br>
-
-
-<table class="table" width="100%">
+    <table class="table" width="100%">
     <thead>
         <tr>
-            <td width="5%" class="text-center small">ที่</td>
-            <td width="50%" class="text-start small">ชื่อสินค้า</td>
-            <td width="15%" class="text-center small">จำนวน</td>
-            <td width="15%" class="text-center small">ราคา / หน่วย</td>
-            <td width="15%" class="text-center small">รวม</td>
+            <td width="5%" class="text-center">ที่</td>
+            <td width="50%" class="text-start">ชื่อสินค้า</td>
+            <td width="15%" class="text-center">จำนวน</td>
+            <td width="15%" class="text-center">ราคา / หน่วย</td>
+            <td width="15%" class="text-center">รวม</td>
         </tr>
     </thead>
     <tbody>
@@ -166,23 +164,20 @@ if (isset($_GET['b'])) {
         $total += $sum;
     ?>
         <tr>
-            <td class="text-center small"><?=$i;?></td>
-            <td class="small"><?=$data['name'];?></td>
-            <td class="text-center small"><?=$data['item'];?></td>
-            <td class="text-center small"><?=number_format($data['price'], 2);?></td>
-            <td class="text-center small"><?=number_format($sum, 2);?></td>
+            <td class="text-center"><?=$i;?></td>
+            <td><?=$data['name'];?></td>
+            <td class="text-center"><?=$data['item'];?></td>
+            <td class="text-center"><?=number_format($data['price'], 2);?></td>
+            <td class="text-center"><?=number_format($sum, 2);?></td>
         </tr>
     <?php } ?>
     <tr>
         <td colspan="2" class="text-start small"><?= convert_number_to_words($total); ?> บาทถ้วน</td>
-        <td colspan="2" class="text-center small">รวมเงินทั้งสิ้น</td>
-        <td class="text-center small"><strong><?=number_format($total, 2);?></strong> บาท</td>
+        <td colspan="2" class="text-center">รวมเงินทั้งสิ้น</td>
+        <td class="text-center"><strong><?=number_format($total, 2);?></strong> บาท</td>
     </tr>
     </tbody>
 </table>
-
-
-
 
       <br><br>
       <div class="row">
