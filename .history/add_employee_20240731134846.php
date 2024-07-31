@@ -48,7 +48,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class=\"spinner-border text-success\" role=\"status\">
                     <span class=\"visually-hidden\">Loading...</span>
                 </div>
-                <div class=\"mt-3\">กำลังบันทึกข้อมูล...</div>
             </div>
         </div>
     `;

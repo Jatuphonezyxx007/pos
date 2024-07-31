@@ -676,8 +676,6 @@ body {
           </div>
         </div>
 
-        <br>
-        
         <div id="qrCodeContainer" style="display: none;">
           <img class="rounded mx-auto d-block" id="qrCodeImage" src="" alt="QR Code" />
         </div>
@@ -685,7 +683,7 @@ body {
 
       <div class="modal-footer">
         <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ย้อนกลับ</button> -->
-        <button type="button" class="btn btn-primary w-100" id="paymentButton">ดำเนินการต่อ</button>
+        <button type="button" class="btn btn-primary" id="paymentButton">ชำระเงิน</button>
       </div>
     </div>
   </div>

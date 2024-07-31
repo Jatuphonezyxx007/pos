@@ -676,8 +676,6 @@ body {
           </div>
         </div>
 
-        <br>
-        
         <div id="qrCodeContainer" style="display: none;">
           <img class="rounded mx-auto d-block" id="qrCodeImage" src="" alt="QR Code" />
         </div>

@@ -40,34 +40,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         echo "<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {});
-    document.getElementById('modalMessage').innerHTML = `
-        <div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\">
-            <div class=\"text-center\">
-                <div class=\"spinner-border text-success\" role=\"status\">
-                    <span class=\"visually-hidden\">Loading...</span>
-                </div>
-                <div class=\"mt-3\">กำลังบันทึกข้อมูล...</div>
-            </div>
-        </div>
-    `;
-    myModal.show();
-    setTimeout(function() {
-        document.getElementById('modalMessage').innerHTML = `
-            <div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\">
-                <div class=\"text-center\">
-                    <i class=\"bi bi-check-circle-fill text-success\" style=\"font-size: 2rem;\"></i>
-                    <div class=\"mt-3\">ข้อมูลพนักงานบันทึกเรียบร้อยแล้ว</div>
-                </div>
-            </div>
-        `;
-        setTimeout(function() {
-            window.location.href = 'employee_list.php';
-        }, 1000);
-    }, 2000);
-});
-</script>";
+        document.addEventListener('DOMContentLoaded', function() {
+            var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {});
+            document.getElementById('modalMessage').innerHTML = '<div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\"><div class=\"spinner-border text-success\" role=\"status\" id=\"spinner\"><span class=\"visually-hidden\">Loading...</span></div></div> กำลังบันทึกข้อมูล...';
+            myModal.show();
+            setTimeout(function() {
+                document.getElementById('modalMessage').innerHTML = '<div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\"><div class=\"text-success\"><i class=\"bi bi-check-circle-fill\"></i> ข้อมูลพนักงานบันทึกเรียบร้อยแล้ว</div></div>';
+                setTimeout(function() {
+                    window.location.href = 'employee_list.php';
+                }, 1000);
+            }, 2000);
+        });
+        </script>";
     } else {
         echo "Error inserting record: " . mysqli_error($conn);
     }
