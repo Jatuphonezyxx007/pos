@@ -35,9 +35,9 @@
 }
 
 .font-xsmall {
-        font-size: 0.25rem; /* หรือคุณสามารถใช้ขนาดที่เล็กกว่าที่คุณต้องการ */
+        font-size: 0.75rem; /* หรือคุณสามารถใช้ขนาดที่เล็กกว่าที่คุณต้องการ */
     }
-
+    
 </style>
 
 </head>
@@ -173,11 +173,7 @@ if (isset($_GET['b'])) {
     ?>
         <tr>
             <td class="text-center small"><?=$i;?></td>
-<td class="small">
-    <?=$data['name'];?>
-    <br>
-    <span class="text-xsmall"><?=$data['size_name'];?></span>
-</td>
+            <td class="small"><?=$data['name'];?><br><?=$data['size_name'];?></td>
             <td class="text-center small"><?=$data['item'];?></td>
             <td class="text-center small"><?=number_format($data['price'], 2);?></td>
             <td class="text-center small"><?=number_format($sum, 2);?></td>

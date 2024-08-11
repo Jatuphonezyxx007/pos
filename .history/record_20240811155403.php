@@ -70,7 +70,6 @@ if (isset($_POST['payments']) && isset($_POST['orderDetails'])) {
 
     // ปริ้นใบรับเงินและรีเฟรชหน้า sale.php
     echo "<script>
-            localStorage.clear(); // ล้างข้อมูลทั้งหมดจาก Local Storage
             window.location.href = 'sale.php';
           </script>";
 } else {

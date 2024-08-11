@@ -1,21 +1,21 @@
 <?php
-// error_reporting(E_NOTICE);
+error_reporting(E_NOTICE);
 
-// 	@session_start();
-// 	include("connectdb.php");
-// 	$sql = "select * from products where id ='{$_GET['id']}' ";
-// 	$rs = mysqli_query($conn, $sql) ;
-// 	$data = mysqli_fetch_array($rs);
-// 	$id = $_GET['id'] ;
+	@session_start();
+	include("connectdb.php");
+	$sql = "select * from products where id ='{$_GET['id']}' ";
+	$rs = mysqli_query($conn, $sql) ;
+	$data = mysqli_fetch_array($rs);
+	$id = $_GET['id'] ;
 	
-// 	if(isset($_GET['id'])) {
-// 		$_SESSION['sid'][$id] = $data['id'];
-// 		$_SESSION['sname'][$id] = $data['name'];
-// 		$_SESSION['sprice'][$id] = $data['price'];
-// 		$_SESSION['ssize'][$id] = $data['size'];
-// 		$_SESSION['spicture'][$id] = $data['img'];
-// 		@$_SESSION['sitem'][$id]++;
-// 	}
+	if(isset($_GET['id'])) {
+		$_SESSION['sid'][$id] = $data['id'];
+		$_SESSION['sname'][$id] = $data['name'];
+		$_SESSION['sprice'][$id] = $data['price'];
+		// $_SESSION['ssize'][$id] = $data['size'];
+		// $_SESSION['spicture'][$id] = $data['img'];
+		@$_SESSION['sitem'][$id]++;
+	}
 
 
 ?>
@@ -191,16 +191,14 @@ body {
 
 
 
-/* input[type="button-cal"] { 
-    width: 100%; 
-    padding: 20px 40px; 
-    background-color: rgb(223, 223, 223); 
-    color: black;
-    font-size: 15px; 
-    font-weight: bold; 
-    border: none; 
-    border-radius: 5px;
-}  */
+#calculatorContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+
 
 
 
@@ -496,91 +494,90 @@ body {
         <div class="pc-content">
             <br> 
             <div id="product-list" class="row g-2">
-            <?php
-include("connectdb.php");
-@$src = $_POST['src'];
-$sql = "SELECT products.*, MIN(size.price) AS min_price, MAX(size.price) AS max_price 
-FROM `products`
-JOIN `size` ON products.id = size.id
-WHERE (`products`.`barcode` LIKE '%{$src}%' OR `products`.`name` LIKE '%{$src}%')
-GROUP BY products.id
-ORDER BY `id` ASC";
+    <?php
+    include("connectdb.php");
+    @$src = $_POST['src'];
+    $sql = "SELECT products.*, MIN(size.price) AS min_price, MAX(size.price) AS max_price 
+    FROM `products`
+    JOIN `size` ON products.id = size.id
+    WHERE (`products`.`barcode` LIKE '%{$src}%' OR `products`.`name` LIKE '%{$src}%')
+    GROUP BY products.id
+    ORDER BY `id` ASC";
 
-$rs = mysqli_query($conn, $sql);
-while ($data = mysqli_fetch_array($rs)){
-?>
-<div class="col-sm-12 col-md-3 col-lg-4">
-    <div class="card">
-        <img src="assets/images/products_2/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="280px">
-        <div class="card-body">
-            <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
-            <p class="card-text">
-                <?php if ($data['min_price'] == $data['max_price']) { ?>
-                    <?= number_format($data['min_price'],); ?> บาท
-                <?php } else { ?>
-                    <?= number_format($data['min_price'],); ?> - <?= number_format($data['max_price'],); ?> บาท
-                <?php } ?>
-            </p>
+    $rs = mysqli_query($conn, $sql);
+    while ($data = mysqli_fetch_array($rs)){
+    ?>
+    <div class="col-sm-12 col-md-3 col-lg-4">
+        <div class="card">
+            <img src="assets/images/products_2/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="280px">
+            <div class="card-body">
+                <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
+                <p class="card-text">
+                    <?php if ($data['min_price'] == $data['max_price']) { ?>
+                        <?= number_format($data['min_price'],); ?> บาท
+                    <?php } else { ?>
+                        <?= number_format($data['min_price'],); ?> - <?= number_format($data['max_price'],); ?> บาท
+                    <?php } ?>
+                </p>
 
-            <!-- Button trigger modal -->
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"
-                data-product-id="<?=$data['id'];?>"
-                data-product-name="<?=$data['name'];?>">
-                เพิ่ม
-            </button>
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                    data-product-id="<?=$data['id'];?>"
+                    data-product-name="<?=$data['name'];?>">
+                    เพิ่ม
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">ชื่อรายการสินค้า</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+    <div id="size-buttons-container"></div>
+    <br><br>
+    <div class="row align-items-center">
+    <div class="col-2">
+        <p class="mb-0">จำนวน</p>
+    </div>
+    <div class="col-5">
+        <div class="input-group input-group-sm">
+            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="decreaseQuantity()"><i class="ph ph-minus-circle"></i></button>
+            <input class="form-control form-control-sm mx-2" type="number" id="quantity" min="1" value="1" readonly>
+            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="increaseQuantity()"><i class="ph ph-plus-circle"></i></button>
         </div>
     </div>
-</div>
-<?php
-}
-mysqli_close($conn);
-?> 
+</div>    
+
+<br>
+
+    <div class="row align-items-center">
+        <div class="col-auto">
+            <p class="mb-0 text-start">ราคา</p>
+        </div>
+        <div class="col">
+            <p id="price-display" class="mb-0 text-start">0 บาท</p>
+        </div>
+    </div>
 
 </div>
-
-
-
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">ชื่อรายการสินค้า</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="size-buttons-container"></div>
-                <br><br>
-                <div class="row align-items-center">
-                    <div class="col-2">
-                        <p class="mb-0">จำนวน</p>
-                    </div>
-                    <div class="col-5">
-                        <div class="input-group input-group-sm">
-                            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="decreaseQuantity()"><i class="ph ph-minus-circle"></i></button>
-                            <input class="form-control form-control-sm mx-2" type="number" id="quantity" min="1" value="1" readonly>
-                            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="increaseQuantity()"><i class="ph ph-plus-circle"></i></button>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary w-100" id="add-to-order-button">
+                                  <i class="ph ph-check"></i>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </div>    
-
-                <br>
-
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <p class="mb-0 text-start">ราคา</p>
-                    </div>
-                    <div class="col">
-                        <p id="price-display" class="mb-0 text-start">0 บาท</p>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary w-100" id="add-to-order-button">
-                  <i class="ph ph-check"></i>
-                </button>
-            </div>
         </div>
     </div>
+    <?php
+    }
+    mysqli_close($conn);
+    ?> 
 </div>
 
 
@@ -626,7 +623,7 @@ mysqli_close($conn);
         <tfoot>
             <tr>
                 <td colspan="3" class="text-end"><strong>รวม</strong></td>
-                <td class="text-center" id="total-price"><strong>0 บาท</strong></td>
+                <td class="text-center" id="total-price"><strong>0</strong></td>
             </tr>
         </tfoot>
     </table>
@@ -648,7 +645,7 @@ mysqli_close($conn);
 
   <!-- <a href="clear.php" class="btn btn-danger">ล้างทั้งหมด</a> -->
 
-  <a href="#" class="btn btn-danger" id="clear-order-button">ล้างทั้งหมด</a>
+  <a href="#" class="btn btn-danger" onclick="window.location.reload(); return false;">ล้างทั้งหมด</a>
 
 </p>
         </div>
@@ -671,12 +668,11 @@ mysqli_close($conn);
         <div class="col-md">
           <div class="form-floating">
             <select class="form-select" id="paymentMethod" aria-label="payment" name="payments">
-            <option value="" disabled selected>กรุณาเลือกการชำระเงิน</option>
               <?php
               include("connectdb.php");
               $sql2 = "SELECT * FROM `paymethod`";
               $rs2 = mysqli_query($conn, $sql2);
-              while ($data2 = mysqli_fetch_array($rs2)){
+              while ($data2 = mysqli_fetch_array($rs2)) {
               ?>
                 <option value="<?=$data2['PayMethod_id'];?>">
                   <?=$data2['PayMethod_name'];?>
@@ -687,62 +683,45 @@ mysqli_close($conn);
           </div>
         </div>
 
-        <br>
-
-        <!-- <div class="container"> -->
-
-        <div id="calContainer" style="display: none;">
-<!-- ตารางเครื่องคิดเลข -->
-<table class="table table-bordered" width="100%" id="calcu">
-            <tr>
-                <td colspan="4">
-                    <input class="form-control text-end w-100 fs-4" type="text" id="result" readonly value="0">
-                </td>
-            </tr>
-            <tr>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('7')">7</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('8')">8</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('9')">9</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('1000')">1000</button></td>
-            </tr>
-            <tr>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('4')">4</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('5')">5</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('6')">6</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('500')">500</button></td>
-            </tr>
-            <tr>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('1')">1</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('2')">2</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('3')">3</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('100')">100</button></td>
-            </tr>
-            <tr>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('.')">.</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('0')">0</button></td>
-                <td><button class="btn btn-secondary w-100" onclick="deleteLastChar()">ลบ</button></td>
-                <td><button class="btn btn-primary w-100" onclick="calculateTotal()">เต็ม</button></td>
-            </tr>
-        </table>
-      </div>
-
-<!-- </div> -->
-
-
-        
         <div id="qrCodeContainer" style="display: none;">
-          <img class="rounded mx-auto d-block" id="qrCodeImage" src="" alt="QR Code" />
+          <img id="qrCodeImage" src="" alt="QR Code" />
+        </div>
+
+        <div id="calculatorContainer" style="display: none;">
+          <!-- เครื่องคิดเลข HTML -->
+          <div class="calculator card">
+            <input type="text" class="calculator-screen z-depth-1" value="" disabled />
+            <div class="calculator-keys">
+              <!-- เครื่องคิดเลขปุ่ม -->
+              <button type="button" data-mdb-button-init class="operator btn btn-info" value="+">+</button>
+              <button type="button" data-mdb-button-init class="operator btn btn-info" value="-">-</button>
+              <button type="button" data-mdb-button-init class="operator btn btn-info" value="*">&times;</button>
+              <button type="button" data-mdb-button-init class="operator btn btn-info" value="/">&divide;</button>
+              <button type="button" data-mdb-button-init value="7" data-mdb-ripple-init class="btn btn-light waves-effect">7</button>
+              <button type="button" data-mdb-button-init value="8" data-mdb-ripple-init class="btn btn-light waves-effect">8</button>
+              <button type="button" data-mdb-button-init value="9" data-mdb-ripple-init class="btn btn-light waves-effect">9</button>
+              <button type="button" data-mdb-button-init value="4" data-mdb-ripple-init class="btn btn-light waves-effect">4</button>
+              <button type="button" data-mdb-button-init value="5" data-mdb-ripple-init class="btn btn-light waves-effect">5</button>
+              <button type="button" data-mdb-button-init value="6" data-mdb-ripple-init class="btn btn-light waves-effect">6</button>
+              <button type="button" data-mdb-button-init value="1" data-mdb-ripple-init class="btn btn-light waves-effect">1</button>
+              <button type="button" data-mdb-button-init value="2" data-mdb-ripple-init class="btn btn-light waves-effect">2</button>
+              <button type="button" data-mdb-button-init value="3" data-mdb-ripple-init class="btn btn-light waves-effect">3</button>
+              <button type="button" data-mdb-button-init value="0" data-mdb-ripple-init class="btn btn-light waves-effect">0</button>
+              <button type="button" data-mdb-button-init class="decimal function btn btn-secondary" value=".">.</button>
+              <button type="button" data-mdb-button-init class="all-clear function btn btn-danger btn-sm" value="all-clear">AC</button>
+              <button type="button" data-mdb-button-init class="equal-sign operator btn btn-default" value="=">=</button>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="modal-footer">
-        <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ย้อนกลับ</button> -->
-        <button type="button" class="btn btn-primary w-100" id="paymentButton">ดำเนินการต่อ</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ย้อนกลับ</button>
+        <button type="button" class="btn btn-primary" id="paymentButton">ดำเนินการต่อ</button>
       </div>
     </div>
   </div>
 </div>
-
 
         <!-- <form method="post" action="record.php">
   <div class="modal-body">
@@ -914,7 +893,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updatePriceDisplay() {
         let quantity = parseInt(quantityInput.value);
         let totalPrice = pricePerUnit * quantity;
-        priceContainer.textContent = totalPrice.toLocaleString();
+        priceContainer.textContent = totalPrice.toLocaleString() + ' บาท';
     }
 
     modal.addEventListener('show.bs.modal', function (event) {
@@ -978,14 +957,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-
-
-
-
-
-
 // ฟังก์ชันเพื่อเพิ่มรายการใหม่ในตาราง
 document.getElementById('add-to-order-button').addEventListener('click', function() {
+    let quantityInput = document.getElementById('quantity'); // ค่าของจำนวน
     let quantity = parseInt(quantityInput.value);
     let totalPrice = pricePerUnit * quantity;
 
@@ -1005,7 +979,7 @@ document.getElementById('add-to-order-button').addEventListener('click', functio
 
         let existingPrice = parseFloat(existingRow.querySelector('.price').textContent.replace(/[^0-9.-]+/g, ""));
         let newPrice = (existingPrice / existingQuantity) * newQuantity;
-        existingRow.querySelector('.price').textContent = newPrice.toLocaleString();
+        existingRow.querySelector('.price').textContent = newPrice.toLocaleString() + ' บาท';
     } else {
         // ถ้าไม่มีสินค้านี้ในตาราง
         let newRow = document.createElement('tr');
@@ -1023,52 +997,8 @@ document.getElementById('add-to-order-button').addEventListener('click', functio
     }
 
     updateTotalPrice();
-
-    // เก็บรายการสินค้าลงใน Local Storage
-    saveOrderList();
-
-    // รีเฟรชหน้า
-    window.location.reload();  // รีเฟรชหน้า sale.php
+    $('#exampleModal').modal('hide');
 });
-
-// ฟังก์ชันเพื่อเก็บรายการสินค้าลงใน Local Storage
-function saveOrderList() {
-    let orderList = document.getElementById('order-list').innerHTML;
-    localStorage.setItem('orderList', orderList);
-}
-
-// ฟังก์ชันเพื่อโหลดรายการสินค้าจาก Local Storage เมื่อเปิดหน้า
-function loadOrderList() {
-    let savedOrderList = localStorage.getItem('orderList');
-    if (savedOrderList) {
-        document.getElementById('order-list').innerHTML = savedOrderList;
-        updateTotalPrice(); // อัปเดตราคาทั้งหมดหลังจากโหลดรายการ
-    }
-}
-
-// ฟังก์ชันเพื่อเคลียร์ Local Storage และรีเฟรชหน้า
-function clearOrderList() {
-    localStorage.removeItem('orderList'); // ล้างข้อมูลใน Local Storage
-    window.location.reload(); // รีเฟรชหน้า sale.php
-}
-
-// เรียกใช้ฟังก์ชันโหลดรายการสินค้าทันทีที่หน้าเว็บโหลดเสร็จ
-window.onload = loadOrderList;
-
-// เรียกใช้ฟังก์ชัน clearOrderList เมื่อคลิกปุ่ม "ล้างทั้งหมด"
-document.getElementById('clear-order-button').addEventListener('click', clearOrderList);
-
-
-
-
-
-
-
-
-
-
-
-
 
 // ใช้ event delegation เพื่อให้สามารถลบได้จากปุ่ม delete-button
 document.getElementById('order-list').addEventListener('click', function(event) {
@@ -1110,6 +1040,7 @@ document.getElementById('pay-button').addEventListener('click', function(event) 
 
 
 document.getElementById('paymentButton').addEventListener('click', function() {
+    // รับค่าจากตาราง
     var orderList = document.getElementById('order-list');
     var orderDetails = [];
     
@@ -1127,22 +1058,23 @@ document.getElementById('paymentButton').addEventListener('click', function() {
         });
     }
 
-    // ตรวจสอบข้อมูลใน orderDetails
-    console.log(orderDetails);
-
+    // รับค่าจากวิธีการชำระเงินที่เลือก
     var paymentMethod = document.getElementById('paymentMethod').value;
 
     if (paymentMethod) {
+        // สร้างฟอร์มแบบไดนามิก
         var form = document.createElement('form');
         form.method = 'POST';
         form.action = 'record.php';
         
+        // เพิ่มข้อมูลการชำระเงิน
         var paymentInput = document.createElement('input');
         paymentInput.type = 'hidden';
         paymentInput.name = 'payments';
         paymentInput.value = paymentMethod;
         form.appendChild(paymentInput);
 
+        // เพิ่มข้อมูลการสั่งซื้อ
         var orderDetailsInput = document.createElement('input');
         orderDetailsInput.type = 'hidden';
         orderDetailsInput.name = 'orderDetails';
@@ -1155,7 +1087,6 @@ document.getElementById('paymentButton').addEventListener('click', function() {
         alert('กรุณาเลือกวิธีการชำระเงิน');
     }
 });
-
 
 
 
@@ -1175,116 +1106,40 @@ function calculateTotalPrice() {
     return totalPrice.toLocaleString(); // ใช้ใน URL จะได้ราคารวมที่ไม่ใช้จุดทศนิยม
 }
 
+
+
+
 // ฟังก์ชันที่เรียกเมื่อเลือกวิธีการชำระเงิน
 document.getElementById('paymentMethod').addEventListener('change', function() {
     var selectedValue = this.value;
     var qrCodeContainer = document.getElementById('qrCodeContainer');
     var qrCodeImage = document.getElementById('qrCodeImage');
-    var calContainer = document.getElementById('calContainer');
 
     if (selectedValue == '2') { // 2 คือ paymethod_id ของ PromtPay
         var totalPrice = calculateTotalPrice();
         qrCodeImage.src = `https://promptpay.io/0955426971/${totalPrice}.png`; // เปลี่ยน URL ให้มีราคารวม
         qrCodeContainer.style.display = 'block'; // แสดง QR Code
-        calContainer.style.display = 'none'; // ซ่อน Calculator Container
-    } else if (selectedValue == '1') { // 1 คือ paymethod_id ของ Cash
-        qrCodeContainer.style.display = 'none'; // ซ่อน QR Code
-        calContainer.style.display = 'block'; // แสดง Calculator Container
     } else {
         qrCodeContainer.style.display = 'none'; // ซ่อน QR Code
-        calContainer.style.display = 'none'; // ซ่อน Calculator Container
     }
 });
+
+
+
+
+
+
+
+
+
 
 // ฟังก์ชันที่เรียกเมื่อปิดหรือออกจาก modal
 document.getElementById('paymentModal').addEventListener('hide.bs.modal', function() {
     document.getElementById('paymentMethod').value = '1'; // ตั้งค่า select เป็น id 1
     document.getElementById('qrCodeImage').src = ''; // เคลียร์ QR Code
     document.getElementById('qrCodeContainer').style.display = 'none'; // ซ่อน QR Code
-    document.getElementById('calContainer').style.display = 'block'; // แสดง Calculator Container
 });
 
-// ฟังก์ชันคำนวณราคารวม (ต้องสร้างฟังก์ชันนี้ให้ทำงานได้ตามต้องการ)
-function calculateTotalPrice() {
-    // สมมติว่าเป็นการคำนวณราคารวมของสินค้าในตะกร้า
-    return 1000; // ปรับให้ตรงกับความต้องการของคุณ
-}
-
-
-
-
-
-
-
-          //เครื่องคิดเลข
-//           document.addEventListener('DOMContentLoaded', function() {
-//     const resultField = document.getElementById('result');
-//     const buttons = document.querySelectorAll('#calcu input[type="button"]');
-
-//     buttons.forEach(button => {
-//         button.addEventListener('click', function() {
-//             const value = this.value;
-
-//             if (value === 'เต็ม') {
-//                 // Calculate and display result
-//                 try {
-//                     resultField.value = eval(resultField.value);
-//                 } catch (e) {
-//                     resultField.value = 'Error';
-//                 }
-//             } else if (value === 'ลบ') {
-//                 // Remove the last character from the result field
-//                 if (resultField.value.length > 1) {
-//                     resultField.value = resultField.value.slice(0, -1);
-//                 } else {
-//                     resultField.value = '0'; // Reset to 0 if only one character left
-//                 }
-//             } else {
-//                 // Append value to result field
-//                 if (resultField.value === '0') {
-//                     resultField.value = value;
-//                 } else {
-//                     resultField.value += value;
-//                 }
-//             }
-//         });
-//     });
-// });
-
-
-
-
-
-
-
-function addToResult(value) {
-            let result = document.getElementById("result");
-            if (result.value === "0" && value !== ".") {
-                result.value = value; // แสดงค่าที่กดแทนที่ 0
-            } else {
-                result.value += value; // เพิ่มค่าที่กดเข้ามา
-            }
-        }
-
-        function deleteLastChar() {
-            let result = document.getElementById("result");
-            if (result.value.length > 1) {
-                result.value = result.value.slice(0, -1); // ลบตัวเลขตัวสุดท้าย
-            } else {
-                result.value = "0"; // ถ้าลบแล้วเหลือเพียงตัวเลขเดียว ให้แสดงเป็น 0
-            }
-        }
-
-        // function calculateTotal() {
-        //     // ตัวอย่างการคำนวณ: แสดงผลรวมของค่าที่กรอก
-        //     let result = document.getElementById("result");
-        //     try {
-        //         // คำนวณค่าผลลัพธ์ ถ้าค่าที่กรอกเป็นการคำนวณที่ถูกต้อง
-        //         result.value = eval(result.value);
-        //     } catch {
-        //         result.value = "Error"; // แสดงข้อความผิดพลาด
-        //     }
-        // }
 
 
 

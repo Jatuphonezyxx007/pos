@@ -626,7 +626,7 @@ mysqli_close($conn);
         <tfoot>
             <tr>
                 <td colspan="3" class="text-end"><strong>รวม</strong></td>
-                <td class="text-center" id="total-price"><strong>0 บาท</strong></td>
+                <td class="text-center" id="total-price"><strong>0</strong></td>
             </tr>
         </tfoot>
     </table>
@@ -648,7 +648,7 @@ mysqli_close($conn);
 
   <!-- <a href="clear.php" class="btn btn-danger">ล้างทั้งหมด</a> -->
 
-  <a href="#" class="btn btn-danger" id="clear-order-button">ล้างทั้งหมด</a>
+  <a href="#" class="btn btn-danger" onclick="clearOrderList(); return false;">ล้างทั้งหมด</a>
 
 </p>
         </div>
@@ -914,7 +914,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updatePriceDisplay() {
         let quantity = parseInt(quantityInput.value);
         let totalPrice = pricePerUnit * quantity;
-        priceContainer.textContent = totalPrice.toLocaleString();
+        priceContainer.textContent = totalPrice.toLocaleString() + ' บาท';
     }
 
     modal.addEventListener('show.bs.modal', function (event) {
@@ -1005,7 +1005,7 @@ document.getElementById('add-to-order-button').addEventListener('click', functio
 
         let existingPrice = parseFloat(existingRow.querySelector('.price').textContent.replace(/[^0-9.-]+/g, ""));
         let newPrice = (existingPrice / existingQuantity) * newQuantity;
-        existingRow.querySelector('.price').textContent = newPrice.toLocaleString();
+        existingRow.querySelector('.price').textContent = newPrice.toLocaleString() + ' บาท';
     } else {
         // ถ้าไม่มีสินค้านี้ในตาราง
         let newRow = document.createElement('tr');
@@ -1017,7 +1017,7 @@ document.getElementById('add-to-order-button').addEventListener('click', functio
                 <a href="#" class="ph ph-trash text-danger delete-button"></a>
             </td>
             <td class="text-center quantity">${quantity}</td>
-            <td class="text-end price">${totalPrice.toLocaleString()}</td>
+            <td class="text-end price">${totalPrice.toLocaleString()} บาท</td>
         `;
         orderList.appendChild(newRow);
     }
@@ -1046,19 +1046,18 @@ function loadOrderList() {
     }
 }
 
+// เรียกใช้ฟังก์ชันโหลดรายการสินค้าทันทีที่หน้าเว็บโหลดเสร็จ
+window.onload = loadOrderList;
+
+
+
+
+
 // ฟังก์ชันเพื่อเคลียร์ Local Storage และรีเฟรชหน้า
 function clearOrderList() {
     localStorage.removeItem('orderList'); // ล้างข้อมูลใน Local Storage
     window.location.reload(); // รีเฟรชหน้า sale.php
 }
-
-// เรียกใช้ฟังก์ชันโหลดรายการสินค้าทันทีที่หน้าเว็บโหลดเสร็จ
-window.onload = loadOrderList;
-
-// เรียกใช้ฟังก์ชัน clearOrderList เมื่อคลิกปุ่ม "ล้างทั้งหมด"
-document.getElementById('clear-order-button').addEventListener('click', clearOrderList);
-
-
 
 
 

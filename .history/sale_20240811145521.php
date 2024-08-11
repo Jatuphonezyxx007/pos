@@ -1,21 +1,21 @@
 <?php
-// error_reporting(E_NOTICE);
+error_reporting(E_NOTICE);
 
-// 	@session_start();
-// 	include("connectdb.php");
-// 	$sql = "select * from products where id ='{$_GET['id']}' ";
-// 	$rs = mysqli_query($conn, $sql) ;
-// 	$data = mysqli_fetch_array($rs);
-// 	$id = $_GET['id'] ;
+	@session_start();
+	include("connectdb.php");
+	$sql = "select * from products where id ='{$_GET['id']}' ";
+	$rs = mysqli_query($conn, $sql) ;
+	$data = mysqli_fetch_array($rs);
+	$id = $_GET['id'] ;
 	
-// 	if(isset($_GET['id'])) {
-// 		$_SESSION['sid'][$id] = $data['id'];
-// 		$_SESSION['sname'][$id] = $data['name'];
-// 		$_SESSION['sprice'][$id] = $data['price'];
-// 		$_SESSION['ssize'][$id] = $data['size'];
-// 		$_SESSION['spicture'][$id] = $data['img'];
-// 		@$_SESSION['sitem'][$id]++;
-// 	}
+	if(isset($_GET['id'])) {
+		$_SESSION['sid'][$id] = $data['id'];
+		$_SESSION['sname'][$id] = $data['name'];
+		$_SESSION['sprice'][$id] = $data['price'];
+		// $_SESSION['ssize'][$id] = $data['size'];
+		// $_SESSION['spicture'][$id] = $data['img'];
+		@$_SESSION['sitem'][$id]++;
+	}
 
 
 ?>
@@ -524,10 +524,10 @@ while ($data = mysqli_fetch_array($rs)){
 
             <!-- Button trigger modal -->
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"
-                data-product-id="<?=$data['id'];?>"
-                data-product-name="<?=$data['name'];?>">
-                เพิ่ม
-            </button>
+    data-product-id="<?=$data['id'];?>"
+    data-product-name="<?=$data['name'];?>">
+    เพิ่ม
+</button>
         </div>
     </div>
 </div>
@@ -626,7 +626,7 @@ mysqli_close($conn);
         <tfoot>
             <tr>
                 <td colspan="3" class="text-end"><strong>รวม</strong></td>
-                <td class="text-center" id="total-price"><strong>0 บาท</strong></td>
+                <td class="text-center" id="total-price"><strong>0</strong></td>
             </tr>
         </tfoot>
     </table>
@@ -648,7 +648,7 @@ mysqli_close($conn);
 
   <!-- <a href="clear.php" class="btn btn-danger">ล้างทั้งหมด</a> -->
 
-  <a href="#" class="btn btn-danger" id="clear-order-button">ล้างทั้งหมด</a>
+  <a href="#" class="btn btn-danger" onclick="window.location.reload(); return false;">ล้างทั้งหมด</a>
 
 </p>
         </div>
@@ -914,7 +914,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updatePriceDisplay() {
         let quantity = parseInt(quantityInput.value);
         let totalPrice = pricePerUnit * quantity;
-        priceContainer.textContent = totalPrice.toLocaleString();
+        priceContainer.textContent = totalPrice.toLocaleString() + ' บาท';
     }
 
     modal.addEventListener('show.bs.modal', function (event) {
@@ -929,6 +929,37 @@ document.addEventListener('DOMContentLoaded', function() {
         pricePerUnit = 0;
         maxQuantity = 0;
 
+
+        
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+    var modal = document.getElementById('exampleModal');
+    var modalTitle = modal.querySelector('.modal-title');
+    var sizeButtonsContainer = modal.querySelector('#size-buttons-container');
+    var priceContainer = modal.querySelector('#price-display');
+    var quantityInput = document.getElementById("quantity");
+    var pricePerUnit = 0;
+    var maxQuantity = 0;
+    var productName = '';
+    var productSize = '';
+
+    // ฟังก์ชันตั้งค่าโมดัลเมื่อแสดง
+    modal.addEventListener('show.bs.modal', function(event) {
+        var button = event.relatedTarget; // ปุ่มที่ถูกคลิก
+        var productId = button.getAttribute('data-product-id');
+        productName = button.getAttribute('data-product-name');
+
+        // อัปเดตชื่อสินค้าในโมดัล
+        modalTitle.textContent = 'ชื่อสินค้า: ' + productName;
+
+        // รีเซ็ตค่าต่าง ๆ ในโมดัล
+        sizeButtonsContainer.innerHTML = ''; // ล้างข้อมูลเดิมก่อน
+        priceContainer.textContent = '0 บาท';
+        pricePerUnit = 0;
+        maxQuantity = 0;
+
+        // ดึงข้อมูลขนาดของสินค้า
         fetch('fetch_sizes.php', {
             method: 'POST',
             headers: {
@@ -938,12 +969,12 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.text())
         .then(data => {
-            var sizeButtonsContainer = modal.querySelector('#size-buttons-container');
-            sizeButtonsContainer.innerHTML = data;
+            sizeButtonsContainer.innerHTML = data; // แสดงปุ่มขนาดสินค้า
         })
         .catch(error => console.error('Error:', error));
     });
 
+    // รีเซ็ตโมดัลเมื่อซ่อน
     modal.addEventListener('hide.bs.modal', function () {
         priceContainer.textContent = '0 บาท';
         pricePerUnit = 0;
@@ -952,6 +983,7 @@ document.addEventListener('DOMContentLoaded', function() {
         quantityInput.max = 1;
     });
 
+    // การคลิกที่ปุ่มขนาด
     $(document).on('click', '.size-button', function() {
         $('.size-button').removeClass('selected');
         $(this).addClass('selected');
@@ -978,6 +1010,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    function updatePriceDisplay() {
+        let quantity = parseInt(quantityInput.value);
+        let totalPrice = pricePerUnit * quantity;
+        priceContainer.textContent = totalPrice.toLocaleString() + ' บาท';
+    }
+
+    function setPricePerUnit(price, qty) {
+        pricePerUnit = price;
+        maxQuantity = qty;
+        quantityInput.max = maxQuantity;
+
+        if (maxQuantity === 0) {
+            pricePerUnit = 0;
+            quantityInput.value = 0;
+        } else {
+            quantityInput.value = 1;
+        }
+
+        updatePriceDisplay();
+    }
+});
+
 
 
 
@@ -986,6 +1040,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ฟังก์ชันเพื่อเพิ่มรายการใหม่ในตาราง
 document.getElementById('add-to-order-button').addEventListener('click', function() {
+    let quantityInput = document.getElementById('quantity'); // ค่าของจำนวน
     let quantity = parseInt(quantityInput.value);
     let totalPrice = pricePerUnit * quantity;
 
@@ -1005,7 +1060,7 @@ document.getElementById('add-to-order-button').addEventListener('click', functio
 
         let existingPrice = parseFloat(existingRow.querySelector('.price').textContent.replace(/[^0-9.-]+/g, ""));
         let newPrice = (existingPrice / existingQuantity) * newQuantity;
-        existingRow.querySelector('.price').textContent = newPrice.toLocaleString();
+        existingRow.querySelector('.price').textContent = newPrice.toLocaleString() + ' บาท';
     } else {
         // ถ้าไม่มีสินค้านี้ในตาราง
         let newRow = document.createElement('tr');
@@ -1023,52 +1078,8 @@ document.getElementById('add-to-order-button').addEventListener('click', functio
     }
 
     updateTotalPrice();
-
-    // เก็บรายการสินค้าลงใน Local Storage
-    saveOrderList();
-
-    // รีเฟรชหน้า
-    window.location.reload();  // รีเฟรชหน้า sale.php
+    $('#exampleModal').modal('hide');
 });
-
-// ฟังก์ชันเพื่อเก็บรายการสินค้าลงใน Local Storage
-function saveOrderList() {
-    let orderList = document.getElementById('order-list').innerHTML;
-    localStorage.setItem('orderList', orderList);
-}
-
-// ฟังก์ชันเพื่อโหลดรายการสินค้าจาก Local Storage เมื่อเปิดหน้า
-function loadOrderList() {
-    let savedOrderList = localStorage.getItem('orderList');
-    if (savedOrderList) {
-        document.getElementById('order-list').innerHTML = savedOrderList;
-        updateTotalPrice(); // อัปเดตราคาทั้งหมดหลังจากโหลดรายการ
-    }
-}
-
-// ฟังก์ชันเพื่อเคลียร์ Local Storage และรีเฟรชหน้า
-function clearOrderList() {
-    localStorage.removeItem('orderList'); // ล้างข้อมูลใน Local Storage
-    window.location.reload(); // รีเฟรชหน้า sale.php
-}
-
-// เรียกใช้ฟังก์ชันโหลดรายการสินค้าทันทีที่หน้าเว็บโหลดเสร็จ
-window.onload = loadOrderList;
-
-// เรียกใช้ฟังก์ชัน clearOrderList เมื่อคลิกปุ่ม "ล้างทั้งหมด"
-document.getElementById('clear-order-button').addEventListener('click', clearOrderList);
-
-
-
-
-
-
-
-
-
-
-
-
 
 // ใช้ event delegation เพื่อให้สามารถลบได้จากปุ่ม delete-button
 document.getElementById('order-list').addEventListener('click', function(event) {
@@ -1110,6 +1121,7 @@ document.getElementById('pay-button').addEventListener('click', function(event) 
 
 
 document.getElementById('paymentButton').addEventListener('click', function() {
+    // รับค่าจากตาราง
     var orderList = document.getElementById('order-list');
     var orderDetails = [];
     
@@ -1127,22 +1139,23 @@ document.getElementById('paymentButton').addEventListener('click', function() {
         });
     }
 
-    // ตรวจสอบข้อมูลใน orderDetails
-    console.log(orderDetails);
-
+    // รับค่าจากวิธีการชำระเงินที่เลือก
     var paymentMethod = document.getElementById('paymentMethod').value;
 
     if (paymentMethod) {
+        // สร้างฟอร์มแบบไดนามิก
         var form = document.createElement('form');
         form.method = 'POST';
         form.action = 'record.php';
         
+        // เพิ่มข้อมูลการชำระเงิน
         var paymentInput = document.createElement('input');
         paymentInput.type = 'hidden';
         paymentInput.name = 'payments';
         paymentInput.value = paymentMethod;
         form.appendChild(paymentInput);
 
+        // เพิ่มข้อมูลการสั่งซื้อ
         var orderDetailsInput = document.createElement('input');
         orderDetailsInput.type = 'hidden';
         orderDetailsInput.name = 'orderDetails';
@@ -1155,7 +1168,6 @@ document.getElementById('paymentButton').addEventListener('click', function() {
         alert('กรุณาเลือกวิธีการชำระเงิน');
     }
 });
-
 
 
 

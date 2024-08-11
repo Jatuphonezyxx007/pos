@@ -33,11 +33,6 @@
 .row1{
   height: 15px;;
 }
-
-.font-xsmall {
-        font-size: 0.25rem; /* หรือคุณสามารถใช้ขนาดที่เล็กกว่าที่คุณต้องการ */
-    }
-
 </style>
 
 </head>
@@ -151,16 +146,15 @@ if (isset($_GET['b'])) {
 
     // ดึงข้อมูลจาก orders_detail และ products พร้อมข้อมูลจาก size
     $sql = "
-    SELECT 
-        od.*,
-        p.name,
-        s.price,
-        s.size_name
-    FROM orders_detail od
-    INNER JOIN products p ON od.p_id = p.id
-    INNER JOIN size s ON od.s_id = s.size_id
-    WHERE od.order_id = '$order_id'
-";
+        SELECT 
+            od.*,
+            p.name,
+            s.price
+        FROM orders_detail od
+        INNER JOIN products p ON od.p_id = p.id
+        INNER JOIN size s ON p.id = s.id
+        WHERE od.order_id = '$order_id'
+    ";
     $rs = mysqli_query($conn, $sql);
     
     $i = 0;
@@ -173,11 +167,7 @@ if (isset($_GET['b'])) {
     ?>
         <tr>
             <td class="text-center small"><?=$i;?></td>
-<td class="small">
-    <?=$data['name'];?>
-    <br>
-    <span class="text-xsmall"><?=$data['size_name'];?></span>
-</td>
+            <td class="small"><?=$data['name'];?></td>
             <td class="text-center small"><?=$data['item'];?></td>
             <td class="text-center small"><?=number_format($data['price'], 2);?></td>
             <td class="text-center small"><?=number_format($sum, 2);?></td>

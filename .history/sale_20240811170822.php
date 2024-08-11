@@ -626,7 +626,7 @@ mysqli_close($conn);
         <tfoot>
             <tr>
                 <td colspan="3" class="text-end"><strong>รวม</strong></td>
-                <td class="text-center" id="total-price"><strong>0 บาท</strong></td>
+                <td class="text-center" id="total-price"><strong>0</strong></td>
             </tr>
         </tfoot>
     </table>

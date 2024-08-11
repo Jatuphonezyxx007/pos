@@ -626,7 +626,7 @@ mysqli_close($conn);
         <tfoot>
             <tr>
                 <td colspan="3" class="text-end"><strong>รวม</strong></td>
-                <td class="text-center" id="total-price"><strong>0 บาท</strong></td>
+                <td class="text-center" id="total-price"><strong>0</strong></td>
             </tr>
         </tfoot>
     </table>
@@ -1017,7 +1017,7 @@ document.getElementById('add-to-order-button').addEventListener('click', functio
                 <a href="#" class="ph ph-trash text-danger delete-button"></a>
             </td>
             <td class="text-center quantity">${quantity}</td>
-            <td class="text-end price">${totalPrice.toLocaleString()}</td>
+            <td class="text-end price">${totalPrice.toLocaleString()} บาท</td>
         `;
         orderList.appendChild(newRow);
     }
