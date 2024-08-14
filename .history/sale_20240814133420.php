@@ -1168,11 +1168,11 @@ function calculateTotalPrice() {
 
     rows.forEach(row => {
         let quantity = parseInt(row.querySelector('.quantity').textContent);
-        let price = parseFloat(row.querySelector('.price').textContent.replace(/[^0-9.-]+/g, ""));
-        totalPrice += price;
+        let total = parseFloat(row.querySelector('.price').textContent.replace(/[^0-9.-]+/g, ""));
+        totalPrice += total;
     });
 
-    return totalPrice; // ส่งคืนราคารวม
+    return totalPrice.toLocaleString(); // ใช้ใน URL จะได้ราคารวมที่ไม่ใช้จุดทศนิยม
 }
 
 // ฟังก์ชันที่เรียกเมื่อเลือกวิธีการชำระเงิน
@@ -1183,8 +1183,8 @@ document.getElementById('paymentMethod').addEventListener('change', function() {
     var calContainer = document.getElementById('calContainer');
 
     if (selectedValue == '2') { // 2 คือ paymethod_id ของ PromtPay
-        var totalPrice = calculateTotalPrice().toFixed(2); // คำนวณราคารวมและรูปแบบทศนิยมสองตำแหน่ง
-        qrCodeImage.src = `https://promptpay.io/0955426971/${totalPrice}.png?filename=QRCode_${totalPrice}.png`; // ใช้ราคารวมเป็นชื่อไฟล์
+        var totalPrice = calculateTotalPrice();
+        qrCodeImage.src = `https://promptpay.io/0955426971/${totalPrice}.png`; // เปลี่ยน URL ให้มีราคารวม
         qrCodeContainer.style.display = 'block'; // แสดง QR Code
         calContainer.style.display = 'none'; // ซ่อน Calculator Container
     } else if (selectedValue == '1') { // 1 คือ paymethod_id ของ Cash
