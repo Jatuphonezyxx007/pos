@@ -264,7 +264,6 @@ body {
 </div>
 <!-- [ Pre-loader ] End -->
 <!-- [ Sidebar Menu ] start -->
-<!-- [ Sidebar Menu ] start -->
 <nav class="pc-sidebar">
   <div class="navbar-wrapper">
     <div class="m-header">
@@ -275,26 +274,14 @@ body {
     </div>
     <div class="navbar-content">
       <ul class="pc-navbar">
-
-      <?php if ($role_name == 'admin') : ?>
-      <li class="pc-item">
-          <a href="dashboard.php" class="pc-link">
-            <span class="pc-micon"><i class="ph ph-gauge"></i></span>
-            <span class="pc-mtext">Dashboard</span>
-          </a>
-        </li>
-        <?php endif; ?>
-
-
-
-
-
         <li class="pc-item pc-hasmenu">
+          
           <a href="#!" class="pc-link"
             ><span class="pc-micon">
             <i class="ph ph-basket"></i> </span
             ><span class="pc-mtext">หน้าร้าน</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span
           ></a>
+
 
           <ul class="pc-submenu">
     <li class="pc-item">
@@ -333,36 +320,12 @@ body {
         <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/products_list.php' ? 'active' : '') ?>" href="products_list.php">รายการสินค้า</a>
     </li>
 
-    <?php if ($role_name == 'admin') : ?>
     <li class="pc-item">
         <a class="pc-link <?= ($_SERVER['PHP_SELF'] == 'products_manage.php' ? 'active' : '') ?>" href="products_manage.php">จัดการรายการสินค้า</a>
     </li>
-    <?php endif; ?>
 
 </ul>
         </li>
-
-
-        <?php if ($role_name == 'admin') : ?>
-        <li class="pc-item pc-hasmenu">
-          <a href="#!" class="pc-link"
-            ><span class="pc-micon">
-            <i class="ph ph-users"></i> </span>
-            <span class="pc-mtext">การจัดการ</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span
-          ></a>
-
-          <ul class="pc-submenu">
-    <li class="pc-item">
-        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/employee_list.php' ? 'active' : '') ?>" href="employee_list.php">พนักงาน</a>
-    </li>
-    <!-- <li class="pc-item">
-        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sample-page2.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
-    </li> -->
-</ul>
-        </li>
-        <?php endif; ?>
-
-
 
         <li class="pc-item pc-caption">
             <label>UI Components</label>
@@ -472,9 +435,7 @@ body {
     </div>
   </div>
 </nav>
-<!-- [ Sidebar Menu ] end -->
-
- <!-- [ Header Topbar ] start -->
+<!-- [ Sidebar Menu ] end --> <!-- [ Header Topbar ] start -->
 
 <header class="pc-header">
   <div class="m-header">

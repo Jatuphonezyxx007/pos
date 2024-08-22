@@ -444,7 +444,7 @@ body {
           <h8 class="text-white text-center" id="date"></h8>
           <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
             aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
-            <img src="<?php echo $imagePath; ?>" alt="user-image" class="user-avtar" style="height: 40px">
+            <img src="assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
           </a>
           <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
             <div class="dropdown-body">
@@ -485,7 +485,7 @@ body {
                         <span>Add account</span>
                       </span>
                     </a>
-                    <a href="logout.php" class="dropdown-item">
+                    <a href="#" class="dropdown-item">
                       <span class="d-flex align-items-center">
                         <i class="ph ph-power"></i>
                         <span>Logout</span>

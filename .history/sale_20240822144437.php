@@ -339,12 +339,8 @@ body {
     </li>
     <?php endif; ?>
 
-</ul>
-        </li>
 
-
-        <?php if ($role_name == 'admin') : ?>
-        <li class="pc-item pc-hasmenu">
+    <li class="pc-item pc-hasmenu">
           <a href="#!" class="pc-link"
             ><span class="pc-micon">
             <i class="ph ph-users"></i> </span>
@@ -360,9 +356,12 @@ body {
     </li> -->
 </ul>
         </li>
-        <?php endif; ?>
 
 
+        
+
+</ul>
+        </li>
 
         <li class="pc-item pc-caption">
             <label>UI Components</label>

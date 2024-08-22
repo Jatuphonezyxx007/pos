@@ -1,31 +1,5 @@
 <?php
-session_start();
 include('connectdb.php');
-
-
-if (empty($_SESSION['aid'])) {
-  echo "<script>";
-  echo "alert('Access Denied !!!');";
-  echo "window.location.href='index.php';";
-  echo "</script>";
-  exit;
-}
-
-// ใช้งาน session
-$aid = $_SESSION['aid'];
-$aname = $_SESSION['aname'];
-$role_id = $_SESSION['role_id'];
-$role_name = $_SESSION['role_name'];
-$img = $_SESSION['img'];
-
-// ตรวจสอบว่าค่าที่เก็บใน session มีอยู่หรือไม่
-if (empty($img)) {
-  // กำหนดรูปภาพเริ่มต้นในกรณีที่ไม่มีรูปภาพ
-  $img = 'default.jpg'; 
-}
-
-// สร้าง URL สำหรับรูปภาพ
-$imagePath = "assets/images/emp/" . $aid . "." . $img;
 
 // รับ emp_id และ paymethod_id จากฟอร์ม
 $selected_emp_id = isset($_POST['emp_id']) ? $_POST['emp_id'] : 0;
@@ -444,7 +418,7 @@ body {
           <h8 class="text-white text-center" id="date"></h8>
           <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
             aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
-            <img src="<?php echo $imagePath; ?>" alt="user-image" class="user-avtar" style="height: 40px">
+            <img src="assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
           </a>
           <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
             <div class="dropdown-body">
@@ -485,7 +459,7 @@ body {
                         <span>Add account</span>
                       </span>
                     </a>
-                    <a href="logout.php" class="dropdown-item">
+                    <a href="#" class="dropdown-item">
                       <span class="d-flex align-items-center">
                         <i class="ph ph-power"></i>
                         <span>Logout</span>

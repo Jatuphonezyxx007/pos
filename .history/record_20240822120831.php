@@ -13,7 +13,7 @@ if (isset($_POST['payments']) && isset($_POST['orderDetails'])) {
     }
 
     // คำนวณยอดรวม
-    $total = 0;
+    // $total = 0;
     foreach ($orderDetails as $item) {
         $total += $item['price'] * $item['quantity'];
     }

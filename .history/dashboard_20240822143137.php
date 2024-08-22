@@ -485,7 +485,7 @@ body {
                         <span>Add account</span>
                       </span>
                     </a>
-                    <a href="logout.php" class="dropdown-item">
+                    <a href="#" class="dropdown-item">
                       <span class="d-flex align-items-center">
                         <i class="ph ph-power"></i>
                         <span>Logout</span>

@@ -333,36 +333,12 @@ body {
         <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/products_list.php' ? 'active' : '') ?>" href="products_list.php">รายการสินค้า</a>
     </li>
 
-    <?php if ($role_name == 'admin') : ?>
     <li class="pc-item">
         <a class="pc-link <?= ($_SERVER['PHP_SELF'] == 'products_manage.php' ? 'active' : '') ?>" href="products_manage.php">จัดการรายการสินค้า</a>
     </li>
-    <?php endif; ?>
 
 </ul>
         </li>
-
-
-        <?php if ($role_name == 'admin') : ?>
-        <li class="pc-item pc-hasmenu">
-          <a href="#!" class="pc-link"
-            ><span class="pc-micon">
-            <i class="ph ph-users"></i> </span>
-            <span class="pc-mtext">การจัดการ</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span
-          ></a>
-
-          <ul class="pc-submenu">
-    <li class="pc-item">
-        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/employee_list.php' ? 'active' : '') ?>" href="employee_list.php">พนักงาน</a>
-    </li>
-    <!-- <li class="pc-item">
-        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sample-page2.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
-    </li> -->
-</ul>
-        </li>
-        <?php endif; ?>
-
-
 
         <li class="pc-item pc-caption">
             <label>UI Components</label>

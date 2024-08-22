@@ -19,7 +19,7 @@ if (isset($_POST['payments']) && isset($_POST['orderDetails'])) {
     }
 
     // สร้างคำสั่ง SQL สำหรับการแทรกข้อมูลลงในตาราง orders
-    $sql = "INSERT INTO `orders` (order_total, order_date, emp_id, paymethod_id) VALUES ('$total', CURRENT_TIMESTAMP, '003', '$paymethod_id')";
+    $sql = "INSERT INTO `orders` (order_total, order_date, emp_id, paymethod_id) VALUES ('$total', CURRENT_TIMESTAMP, '002', '$paymethod_id')";
     if (!mysqli_query($conn, $sql)) {
         die("Insert error in orders: " . mysqli_error($conn));
     }
