@@ -204,37 +204,6 @@ body {
 
 
 
-.custom-number-input {
-    display: flex;
-    align-items: center;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    overflow: hidden;
-    width: fit-content;
-}
-
-.custom-number-input button {
-    background-color: #007bff; /* สีฟ้า */
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.custom-number-input button.btn-plus {
-    background-color: #808080; /* สีเทา */
-}
-
-.custom-number-input input {
-    text-align: center;
-    border: none;
-    padding: 10px 0;
-    width: 50px;
-    font-size: 16px;
-    outline: none;
-    color: #333;
-}
 
 
 
@@ -586,11 +555,11 @@ mysqli_close($conn);
                         <p class="mb-0">จำนวน</p>
                     </div>
                     <div class="col-5">
-                    <div class="custom-number-input">
-                      <button class="btn btn-secondary" onclick="decreaseQuantity()">-</button>
-                      <input type="text" id="quantity" value="0" readonly>
-                      <button class="btn btn-secondary" onclick="increaseQuantity()">+</button>
-                    </div>
+                        <div class="input-group input-group-sm">
+                            <button class="counter-minus btn btn-primary" type="button" onclick="decreaseQuantity()"><i class="ph ph-minus-circle"></i></button>
+                            <input class="form-control form-control-sm mx-2" type="number" id="quantity" min="1" value="1" readonly>
+                            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="increaseQuantity()"><i class="ph ph-plus-circle"></i></button>
+                        </div>
                     </div>
                 </div>    
 

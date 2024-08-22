@@ -212,7 +212,7 @@ body {
         <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sale.php' ? 'active' : '') ?>" href="sale.php">หน้าขาย</a>
     </li>
     <li class="pc-item">
-        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sale_history.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == 'sale_history.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
     </li>
 </ul>
 
@@ -245,7 +245,7 @@ body {
     </li>
 
     <li class="pc-item">
-        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == 'products_manage.php' ? 'active' : '') ?>" href="products_manage.php">จัดการรายการสินค้า</a>
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/products_manage.php' ? 'active' : '') ?>" href="products_manage.php">จัดการรายการสินค้า</a>
     </li>
 
 </ul>
@@ -359,8 +359,7 @@ body {
     </div>
   </div>
 </nav>
-<!-- [ Sidebar Menu ] end -->
-<!-- [ Header Topbar ] start -->
+<!-- [ Sidebar Menu ] end --> <!-- [ Header Topbar ] start -->
 
 <header class="pc-header">
   <div class="m-header">

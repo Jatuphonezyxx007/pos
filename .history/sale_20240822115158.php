@@ -587,10 +587,10 @@ mysqli_close($conn);
                     </div>
                     <div class="col-5">
                     <div class="custom-number-input">
-                      <button class="btn btn-secondary" onclick="decreaseQuantity()">-</button>
-                      <input type="text" id="quantity" value="0" readonly>
-                      <button class="btn btn-secondary" onclick="increaseQuantity()">+</button>
-                    </div>
+    <button class="btn btn-primary" onclick="decreaseQuantity()">-</button>
+    <input type="text" id="quantity" value="0" readonly>
+    <button class="btn-plus" onclick="increaseQuantity()">+</button>
+</div>
                     </div>
                 </div>    
 

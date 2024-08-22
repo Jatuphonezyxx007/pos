@@ -204,37 +204,6 @@ body {
 
 
 
-.custom-number-input {
-    display: flex;
-    align-items: center;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    overflow: hidden;
-    width: fit-content;
-}
-
-.custom-number-input button {
-    background-color: #007bff; /* สีฟ้า */
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.custom-number-input button.btn-plus {
-    background-color: #808080; /* สีเทา */
-}
-
-.custom-number-input input {
-    text-align: center;
-    border: none;
-    padding: 10px 0;
-    width: 50px;
-    font-size: 16px;
-    outline: none;
-    color: #333;
-}
 
 
 
@@ -587,10 +556,10 @@ mysqli_close($conn);
                     </div>
                     <div class="col-5">
                     <div class="custom-number-input">
-                      <button class="btn btn-secondary" onclick="decreaseQuantity()">-</button>
-                      <input type="text" id="quantity" value="0" readonly>
-                      <button class="btn btn-secondary" onclick="increaseQuantity()">+</button>
-                    </div>
+    <button class="btn-minus" onclick="decreaseQuantity()">-</button>
+    <input type="number" id="quantity" min="1" value="10" readonly>
+    <button class="btn-plus" onclick="increaseQuantity()">+</button>
+</div>
                     </div>
                 </div>    
 

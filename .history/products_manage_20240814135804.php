@@ -359,8 +359,7 @@ body {
     </div>
   </div>
 </nav>
-<!-- [ Sidebar Menu ] end -->
-<!-- [ Header Topbar ] start -->
+<!-- [ Sidebar Menu ] end --> <!-- [ Header  <!-- [ Header Topbar ] start -->
 
 <header class="pc-header">
   <div class="m-header">

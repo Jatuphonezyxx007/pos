@@ -212,7 +212,7 @@ body {
         <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sale.php' ? 'active' : '') ?>" href="sale.php">หน้าขาย</a>
     </li>
     <li class="pc-item">
-        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sale_history.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == 'sale_history.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
     </li>
 </ul>
 
@@ -245,7 +245,7 @@ body {
     </li>
 
     <li class="pc-item">
-        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == 'products_manage.php' ? 'active' : '') ?>" href="products_manage.php">จัดการรายการสินค้า</a>
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/products_manage.php' ? 'active' : '') ?>" href="products_manage.php">จัดการรายการสินค้า</a>
     </li>
 
 </ul>
@@ -359,8 +359,7 @@ body {
     </div>
   </div>
 </nav>
-<!-- [ Sidebar Menu ] end -->
-<!-- [ Header Topbar ] start -->
+<!-- [ Sidebar Menu ] end --> <!-- [ Header Topbar ] start -->
 
 <header class="pc-header">
   <div class="m-header">
@@ -498,7 +497,7 @@ while ($data = mysqli_fetch_array($rs)){
 
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
 
-    <input type="hidden" name="id" value="<?= $id ?>">
+    <input type="hidden" name="id" value="<?= $product_id ?>">
     <button class="btn btn-primary me-md-2" type="submit">แก้ไข</button>
 
                                     <!-- <button class="btn btn-primary me-md-2" type="button">แก้ไข</button> -->

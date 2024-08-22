@@ -203,38 +203,36 @@ body {
 }  */
 
 
+.handle-counter { overflow: hidden; }
 
-.custom-number-input {
-    display: flex;
-    align-items: center;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    overflow: hidden;
-    width: fit-content;
+.handle-counter .counter-minus,  .handle-counter .counter-plus,  .handle-counter input {
+  float: left;
+  text-align: center;
 }
 
-.custom-number-input button {
-    background-color: #007bff; /* สีฟ้า */
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    font-size: 16px;
+.handle-counter .counter-minus,  .handle-counter .counter-plus { text-align: center; }
+
+.handle-counter input {
+  width: 50px;
+  border-width: 1px;
+  border-left: none;
+  border-right: none;
 }
 
-.custom-number-input button.btn-plus {
-    background-color: #808080; /* สีเทา */
+.btn {
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  color: #fff;
 }
 
-.custom-number-input input {
-    text-align: center;
-    border: none;
-    padding: 10px 0;
-    width: 50px;
-    font-size: 16px;
-    outline: none;
-    color: #333;
+.btn:disabled, .btn:disabled:hover {
+  background-color: darkgrey;
+  cursor: not-allowed;
 }
+
+.btn-primary { background-color: #009dda; }
+
+.btn-primary:hover, .btn-primary:focus { background-color: #0486b9; }
 
 
 
@@ -243,6 +241,7 @@ body {
   </style>
 
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+
 
 </head>
 <!-- [Head] end -->
@@ -586,11 +585,18 @@ mysqli_close($conn);
                         <p class="mb-0">จำนวน</p>
                     </div>
                     <div class="col-5">
-                    <div class="custom-number-input">
-                      <button class="btn btn-secondary" onclick="decreaseQuantity()">-</button>
-                      <input type="text" id="quantity" value="0" readonly>
-                      <button class="btn btn-secondary" onclick="increaseQuantity()">+</button>
-                    </div>
+                        <!-- <div class="input-group input-group-sm">
+                            <button class="counter-minus btn btn-primary" type="button" onclick="decreaseQuantity()"><i class="ph ph-minus-circle"></i></button>
+                            <input class="form-control form-control-sm mx-2" type="number" id="quantity" min="1" value="1" readonly>
+                            <button class="counter-plus btn btn-primary" type="button" onclick="increaseQuantity()"><i class="ph ph-plus-circle"></i></button>
+                        </div> -->
+
+                        <div class="handle-counter" id="handleCounter">
+  <button class="counter-minus btn btn-primary">-</button>
+  <input type="text" value="3">
+  <button class="counter-plus btn btn-primary">+</button>
+</div>
+
                     </div>
                 </div>    
 
@@ -844,6 +850,8 @@ mysqli_close($conn);
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
+<script src="//code.jquery.com/jquery.min.js"></script>
+<script src="app/js/handleCounter.js"></script>
 
 <script>
 $(document).ready(function() {
