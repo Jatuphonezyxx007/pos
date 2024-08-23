@@ -10,14 +10,12 @@ if (empty($_SESSION['aid'])) {
     exit;
 }
 
-
 // ใช้งาน session
 $aid = $_SESSION['aid'];
 $aname = $_SESSION['aname'];
 $role_id = $_SESSION['role_id'];
 $role_name = $_SESSION['role_name'];
 $img = $_SESSION['img'];
-// $order_date = strtotime($data['order_date']);
 
 // ตรวจสอบว่าค่าที่เก็บใน session มีอยู่หรือไม่
 if (empty($img)) {
@@ -27,9 +25,6 @@ if (empty($img)) {
 
 // สร้าง URL สำหรับรูปภาพ
 $imagePath = "assets/images/emp/" . $aid . "." . $img;
-
-
-
 ?>
 
 
@@ -458,7 +453,7 @@ body {
           <h8 class="text-white text-center" id="date"></h8>
           <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
             aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
-            <img src="<?php echo $imagePath; ?>" alt="user-image" class="user-avtar" style="height: 40px">
+            <img src="assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
           </a>
           <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
             <div class="dropdown-body">
@@ -545,67 +540,61 @@ body {
 
               <table class="table table-striped table-sm-gap" width="100%">
   <thead>
-    <tr>
-      <td width="10%" class="text-center"></td>
-      <td width="10%" class="text-center">เลขที่ใบสั่งซื้อ</td>
-      <td width="15%" class="text-start">วันที่ (สร้าง)</td>
-      <td width="12%" class="text-end">ราคารวม (บาท)</td>
-      <td width="20%" class="text-center">พนักงาน</td>
-      <td width="13%" class="text-center">ชำระโดย</td>
-      <!-- <td width="10%" class="text-center">สถานะ</td> -->
-      <td width="20%" class="text-center">รายการ</td>
-    </tr>
+  <tr>
+                    <td width="10%" class="text-center"></td>
+                    <td width="10%" class="text-center">เลขที่ใบสั่งซื้อ</td>
+                    <td width="15%" class="text-start">วันที่ (สร้าง)</td>
+                    <td width="12%" class="text-end">ราคารวม (บาท)</td>
+                    <td width="10%" class="text-center">พนักงาน</td>
+                    <td width="13%" class="text-center">ชำระโดย</td>
+                    <td width="10%" class="text-center">สถานะ</td>
+                    <td width="20%" class="text-center">รายการ</td>
+
+
+                    <!-- <th width="5%">&nbsp;</th> -->
+                  </tr>
   </thead>
 
   <tbody>
   <?php
-  // สร้าง SQL Query ตามบทบาทของผู้ใช้
-  if ($role_name == 'admin') {
-      // ถ้าเป็น admin แสดงรายการทั้งหมด
-      $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
-              FROM orders o 
-              JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
-              JOIN employees ep ON o.emp_id = ep.emp_id
-              ORDER BY o.order_id DESC";
-  } elseif ($role_name == 'employee') {
-      // ถ้าเป็น employee แสดงเฉพาะรายการของตนเอง
-      $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
-              FROM orders o 
-              JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
-              JOIN employees ep ON o.emp_id = ep.emp_id
-              WHERE o.emp_id = '$aid'
-              ORDER BY o.order_id DESC";
-  }
-
+  include("connectdb.php");
+  
+  $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
+          FROM orders o 
+          JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
+          JOIN employees ep ON  o.emp_id = ep.emp_id
+          ORDER BY o.order_id DESC";
+  
   $rs = mysqli_query($conn, $sql);
-
-  // ตรวจสอบว่ามีผลลัพธ์หรือไม่
-  if (mysqli_num_rows($rs) > 0) {
-      while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
-      ?>
-        <tr>
-          <td class="text-center">
-            <a href="history_detail.php?a=<?=$data['order_id'];?>">รายละเอียด</a>
-          </td>
-          <td class="text-center"><?=$data['order_id'];?></td>
-          <td class="text-start text-muted"><small><?= date('l d F Y H:i:s', strtotime($data['order_date'])); ?></small></td>
-          <td class="text-end"><?=number_format($data['order_total'], 2);?></td>
-          <td class="text-center"><?=$data['emp_name'];?></td>
-          <td class="text-center"><?=$data['paymethod_name'];?></td>
-          <!-- <td class="text-center">&nbsp;</td> -->
-          <td class="text-center">
-            <a href="delete.php?id=<?=$data['order_id'];?>" type="button" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?');">คืนสินค้า</a>
-            <a type="button" class="btn btn-success" onClick="window.open('bill_print.php?b=<?=$data['order_id'];?>', '_blank', 'width=760,height=560')">ใบเสร็จ</a>
-          </td>
-        </tr>
-      <?php  
-      }
-  } else {
-      // ถ้าไม่มีผลลัพธ์ แสดงข้อความ "ไม่มีรายการการขาย"
-      echo '<tr><td colspan="8" class="text-center">ไม่มีรายการการขาย</td></tr>';
-  }
+  
+  while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
   ?>
-  </tbody>
+    <tr>
+      <td class="text-center">
+        <a href="history_detail.php?a=<?=$data['order_id'];?>">รายละเอียด</a>
+      </td>
+      <td class="text-center"><?=$data['order_id'];?></td>
+      <td class="text-start"><?=$data['order_date'];?></td>
+      <td class="text-end"><?=number_format($data['order_total'], 2);?></td>
+      <td class="text-center"><?=$data['emp_name'];?></td>
+      <td class="text-center"><?=$data['paymethod_name'];?></td>
+      <td class="text-center">&nbsp;</td>
+      <td class="text-center">
+        
+        <a href="delete.php?id=<?=$data['order_id'];?>" type="button" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?');">คืนสินค้า</a>
+
+        <a type="button" class="btn btn-success" onClick="window.open('bill_print.php?b=<?=$data['order_id'];?>', '_blank', 'width=760,height=560')">ใบเสร็จ</a>
+
+        <!-- <a type="button" class="btn btn-success" onClick="window.open('bill_print.php?id=<?=$data['order_id'];?>, '_blank', 'width=760,height=560px')">ใบเสร็จ</a> -->
+
+      </td>
+    </tr>
+  <?php  
+  }  
+  ?>
+</tbody>
+
+
 </table>
 
 

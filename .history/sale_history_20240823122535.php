@@ -10,6 +10,8 @@ if (empty($_SESSION['aid'])) {
     exit;
 }
 
+setlocale(LC_TIME, 'th_TH.UTF-8'); // ตั้งค่า locale เป็นภาษาไทย
+
 
 // ใช้งาน session
 $aid = $_SESSION['aid'];
@@ -18,6 +20,12 @@ $role_id = $_SESSION['role_id'];
 $role_name = $_SESSION['role_name'];
 $img = $_SESSION['img'];
 // $order_date = strtotime($data['order_date']);
+
+// แปลงวันที่จากฐานข้อมูลให้เป็น timestamp
+$order_date = strtotime($data['order_date']);
+
+// แสดงวันที่ในรูปแบบ
+$thai_date = strftime('%A %d %B ', $order_date) . (strftime('%Y', $order_date) + 543);
 
 // ตรวจสอบว่าค่าที่เก็บใน session มีอยู่หรือไม่
 if (empty($img)) {
@@ -588,8 +596,10 @@ body {
             <a href="history_detail.php?a=<?=$data['order_id'];?>">รายละเอียด</a>
           </td>
           <td class="text-center"><?=$data['order_id'];?></td>
-          <td class="text-start text-muted"><small><?= date('l d F Y H:i:s', strtotime($data['order_date'])); ?></small></td>
-          <td class="text-end"><?=number_format($data['order_total'], 2);?></td>
+          <td class="text-start text-muted">
+    <small><?= $thai_date; ?></small>
+</td>          
+<td class="text-end"><?=number_format($data['order_total'], 2);?></td>
           <td class="text-center"><?=$data['emp_name'];?></td>
           <td class="text-center"><?=$data['paymethod_name'];?></td>
           <!-- <td class="text-center">&nbsp;</td> -->

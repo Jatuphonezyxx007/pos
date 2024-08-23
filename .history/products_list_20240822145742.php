@@ -10,14 +10,12 @@ if (empty($_SESSION['aid'])) {
     exit;
 }
 
-
 // ใช้งาน session
 $aid = $_SESSION['aid'];
 $aname = $_SESSION['aname'];
 $role_id = $_SESSION['role_id'];
 $role_name = $_SESSION['role_name'];
 $img = $_SESSION['img'];
-// $order_date = strtotime($data['order_date']);
 
 // ตรวจสอบว่าค่าที่เก็บใน session มีอยู่หรือไม่
 if (empty($img)) {
@@ -27,9 +25,6 @@ if (empty($img)) {
 
 // สร้าง URL สำหรับรูปภาพ
 $imagePath = "assets/images/emp/" . $aid . "." . $img;
-
-
-
 ?>
 
 
@@ -114,6 +109,20 @@ body {
   font-family: "IBM Plex Sans Thai Looped", sans-serif;
 }
 
+
+/* .status-ready {
+  color: green;
+}
+.status-almost {
+  color: orangered;
+}
+.status-out {
+  color: red;
+} */
+
+
+
+
 .fixed-col {
   position: fixed;
   top: 70px; /* เพิ่ม px */
@@ -196,6 +205,12 @@ body {
 
 .pc-link.active {
     font-weight: bold;
+}
+
+.img-icon{
+  height: 70px;
+  width: 70px;
+  border-radius:20px;
 }
 
   </style>
@@ -443,7 +458,7 @@ body {
 
     <!-- เพิ่ม form control ตรงนี้ -->
     <form method="post" class="search-form" onsubmit="return false;">
-      <input type="text" name="src2" placeholder="ค้นหาเลขที่ใบสั่งซื้อ" class="search-input" autofocus>
+      <input type="text" name="src2" placeholder="ค้นหาสินค้า" class="search-input" autofocus>
       <a class="btn btn-primary"><i class="ph ph-magnifying-glass"></i></a>
     </form>
 
@@ -458,7 +473,7 @@ body {
           <h8 class="text-white text-center" id="date"></h8>
           <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
             aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
-            <img src="<?php echo $imagePath; ?>" alt="user-image" class="user-avtar" style="height: 40px">
+            <img src="assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
           </a>
           <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
             <div class="dropdown-body">
@@ -525,88 +540,243 @@ body {
     <div class="pc-content">
       <!-- [ breadcrumb ] start -->
 
-      <?php
-    include("connectdb.php");
-    @$src = $_POST['src2'];
-    $sql = "SELECT * FROM `orders` WHERE (`order_id` LIKE '%{$src}%')";
-    $rs = mysqli_query($conn, $sql);
-    while ($data = mysqli_fetch_array($rs)){
-  ?>
+      <div>
+
+
+      <!-- <div class="col-md-6 col-xl-3">
+          <div class="card bg-grd-primary order-card">
+            <div class="card-body">
+              <h6 class="text-white">สินค้าทั้งหมด</h6>
+              <h2 class="text-end text-white"><i class="feather icon-shopping-cart float-start"></i><span>...</span>
+              </h2>
+              <p class="m-b-0">Completed Orders<span class="float-end">351</span></p>
+            </div>
+          </div>
+        </div>
+        </div> -->
+
 
       <div class="page-header">
         <div class="page-block card mb-0">
           <div class="card-body">
             <div class="row align-items-center">
+
+
               <div class="col-md-12">
                 <div class="page-header-title border-bottom pb-2 mb-2">
-                  <h4 class="mb-0">ประวัติการขาย</h4>
+                  <h4 class="mb-0">รายการสินค้า</h4>
                 </div>
               </div>
 
-              <table class="table table-striped table-sm-gap" width="100%">
+              <div class="table-responsive">
+              <table class="table" width="100%">
   <thead>
-    <tr>
-      <td width="10%" class="text-center"></td>
-      <td width="10%" class="text-center">เลขที่ใบสั่งซื้อ</td>
-      <td width="15%" class="text-start">วันที่ (สร้าง)</td>
-      <td width="12%" class="text-end">ราคารวม (บาท)</td>
-      <td width="20%" class="text-center">พนักงาน</td>
-      <td width="13%" class="text-center">ชำระโดย</td>
-      <!-- <td width="10%" class="text-center">สถานะ</td> -->
-      <td width="20%" class="text-center">รายการ</td>
-    </tr>
+  <tr>
+                    <td width="8%" class="text-center">รหัสสินค้า</td>
+                    <!-- <td width="15%" class="text-center">&nbsp;</td> -->
+                    <td width="35%" class="text-start">ชื่อสินค้า</td>
+                    <td width="12%" class="text-start">ขนาด</td>
+                    <td width="10%" class="text-center">จำนวน</td>
+                    <td width="10%" class="text-center">ราคา (บาท)</td>
+                    <td width="15%" class="text-start">หมวดหมู่</td>
+                    <td width="10%" class="text-start">สถานะ</td>
+
+
+                    <!-- <th width="5%">&nbsp;</th> -->
+                  </tr>
   </thead>
 
-  <tbody>
-  <?php
-  // สร้าง SQL Query ตามบทบาทของผู้ใช้
-  if ($role_name == 'admin') {
-      // ถ้าเป็น admin แสดงรายการทั้งหมด
-      $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
-              FROM orders o 
-              JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
-              JOIN employees ep ON o.emp_id = ep.emp_id
-              ORDER BY o.order_id DESC";
-  } elseif ($role_name == 'employee') {
-      // ถ้าเป็น employee แสดงเฉพาะรายการของตนเอง
-      $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
-              FROM orders o 
-              JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
-              JOIN employees ep ON o.emp_id = ep.emp_id
-              WHERE o.emp_id = '$aid'
-              ORDER BY o.order_id DESC";
-  }
 
-  $rs = mysqli_query($conn, $sql);
+<!-- old code -->
+  <!-- <tbody>
+    <?php
+    include("connectdb.php");
 
-  // ตรวจสอบว่ามีผลลัพธ์หรือไม่
-  if (mysqli_num_rows($rs) > 0) {
-      while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
-      ?>
-        <tr>
-          <td class="text-center">
-            <a href="history_detail.php?a=<?=$data['order_id'];?>">รายละเอียด</a>
-          </td>
-          <td class="text-center"><?=$data['order_id'];?></td>
-          <td class="text-start text-muted"><small><?= date('l d F Y H:i:s', strtotime($data['order_date'])); ?></small></td>
-          <td class="text-end"><?=number_format($data['order_total'], 2);?></td>
-          <td class="text-center"><?=$data['emp_name'];?></td>
-          <td class="text-center"><?=$data['paymethod_name'];?></td>
-          <!-- <td class="text-center">&nbsp;</td> -->
-          <td class="text-center">
-            <a href="delete.php?id=<?=$data['order_id'];?>" type="button" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?');">คืนสินค้า</a>
-            <a type="button" class="btn btn-success" onClick="window.open('bill_print.php?b=<?=$data['order_id'];?>', '_blank', 'width=760,height=560')">ใบเสร็จ</a>
-          </td>
-        </tr>
-      <?php  
-      }
-  } else {
-      // ถ้าไม่มีผลลัพธ์ แสดงข้อความ "ไม่มีรายการการขาย"
-      echo '<tr><td colspan="8" class="text-center">ไม่มีรายการการขาย</td></tr>';
-  }
-  ?>
-  </tbody>
+    $sql = "SELECT 
+        products.id, 
+        products.name, 
+        MIN(size.price) AS min_price, 
+        MAX(size.price) AS max_price, 
+        type.type_name AS type_name,
+        size.id AS size_name,
+        size.qty,
+        CASE 
+            WHEN size.qty > 7 THEN 'พร้อมขาย'
+            WHEN size.qty > 0 AND size.qty <= 7 THEN 'ใกล้หมด'
+            ELSE 'สินค้าหมด'
+        END AS status
+    FROM 
+        `products`
+    JOIN 
+        `size` ON products.id = size.id
+    JOIN 
+        `type` ON products.type_id = type.type_id
+    GROUP BY 
+        products.id, size.id
+    ORDER BY 
+        products.id, size.id";
+
+    if ($stmt = mysqli_prepare($conn, $sql)) {
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        if ($result) {
+            $current_product_id = null;
+            $product_row_started = false;
+
+            while ($data = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+                if ($data['id'] != $current_product_id) {
+                    if ($product_row_started) {
+                        echo '</tr>';
+                    }
+
+                    $current_product_id = $data['id'];
+                    $product_row_started = true;
+
+                    ?>
+                    <tr>
+                        <td class="text-center"><?=$data['id'];?></td>
+                        <td class="text-center">
+                            <img src="assets/images/products_2/<?=$data['id'];?>.jpg" class="card-img-top img-icon" alt="Product Image">
+                        </td>
+                        <td class="text-start"><?=$data['name'];?></td>
+                        <td class="text-center">ขนาด</td>
+                        <td class="text-end">จำนวน</td>
+                            <td class="text-end"><?php if ($data['min_price'] == $data['max_price']) { ?>
+                                <?= number_format($data['min_price']); ?>
+                            <?php } else { ?>
+                                <?= number_format($data['min_price']); ?> - <?= number_format($data['max_price']); ?>
+                            <?php } ?></td>
+
+                        <td class="text-center"><?=$data['type_name'];?></td>
+                        <td><span class="text-center <?=$status_class;?>"><?=$data['status'];?></span></td>
+                    </tr>
+                    <?php
+                }
+
+                ?>
+                
+                <?php
+            }
+
+            if ($product_row_started) {
+                echo '</tr>';
+            }
+
+            mysqli_stmt_close($stmt);
+        } else {
+            echo "<tr><td colspan='7' class='text-center'>Query failed: " . mysqli_error($conn) . "</td></tr>";
+        }
+    } else {
+        die("Query preparation failed: " . mysqli_error($conn));
+    }
+    ?>
+</tbody> -->
+
+
+<tbody>
+<?php
+    include("connectdb.php");
+
+    // Prepare SQL query
+    $sql = "SELECT 
+        products.id AS id, 
+        products.name AS name, 
+        type.type_name AS type_name,
+        size.size_name, 
+        size.qty, 
+        size.price,
+        CASE 
+            WHEN size.qty > 7 THEN 'พร้อมขาย'
+            WHEN size.qty > 0 AND size.qty <= 7 THEN 'ใกล้หมด'
+            ELSE 'สินค้าหมด'
+        END AS status
+    FROM 
+        size
+    JOIN 
+        products ON size.id = products.id
+    JOIN 
+        type ON products.type_id = type.type_id
+    ORDER BY 
+        products.id, size.size_name";
+
+    // Prepare and execute the query
+    if ($stmt = mysqli_prepare($conn, $sql)) {
+      mysqli_stmt_execute($stmt);
+      $result = mysqli_stmt_get_result($stmt);
+
+      if ($result) {
+          $current_product_id = null;
+
+          while ($data = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+              // Determine status class
+              $status_class = '';
+              if ($data['status'] == 'พร้อมขาย') {
+                  $status_class = 'badge bg-success';
+              } elseif ($data['status'] == 'ใกล้หมด') {
+                  $status_class = 'badge bg-warning';
+              } else {
+                  $status_class = 'badge bg-danger';
+              }
+
+              // Check if we need to start a new product row
+              if ($data['id'] != $current_product_id) {
+                  // If we were displaying a product, close its row
+                  if ($current_product_id !== null) {
+                      echo '</tr>';
+                  }
+
+                  // Start a new product row
+                  $current_product_id = $data['id'];
+
+                  // Output the product row
+                  ?>
+                    <tr class="table-light">
+                        <td class="text-center"><?=$data['id'];?></td>
+                        <!-- <td class="text-center">&nbsp;</td> -->
+                        <td colspan="4" class="text-start"><?=$data['name'];?></td>
+                        <!-- <td class="text-start">&nbsp;</td>
+                        <td class="text-center">&nbsp;</td>
+                        <td class="text-end">&nbsp;</td> -->
+                        <td colspan="2" class="text-start"><?=$data['type_name'];?></td>
+                        <td class="text-start">&nbsp;</td>
+                    </tr>
+                    <?php
+                }
+
+                // Output size row
+                ?>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <!-- <td>&nbsp;</td> -->
+                    <td class="text-start"><?=$data['size_name'];?></td>
+                    <td class="text-center"><?=$data['qty'];?></td>
+                    <td class="text-center"><?=number_format($data['price']);?></td>
+                    <td class="text-center">&nbsp;</td>
+                    <td class="text-start"><span class="badge <?=$status_class;?>"><?=$data['status'];?></span></td>                
+                  </tr>
+                <?php
+            }
+
+            // Close the last product row if it was started
+            if ($current_product_id !== null) {
+                echo '</tr>';
+            }
+
+            mysqli_stmt_close($stmt);
+        } else {
+            echo "<tr><td colspan='8' class='text-center'>Query failed: " . mysqli_error($conn) . "</td></tr>";
+        }
+    } else {
+        die("Query preparation failed: " . mysqli_error($conn));
+    }
+    ?>
+</tbody>
+
+
 </table>
+</div>
 
 
 
@@ -825,10 +995,6 @@ body {
       <!-- [ Main Content ] end -->
     </div>
 
-    <?php
-    }
-    mysqli_close($conn);
-  ?> 
 
   </div>
   <!-- [ Main Content ] end -->

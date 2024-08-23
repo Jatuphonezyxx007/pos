@@ -1,36 +1,88 @@
 <?php
-session_start();
+// error_reporting(E_NOTICE);
+
 include("connectdb.php");
 
-if (empty($_SESSION['aid'])) {
-    echo "<script>";
-    echo "alert('Access Denied !!!');";
-    echo "window.location.href='index.php';";
-    echo "</script>";
-    exit;
+// ตรวจสอบว่าตัวแปร $_GET['id'] ถูกกำหนดหรือไม่
+if (isset($_GET['id'])) {
+  $emp_id = $_GET['id'];
+  $sql = "SELECT employees.*, role.role_name
+          FROM employees 
+          INNER JOIN role ON employees.role_id = role.role_id
+          WHERE employees.emp_id = '$emp_id'";
+  $rs = mysqli_query($conn, $sql);
+  if ($rs) {
+      $data = mysqli_fetch_array($rs);
+  } else {
+      echo "Error in query: " . mysqli_error($conn);
+  }
+} else {
+  echo "emp_id is not set.";
 }
 
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+  $emp_name = $_POST['ep_name'];
+  $emp_user = $_POST['ep_user'];
+  $emp_pwd = md5($_POST['ep_pwd']);  
+  // แปลงรหัสผ่านเป็น MD5
+  $emp_email = $_POST['ep_email'];
+  $emp_phone = $_POST['ep_phone'];
+  $role_id = $_POST['ep_role'];
+  $com_id = $data['com_id']; // Assuming com_id is already set and should not be changed
 
-// ใช้งาน session
-$aid = $_SESSION['aid'];
-$aname = $_SESSION['aname'];
-$role_id = $_SESSION['role_id'];
-$role_name = $_SESSION['role_name'];
-$img = $_SESSION['img'];
-// $order_date = strtotime($data['order_date']);
+  $img_sql = "";
+  if($_FILES['ep_pic']['name'] != ""){
+    $allowed = array('gif', 'png', 'jpg', 'jpeg', 'jfif', 'webp');
+    $filename = $_FILES['ep_pic']['name'];
+    $ext = pathinfo($filename, PATHINFO_EXTENSION);
 
-// ตรวจสอบว่าค่าที่เก็บใน session มีอยู่หรือไม่
-if (empty($img)) {
-    // กำหนดรูปภาพเริ่มต้นในกรณีที่ไม่มีรูปภาพ
-    $img = 'default.jpg'; 
+    if (!in_array($ext, $allowed)) {
+      echo "<script>";
+      echo "alert('แก้ไขข้อมูลสินค้าไม่สำเร็จ! ไฟล์รูปต้องเป็น jpg gif หรือ png เท่านั้น');";
+      echo "</script>";
+      exit;
+    } 
+    $target_file = "assets/images/emp/" . $emp_id . "." . $ext;
+    if(move_uploaded_file($_FILES['ep_pic']['tmp_name'], $target_file)) {
+      $img_sql = ", img='$ext'";
+    } else {
+      echo "Error uploading file.";
+      exit;
+    }
+  }
+
+  $sql = "UPDATE employees SET 
+      emp_name='$emp_name', 
+      emp_user='$emp_user', 
+      emp_pwd='$emp_pwd', 
+      emp_email='$emp_email', 
+      emp_phone='$emp_phone', 
+      role_id='$role_id'
+      $img_sql
+  WHERE emp_id='$emp_id'";
+
+  if (mysqli_query($conn, $sql)) {
+      echo "<script>";
+      echo "document.addEventListener('DOMContentLoaded', function() {";
+      echo "  var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {});";
+      echo "document.getElementById('modalMessage').innerHTML = '<div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\"><div class=\"text-center\"><div class=\"spinner-border text-success\" role=\"status\" id=\"spinner\"><span class=\"visually-hidden\">Loading...</span></div><div class=\"mt-2\">กำลังบันทึกข้อมูล</div></div></div>';";
+      echo "  myModal.show();";
+      echo "  setTimeout(function() {";
+      echo "    document.getElementById('modalMessage').innerHTML = '<div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\"><div class=\"text-success\"><i class=\"bi bi-check-circle-fill\"></i> ข้อมูลถูกอัปเดตเรียบร้อยแล้ว</div></div>';";
+      echo "    setTimeout(function() {";
+      echo "      window.location.href = 'employee_list.php';";
+      echo "    }, 1000);"; // เปลี่ยน 1000 ให้เป็นเวลาที่ต้องการในมิลลิวินาที
+      echo "  }, 2000);"; // เปลี่ยน 2000 ให้เป็นเวลาที่ต้องการในมิลลิวินาที
+      echo "});";
+      echo "</script>";
+  } else {
+      echo "Error updating record: " . mysqli_error($conn);
+  }
 }
-
-// สร้าง URL สำหรับรูปภาพ
-$imagePath = "assets/images/emp/" . $aid . "." . $img;
-
-
-
 ?>
+
+
+
 
 
 <!DOCTYPE html>
@@ -38,7 +90,7 @@ $imagePath = "assets/images/emp/" . $aid . "." . $img;
 <!-- [Head] start -->
 
 <head>
-  <title>Sample Page | Gradient Able Dashboard Template</title>
+  <title>POS | Point of Sale</title>
   <!-- [Meta] -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -60,23 +112,6 @@ $imagePath = "assets/images/emp/" . $aid . "." . $img;
 
   <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
 
-  <!-- [Favicon] icon -->
-  <link rel="icon" href="assets/images/favicon.svg" type="image/x-icon"> <!-- [Google Font : Poppins] icon -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
-<!-- [Tabler Icons] https://tablericons.com -->
-<link rel="stylesheet" href="assets/fonts/tabler-icons.min.css" >
-<!-- [Feather Icons] https://feathericons.com -->
-<link rel="stylesheet" href="assets/fonts/feather.css" >
-<!-- [Font Awesome Icons] https://fontawesome.com/icons -->
-<link rel="stylesheet" href="assets/fonts/fontawesome.css" >
-<!-- [Material Icons] https://fonts.google.com/icons -->
-<link rel="stylesheet" href="assets/fonts/material.css" >
-<!-- [Template CSS Files] -->
-<link rel="stylesheet" href="assets/css/style.css" id="main-style-link" >
-<link rel="stylesheet" href="assets/css/style-preset.css" >
-
-
 
 <!-- Script -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -90,7 +125,7 @@ $imagePath = "assets/images/emp/" . $aid . "." . $img;
       // Function to fetch and display products
       function fetchProducts(query) {
         $.ajax({
-          url: "fetch_products.php",
+          url: "fetch_products2.php",
           method: "POST",
           data: { query: query },
           success: function(data) {
@@ -105,6 +140,8 @@ $imagePath = "assets/images/emp/" . $aid . "." . $img;
         fetchProducts(query);
       });
     });
+
+        
   </script>
 
 
@@ -198,6 +235,13 @@ body {
     font-weight: bold;
 }
 
+.pic{
+  height: 200px;
+  width: 150px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto
+}
   </style>
 
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
@@ -442,13 +486,10 @@ body {
     </div>
 
     <!-- เพิ่ม form control ตรงนี้ -->
-    <form method="post" class="search-form" onsubmit="return false;">
-      <input type="text" name="src2" placeholder="ค้นหาเลขที่ใบสั่งซื้อ" class="search-input" autofocus>
+    <!-- <form method="post" class="search-form" onsubmit="return false;">
+      <input type="text" name="src" placeholder="ค้นหาสินค้า" class="search-input" autofocus>
       <a class="btn btn-primary"><i class="ph ph-magnifying-glass"></i></a>
-    </form>
-
-
-
+    </form> -->
 
     <div class="ms-auto">
       <h7 id="clock" class="text-white text-center">00:00:00</h7>
@@ -458,7 +499,7 @@ body {
           <h8 class="text-white text-center" id="date"></h8>
           <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
             aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
-            <img src="<?php echo $imagePath; ?>" alt="user-image" class="user-avtar" style="height: 40px">
+            <img src="assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
           </a>
           <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
             <div class="dropdown-body">
@@ -517,340 +558,202 @@ body {
 </header>
 <!-- [ Header ] end -->
 
-  <!-- [ Main Content ] start -->
+<div class="col-12 col-sm-8 col-md-12">
+  <div class="pc-container px-1">
 
-  <!-- [ Main Content ] start -->
+  <form method="post" enctype="multipart/form-data">
 
-  <div class="pc-container">
     <div class="pc-content">
-      <!-- [ breadcrumb ] start -->
+      
 
-      <?php
-    include("connectdb.php");
-    @$src = $_POST['src2'];
-    $sql = "SELECT * FROM `orders` WHERE (`order_id` LIKE '%{$src}%')";
-    $rs = mysqli_query($conn, $sql);
-    while ($data = mysqli_fetch_array($rs)){
-  ?>
+    <?php if (isset($data)) { ?>
 
-      <div class="page-header">
-        <div class="page-block card mb-0">
-          <div class="card-body">
-            <div class="row align-items-center">
-              <div class="col-md-12">
-                <div class="page-header-title border-bottom pb-2 mb-2">
-                  <h4 class="mb-0">ประวัติการขาย</h4>
-                </div>
-              </div>
+      <div class="row">
 
-              <table class="table table-striped table-sm-gap" width="100%">
-  <thead>
-    <tr>
-      <td width="10%" class="text-center"></td>
-      <td width="10%" class="text-center">เลขที่ใบสั่งซื้อ</td>
-      <td width="15%" class="text-start">วันที่ (สร้าง)</td>
-      <td width="12%" class="text-end">ราคารวม (บาท)</td>
-      <td width="20%" class="text-center">พนักงาน</td>
-      <td width="13%" class="text-center">ชำระโดย</td>
-      <!-- <td width="10%" class="text-center">สถานะ</td> -->
-      <td width="20%" class="text-center">รายการ</td>
-    </tr>
-  </thead>
+      <h5 class="card-title fw-semibold mb-4">แก้ไขข้อมูลพนักงาน : <?=$data['emp_name'];?></h5>
 
-  <tbody>
-  <?php
-  // สร้าง SQL Query ตามบทบาทของผู้ใช้
-  if ($role_name == 'admin') {
-      // ถ้าเป็น admin แสดงรายการทั้งหมด
-      $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
-              FROM orders o 
-              JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
-              JOIN employees ep ON o.emp_id = ep.emp_id
-              ORDER BY o.order_id DESC";
-  } elseif ($role_name == 'employee') {
-      // ถ้าเป็น employee แสดงเฉพาะรายการของตนเอง
-      $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
-              FROM orders o 
-              JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
-              JOIN employees ep ON o.emp_id = ep.emp_id
-              WHERE o.emp_id = '$aid'
-              ORDER BY o.order_id DESC";
-  }
 
-  $rs = mysqli_query($conn, $sql);
+      <div class="col-md-6">
+          <div class="card">
+            <!-- <div class="card-header">
+              <h5>Inline Text Elements</h5>
+            </div> -->
+            <div class="card-body pc-component">
+              <p class="lead m-t-0">รูปภาพ</p>
 
-  // ตรวจสอบว่ามีผลลัพธ์หรือไม่
-  if (mysqli_num_rows($rs) > 0) {
-      while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
-      ?>
-        <tr>
-          <td class="text-center">
-            <a href="history_detail.php?a=<?=$data['order_id'];?>">รายละเอียด</a>
-          </td>
-          <td class="text-center"><?=$data['order_id'];?></td>
-          <td class="text-start text-muted"><small><?= date('l d F Y H:i:s', strtotime($data['order_date'])); ?></small></td>
-          <td class="text-end"><?=number_format($data['order_total'], 2);?></td>
-          <td class="text-center"><?=$data['emp_name'];?></td>
-          <td class="text-center"><?=$data['paymethod_name'];?></td>
-          <!-- <td class="text-center">&nbsp;</td> -->
-          <td class="text-center">
-            <a href="delete.php?id=<?=$data['order_id'];?>" type="button" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?');">คืนสินค้า</a>
-            <a type="button" class="btn btn-success" onClick="window.open('bill_print.php?b=<?=$data['order_id'];?>', '_blank', 'width=760,height=560')">ใบเสร็จ</a>
-          </td>
-        </tr>
-      <?php  
-      }
-  } else {
-      // ถ้าไม่มีผลลัพธ์ แสดงข้อความ "ไม่มีรายการการขาย"
-      echo '<tr><td colspan="8" class="text-center">ไม่มีรายการการขาย</td></tr>';
-  }
-  ?>
-  </tbody>
-</table>
+              <div class="pic">
+                        <img src="assets/images/emp/<?=$data['emp_id'];?>.<?=$data['img'];?>" class="card-img-top rounded mx-auto d-block" alt="">
+                      </div>
 
+                      <br><br><br>
+
+                      <div class="col">
+                        <label for="formFile" class="form-label">เปลี่ยนรูปภาพ</label>
+                        <input class="form-control" type="file" name="ep_pic">
+                        <br>
+                        <h6 class="card-subtitle fw-normal mb-4">สำคัญ : สามารถอัพโหลดรูปภาพเฉพาะไฟล์ png, jpg, gif, tfif และ webp</h6>
+                      </div>
 
 
             </div>
           </div>
         </div>
+
+        
+        <div class="col-md-6">
+          <div class="card">
+            
+          <div class="card-header">
+            <div class="row align-items-center">
+              <div class="col-3">
+                <h5 class="mb-0">รหัสพนักงาน</h5>
+              </div>
+              <div class="col-9">
+              <input class="form-control" type="text" name="ep_id" placeholder="<?= $data['emp_id']; ?>" aria-label="Disabled input example" disabled>              
+            </div>          
+            </div>
+          </div>
+
+            <div class="card-body pc-component">
+
+              <div class="row align-items-center">
+              <div class="col-3">
+                <p class="text-dark mb-0">ชื่อ - นามสกุล</p>
+              </div>
+              <div class="col-9">
+                <input name="ep_name" type="text" class="form-control" value="<?= $data['emp_name']; ?>"> 
+              </div>          
+            </div>
+
+            <br>
+            <div class="row align-items-center">
+              <div class="col-3">
+                <p class="text-dark mb-0">E - mail</p>
+              </div>
+              <div class="col-9">
+                <input name="ep_email" type="text" class="form-control" value="<?= $data['emp_email']; ?>"> 
+              </div>          
+            </div>
+
+            <br>
+            <div class="row align-items-center">
+              <div class="col-3">
+                <p class="text-dark mb-0">เบอร์โทรศัพท์</p>
+              </div>
+              <div class="col-9">
+                <input name="ep_phone" type="text" class="form-control" value="<?= $data['emp_phone']; ?>"> 
+              </div>          
+            </div>
+              </div>
+
+
+              
+            </div>
+
+
+            <div class="card">
+            
+            <div class="card-header">
+              <div class="row align-items-center">
+                <div class="col-3">
+                  <h5 class="mb-0">หน้าที่</h5>
+                </div>
+                <div class="col-9">
+
+                <select class="form-select" id="role" aria-label="role" name="ep_role">
+  <?php
+    include("connectdb.php");
+    $sql2 = "SELECT * FROM `role`";
+    $rs2 = mysqli_query($conn, $sql2);
+    while ($data2 = mysqli_fetch_array($rs2)) {
+  ?>
+    <option value="<?=$data2['role_id'];?>"><?=$data2['role_name'];?></option>
+  <?php } ?>
+</select>
+
+              </div>          
+              </div>
+            </div>
+  
+              <div class="card-body pc-component">
+  
+                <div class="row align-items-center">
+                <div class="col-3">
+                  <p class="text-dark mb-0">ชื่อผู้ใช้</p>
+                </div>
+                <div class="col-9">
+                  <input name="ep_user" type="text" class="form-control" value="<?= $data['emp_user']; ?>"> 
+                </div>          
+              </div>
+  
+              <br>
+              <div class="row align-items-center">
+                <div class="col-3">
+                  <p class="text-dark mb-0">รหัสผ่านใหม่</p>
+                </div>
+                <div class="col-9">
+                  <input name="ep_pwd" type="password" class="form-control" value="<?= $data['emp_pwd']; ?>"> 
+                </div>          
+              </div>
+                </div>               
+              </div>
+  
+
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+  <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">บันทึกข้อมูล</button>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">บันทึกข้อมูล</h5>
+        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
       </div>
-      <!-- [ breadcrumb ] end -->
-
-      <!-- [ Main Content ] start -->
-      <div class="row">
-        <!-- [ Typography ] start -->
-        <!-- <div class="col-sm-12">
-          <div class="card">
-            <div class="card-header">
-              <h5>Headings</h5>
-              <p><span class="badges">.h1</span> through .h6 classes are also available, for when you want to match
-                the font styling of a heading
-                but cannot use the associated HTML element.</p>
-            </div>
-            <div class="card-body pc-component">
-              <h1>h1. Heading</h1>
-              <div class="clearfix"></div>
-              <h2>h2. Heading</h2>
-              <div class="clearfix"></div>
-              <h3>This is a H3</h3>
-              <div class="clearfix"></div>
-              <h4>This is a H4</h4>
-              <div class="clearfix"></div>
-              <h5>This is a H5</h5>
-              <div class="clearfix"></div>
-              <h6>This is a H6</h6>
-            </div>
-          </div>
-        </div> -->
-        <!-- <div class="col-sm-12">
-          <div class="card">
-            <div class="card-header">
-              <h5>Display Headings</h5>
-            </div>
-            <div class="card-body pc-component">
-              <h1 class="display-1">Display 1</h1>
-              <h1 class="display-2">Display 2</h1>
-              <h1 class="display-3">Display 3</h1>
-              <h1 class="display-4">Display 4</h1>
-              <h1 class="display-5">Display 5</h1>
-              <h1 class="display-6">Display 6</h1>
-            </div>
-          </div>
-        </div> -->
-        <!-- <div class="col-md-6">
-          <div class="card">
-            <div class="card-header">
-              <h5>Inline Text Elements</h5>
-            </div>
-            <div class="card-body pc-component">
-              <p class="lead m-t-0">Your title goes here</p>
-              You can use the mark tag to
-              <mark>highlight</mark> text.
-              <br>
-              <del>This line of text is meant to be treated as deleted text.</del>
-              <br>
-              <ins>This line of text is meant to be treated as an addition to the document.</ins>
-              <br>
-              <strong>rendered as bold text</strong>
-              <br>
-              <em>rendered as italicized text</em>
-            </div>
-          </div>
-        </div> -->
-        <!-- <div class="col-md-6">
-          <div class="card">
-            <div class="card-header">
-              <h5>Contextual Text Colors</h5>
-            </div>
-            <div class="card-body pc-component">
-              <p class="text-muted mb-1"> Fusce dapibus, tellus ac cursus commodo, tortor mauris nibh. </p>
-              <p class="text-primary mb-1"> Nullam id dolor id nibh ultricies vehicula ut id elit. </p>
-              <p class="text-success mb-1"> Duis mollis, est non commodo luctus, nisi erat porttitor ligula. </p>
-              <p class="text-info mb-1"> Maecenas sed diam eget risus varius blandit sit amet non magna. </p>
-              <p class="text-warning mb-1"> Etiam porta sem malesuada magna mollis euismod. </p>
-              <p class="text-danger mb-1"> Donec ullamcorper nulla non metus auctor fringilla. </p>
-              <p class="text-dark mb-1"> Nullam id dolor id nibh ultricies vehicula ut id elit. </p>
-            </div>
-          </div>
-        </div> -->
-        <!-- <div class="col-md-6 col-lg-4">
-          <div class="card">
-            <div class="card-header">
-              <h5>Unordered</h5>
-            </div>
-            <div class="card-body pc-component">
-              <ul>
-                <li>Lorem ipsum dolor sit amet</li>
-                <li>Consectetur adipiscing elit</li>
-                <li>Integer molestie lorem at massa</li>
-                <li>Facilisis in pretium nisl aliquet</li>
-                <li>Nulla volutpat aliquam velit
-                  <ul>
-                    <li>Phasellus iaculis neque</li>
-                    <li>Purus sodales ultricies</li>
-                    <li>Vestibulum laoreet porttitor sem</li>
-                    <li>Ac tristique libero volutpat at</li>
-                  </ul>
-                </li>
-                <li>Faucibus porta lacus fringilla vel</li>
-                <li>Aenean sit amet erat nunc</li>
-                <li>Eget porttitor lorem</li>
-              </ul>
-            </div>
-          </div>
-        </div> -->
-        <!-- <div class="col-md-6 col-lg-4">
-          <div class="card">
-            <div class="card-header">
-              <h5>Ordered</h5>
-            </div>
-            <div class="card-body pc-component">
-              <ol>
-                <li>Lorem ipsum dolor sit amet</li>
-                <li>Consectetur adipiscing elit</li>
-                <li>Integer molestie lorem at massa</li>
-                <li>Facilisis in pretium nisl aliquet</li>
-                <li>Nulla volutpat aliquam velit
-                  <ul>
-                    <li>Phasellus iaculis neque</li>
-                    <li>Purus sodales ultricies</li>
-                    <li>Vestibulum laoreet porttitor sem</li>
-                    <li>Ac tristique libero volutpat at</li>
-                  </ul>
-                </li>
-                <li>Faucibus porta lacus fringilla vel</li>
-                <li>Aenean sit amet erat nunc</li>
-                <li>Eget porttitor lorem</li>
-              </ol>
-            </div>
-          </div>
-        </div> -->
-        <!-- <div class="col-md-12 col-lg-4">
-          <div class="card">
-            <div class="card-header">
-              <h5>Unstyled</h5>
-            </div>
-            <div class="card-body pc-component">
-              <ul class="list-unstyled">
-                <li>Lorem ipsum dolor sit amet</li>
-                <li>Integer molestie lorem at massa
-                  <ul>
-                    <li>Phasellus iaculis neque</li>
-                  </ul>
-                </li>
-                <li>Faucibus porta lacus fringilla vel</li>
-                <li>Eget porttitor lorem</li>
-              </ul>
-              <h5>Inline</h5>
-              <hr>
-              <ul class="list-inline m-b-0">
-                <li class="list-inline-item">Lorem ipsum</li>
-                <li class="list-inline-item">Phasellus iaculis</li>
-                <li class="list-inline-item">Nulla volutpat</li>
-              </ul>
-            </div>
-          </div>
-        </div> -->
-        <!-- <div class="col-md-6">
-          <div class="card">
-            <div class="card-header">
-              <h5>Blockquotes</h5>
-            </div>
-            <div class="card-body pc-component">
-              <p class="text-muted mb-1"> Your awesome text goes here. </p>
-              <blockquote class="blockquote">
-                <p class="mb-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a
-                  ante.</p>
-                <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite>
-                </footer>
-              </blockquote>
-              <p class="text-muted m-b-15 m-t-20"> Add <code>.text-end</code> for a blockquote with right-aligned
-                content. </p>
-              <blockquote class="blockquote text-end">
-                <p class="mb-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a
-                  ante.</p>
-                <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite>
-                </footer>
-              </blockquote>
-            </div>
-          </div>
-        </div> -->
-        <!-- <div class="col-md-6">
-          <div class="card">
-            <div class="card-header">
-              <h5>Horizontal Description</h5>
-            </div>
-            <div class="card-body pc-component">
-              <dl class="dl-horizontal row">
-                <dt class="col-sm-3">Description lists</dt>
-                <dd class="col-sm-9">A description list is perfect for defining terms.</dd>
-
-                <dt class="col-sm-3">Euismod</dt>
-                <dd class="col-sm-9">Vestibulum id ligula porta felis euismod semper eget lacinia odio sem nec elit.
-                </dd>
-                <dd class="col-sm-9">Donec id elit non mi porta gravida at eget metus.</dd>
-
-                <dt class="col-sm-3">Malesuada porta</dt>
-                <dd class="col-sm-9">Etiam porta sem malesuada magna mollis euismod.</dd>
-
-                <dt class="col-sm-3 text-truncate">Truncated term is truncated</dt>
-                <dd class="col-sm-9">Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut
-                  fermentum massa justo sit amet risus.</dd>
-              </dl>
-            </div>
-          </div>
-        </div> -->
-        <!-- [ Typography ] end -->
+      <div class="modal-body" id="modalMessage">
+        ...
       </div>
-      <!-- [ Main Content ] end -->
+
+    </div>
+  </div>
+</div>
+
+            </div>
+          </div>
+        </div>
+
+        <?php } else  { ?>
+          <p>No employee data found.</p>
+
+          </form>
+          
+      </div>
+
+      <?php } ?>
+
+
     </div>
 
-    <?php
-    }
-    mysqli_close($conn);
-  ?> 
-
-  </div>
-  <!-- [ Main Content ] end -->
 
   <footer class="pc-footer">
     <div class="footer-wrapper container-fluid">
       <div class="row">
 
 
-
-
-
-
   
         <div class="col-sm-6 ms-auto my-1">
           <ul class="list-inline footer-link mb-0 justify-content-sm-end d-flex">
-          <a href="#top" class="text-end">กลับไปบนสุด</a>
+          <!-- <a href="#top" class="text-end">กลับไปบนสุด</a> -->
           </ul>
         </div>
       </div>
     </div>
   </footer>
+
+
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
 
   <!-- Required Js -->
 <script src="assets/js/plugins/popper.min.js"></script>
@@ -903,53 +806,16 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+document.getElementById('okButton').addEventListener('click', function() {
+  window.location.href = 'employee_list.php';
+});
 
 </script>
 
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-
-
-
-<script src="../assets/js/plugins/popper.min.js"></script>
-<script src="../assets/js/plugins/simplebar.min.js"></script>
-<script src="../assets/js/plugins/bootstrap.min.js"></script>
-<script src="../assets/js/fonts/custom-font.js"></script>
-<script src="../assets/js/pcoded.js"></script>
-<script src="../assets/js/plugins/feather.min.js"></script>
-
-
-
-
-
-<script>layout_change('light');</script>
-
-
-
-
-<script>layout_sidebar_change('light');</script>
-
-
-
-<script>change_box_container('false');</script>
-
-
-<script>layout_caption_change('true');</script>
-
-
-
-
-<script>layout_rtl_change('false');</script>
-
-
-<script>preset_change("preset-1");</script>
-
-
-<script>header_change("header-1");</script>
-
-
 </body>
 
-
+</body>
 <!-- [Body] end -->
 
 </html>

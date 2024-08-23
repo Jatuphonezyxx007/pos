@@ -10,14 +10,12 @@ if (empty($_SESSION['aid'])) {
     exit;
 }
 
-
 // ใช้งาน session
 $aid = $_SESSION['aid'];
 $aname = $_SESSION['aname'];
 $role_id = $_SESSION['role_id'];
 $role_name = $_SESSION['role_name'];
 $img = $_SESSION['img'];
-// $order_date = strtotime($data['order_date']);
 
 // ตรวจสอบว่าค่าที่เก็บใน session มีอยู่หรือไม่
 if (empty($img)) {
@@ -550,9 +548,9 @@ body {
       <td width="10%" class="text-center">เลขที่ใบสั่งซื้อ</td>
       <td width="15%" class="text-start">วันที่ (สร้าง)</td>
       <td width="12%" class="text-end">ราคารวม (บาท)</td>
-      <td width="20%" class="text-center">พนักงาน</td>
+      <td width="10%" class="text-center">พนักงาน</td>
       <td width="13%" class="text-center">ชำระโดย</td>
-      <!-- <td width="10%" class="text-center">สถานะ</td> -->
+      <td width="10%" class="text-center">สถานะ</td>
       <td width="20%" class="text-center">รายการ</td>
     </tr>
   </thead>
@@ -579,31 +577,25 @@ body {
 
   $rs = mysqli_query($conn, $sql);
 
-  // ตรวจสอบว่ามีผลลัพธ์หรือไม่
-  if (mysqli_num_rows($rs) > 0) {
-      while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
-      ?>
-        <tr>
-          <td class="text-center">
-            <a href="history_detail.php?a=<?=$data['order_id'];?>">รายละเอียด</a>
-          </td>
-          <td class="text-center"><?=$data['order_id'];?></td>
-          <td class="text-start text-muted"><small><?= date('l d F Y H:i:s', strtotime($data['order_date'])); ?></small></td>
-          <td class="text-end"><?=number_format($data['order_total'], 2);?></td>
-          <td class="text-center"><?=$data['emp_name'];?></td>
-          <td class="text-center"><?=$data['paymethod_name'];?></td>
-          <!-- <td class="text-center">&nbsp;</td> -->
-          <td class="text-center">
-            <a href="delete.php?id=<?=$data['order_id'];?>" type="button" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?');">คืนสินค้า</a>
-            <a type="button" class="btn btn-success" onClick="window.open('bill_print.php?b=<?=$data['order_id'];?>', '_blank', 'width=760,height=560')">ใบเสร็จ</a>
-          </td>
-        </tr>
-      <?php  
-      }
-  } else {
-      // ถ้าไม่มีผลลัพธ์ แสดงข้อความ "ไม่มีรายการการขาย"
-      echo '<tr><td colspan="8" class="text-center">ไม่มีรายการการขาย</td></tr>';
-  }
+  while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
+  ?>
+    <tr>
+      <td class="text-center">
+        <a href="history_detail.php?a=<?=$data['order_id'];?>">รายละเอียด</a>
+      </td>
+      <td class="text-center"><?=$data['order_id'];?></td>
+      <td class="text-start"><?=$data['order_date'];?></td>
+      <td class="text-end"><?=number_format($data['order_total'], 2);?></td>
+      <td class="text-center"><?=$data['emp_name'];?></td>
+      <td class="text-center"><?=$data['paymethod_name'];?></td>
+      <td class="text-center">&nbsp;</td>
+      <td class="text-center">
+        <a href="delete.php?id=<?=$data['order_id'];?>" type="button" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?');">คืนสินค้า</a>
+        <a type="button" class="btn btn-success" onClick="window.open('bill_print.php?b=<?=$data['order_id'];?>', '_blank', 'width=760,height=560')">ใบเสร็จ</a>
+      </td>
+    </tr>
+  <?php  
+  }  
   ?>
   </tbody>
 </table>

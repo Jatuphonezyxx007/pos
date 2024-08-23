@@ -10,7 +10,6 @@ if (empty($_SESSION['aid'])) {
     exit;
 }
 
-
 // ใช้งาน session
 $aid = $_SESSION['aid'];
 $aname = $_SESSION['aname'];

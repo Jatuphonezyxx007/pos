@@ -10,14 +10,12 @@ if (empty($_SESSION['aid'])) {
     exit;
 }
 
-
 // ใช้งาน session
 $aid = $_SESSION['aid'];
 $aname = $_SESSION['aname'];
 $role_id = $_SESSION['role_id'];
 $role_name = $_SESSION['role_name'];
 $img = $_SESSION['img'];
-// $order_date = strtotime($data['order_date']);
 
 // ตรวจสอบว่าค่าที่เก็บใน session มีอยู่หรือไม่
 if (empty($img)) {
@@ -27,9 +25,6 @@ if (empty($img)) {
 
 // สร้าง URL สำหรับรูปภาพ
 $imagePath = "assets/images/emp/" . $aid . "." . $img;
-
-
-
 ?>
 
 
@@ -443,12 +438,9 @@ body {
 
     <!-- เพิ่ม form control ตรงนี้ -->
     <form method="post" class="search-form" onsubmit="return false;">
-      <input type="text" name="src2" placeholder="ค้นหาเลขที่ใบสั่งซื้อ" class="search-input" autofocus>
+      <input type="text" name="src" placeholder="ค้นหาสินค้า" class="search-input" autofocus>
       <a class="btn btn-primary"><i class="ph ph-magnifying-glass"></i></a>
     </form>
-
-
-
 
     <div class="ms-auto">
       <h7 id="clock" class="text-white text-center">00:00:00</h7>
@@ -458,7 +450,7 @@ body {
           <h8 class="text-white text-center" id="date"></h8>
           <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
             aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
-            <img src="<?php echo $imagePath; ?>" alt="user-image" class="user-avtar" style="height: 40px">
+            <img src="assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
           </a>
           <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
             <div class="dropdown-body">
@@ -520,94 +512,97 @@ body {
   <!-- [ Main Content ] start -->
 
   <!-- [ Main Content ] start -->
-
   <div class="pc-container">
     <div class="pc-content">
       <!-- [ breadcrumb ] start -->
-
-      <?php
-    include("connectdb.php");
-    @$src = $_POST['src2'];
-    $sql = "SELECT * FROM `orders` WHERE (`order_id` LIKE '%{$src}%')";
-    $rs = mysqli_query($conn, $sql);
-    while ($data = mysqli_fetch_array($rs)){
-  ?>
-
       <div class="page-header">
         <div class="page-block card mb-0">
           <div class="card-body">
             <div class="row align-items-center">
               <div class="col-md-12">
-                <div class="page-header-title border-bottom pb-2 mb-2">
-                  <h4 class="mb-0">ประวัติการขาย</h4>
-                </div>
+
+              <div class="col-md-12">
+  <div class="page-header-title border-bottom pb-2 mb-2 d-flex align-items-center">
+    <a href="sale_history.php" class="breadcrumb-item me-2">
+      <i class="ph ph-arrow-left fs-3"></i>
+    </a>
+    <h4 class="mb-0">รายละเอียดคำสั่งซื้อ เลขที่ <?=$_GET['a'];?></h4>
+  </div>
+</div>
+
+                <!-- <div class="page-header-title border-bottom pb-2 mb-2">
+                  
+                <l class="breadcrumb-item"><a href="sale_history.php"><i class="ph ph-arrow-left fs-3"></i></a></l>
+
+                  <h4 class="mb-0">รายละเอียดคำสั่งซื้อ เลขที่ <?=$_GET['a'];?></h4>
+                </div> -->
+              
               </div>
 
-              <table class="table table-striped table-sm-gap" width="100%">
-  <thead>
+
+              <!-- <div class="col-md-12">
+                <ul class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="sale_history.php"><i class="ph ph-arrow-left fs-3"></i></a></li>
+                </ul>
+              </div> -->
+
+
+              <table width="100%" class="table table-striped table-sm-gap">
     <tr>
-      <td width="10%" class="text-center"></td>
-      <td width="10%" class="text-center">เลขที่ใบสั่งซื้อ</td>
-      <td width="15%" class="text-start">วันที่ (สร้าง)</td>
-      <td width="12%" class="text-end">ราคารวม (บาท)</td>
-      <td width="20%" class="text-center">พนักงาน</td>
-      <td width="13%" class="text-center">ชำระโดย</td>
-      <!-- <td width="10%" class="text-center">สถานะ</td> -->
-      <td width="20%" class="text-center">รายการ</td>
+        <td width="5%" class="text-center">ที่</td>
+        <td width="10%" class="text-center">เลขที่บาร์โค้ด</td>
+        <td width="40%">สินค้า</td>
+        <td width="5%" class="text-center">จำนวน</td>
+        <td width="20%" class="text-center">ราคา/ชิ้น</td>
+        <td width="20%" class="text-center">รวม (บาท)</td>
     </tr>
-  </thead>
-
-  <tbody>
-  <?php
-  // สร้าง SQL Query ตามบทบาทของผู้ใช้
-  if ($role_name == 'admin') {
-      // ถ้าเป็น admin แสดงรายการทั้งหมด
-      $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
-              FROM orders o 
-              JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
-              JOIN employees ep ON o.emp_id = ep.emp_id
-              ORDER BY o.order_id DESC";
-  } elseif ($role_name == 'employee') {
-      // ถ้าเป็น employee แสดงเฉพาะรายการของตนเอง
-      $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
-              FROM orders o 
-              JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
-              JOIN employees ep ON o.emp_id = ep.emp_id
-              WHERE o.emp_id = '$aid'
-              ORDER BY o.order_id DESC";
-  }
-
-  $rs = mysqli_query($conn, $sql);
-
-  // ตรวจสอบว่ามีผลลัพธ์หรือไม่
-  if (mysqli_num_rows($rs) > 0) {
-      while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
-      ?>
+    
+    <?php
+    include("connectdb.php");
+    $order_id = $_GET['a']; // รับค่า order_id จาก URL
+    
+    // ดึงข้อมูลจาก orders_detail และ products พร้อมข้อมูลจาก size
+    $sql = "
+    SELECT 
+        od.*,
+        p.barcode,
+        p.name,
+        s.price,
+        s.size_name
+    FROM orders_detail od
+    INNER JOIN products p ON od.p_id = p.id
+    INNER JOIN size s ON od.s_id = s.size_id
+    WHERE od.order_id = '$order_id'
+";
+    $rs = mysqli_query($conn, $sql);
+    
+    $i = 0;
+    $total = 0;
+    
+    while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
+        $i++;
+        $sum = $data['price'] * $data['item'];
+        $total += $sum;
+    ?>
         <tr>
-          <td class="text-center">
-            <a href="history_detail.php?a=<?=$data['order_id'];?>">รายละเอียด</a>
-          </td>
-          <td class="text-center"><?=$data['order_id'];?></td>
-          <td class="text-start text-muted"><small><?= date('l d F Y H:i:s', strtotime($data['order_date'])); ?></small></td>
-          <td class="text-end"><?=number_format($data['order_total'], 2);?></td>
-          <td class="text-center"><?=$data['emp_name'];?></td>
-          <td class="text-center"><?=$data['paymethod_name'];?></td>
-          <!-- <td class="text-center">&nbsp;</td> -->
-          <td class="text-center">
-            <a href="delete.php?id=<?=$data['order_id'];?>" type="button" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?');">คืนสินค้า</a>
-            <a type="button" class="btn btn-success" onClick="window.open('bill_print.php?b=<?=$data['order_id'];?>', '_blank', 'width=760,height=560')">ใบเสร็จ</a>
-          </td>
+            <td class="text-center"><?=$i;?></td>
+            <td class="text-center"><?=@$data['barcode'];?></td>
+            <td><?=$data['name'];?> (<?=$data['size_name'];?>)</td>
+            <td class="text-center"><?=$data['item'];?></td>
+            <td class="text-center"><?=number_format($data['price'], 2);?></td>
+            <td class="text-center"><?=number_format($sum, 2);?></td>
         </tr>
-      <?php  
-      }
-  } else {
-      // ถ้าไม่มีผลลัพธ์ แสดงข้อความ "ไม่มีรายการการขาย"
-      echo '<tr><td colspan="8" class="text-center">ไม่มีรายการการขาย</td></tr>';
-  }
-  ?>
-  </tbody>
+    <?php } ?>
+    
+    <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td class="text-center"><strong>ราคารวม</strong></td>
+        <td class="text-center"><strong><?=number_format($total, 2);?> บาท</strong></td>
+    </tr>
 </table>
-
 
 
             </div>
@@ -824,12 +819,6 @@ body {
       </div>
       <!-- [ Main Content ] end -->
     </div>
-
-    <?php
-    }
-    mysqli_close($conn);
-  ?> 
-
   </div>
   <!-- [ Main Content ] end -->
 
@@ -841,6 +830,18 @@ body {
 
 
 
+
+  <?php
+// ดึงข้อมูลการซื้อจากหน้า checkout.php
+// $product_name = $_POST['product_name'];
+// $product_quantity = $_POST['product_quantity'];
+// $product_price = $_POST['product_price'];
+// $total_price = $product_quantity * $product_price;
+
+// ส่งข้อมูลการซื้อไปยังหน้า detail.php
+// header("Location: detail.php?product_name=$product_name&product_quantity=$product_quantity&product_price=$product_price&total_price=$total_price");
+
+?>
 
   
         <div class="col-sm-6 ms-auto my-1">
