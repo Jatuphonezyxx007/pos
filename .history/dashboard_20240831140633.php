@@ -65,16 +65,6 @@ if ($result_total_sales->num_rows > 0) {
     $total_sales = $row_total_sales['total_sales'];
 }
 
-// ดึงจำนวนสินค้าคงเหลือทั้งหมดจากตาราง size
-$sql_total_qty = "SELECT SUM(qty) AS total_qty FROM size";
-$result_total_qty = $conn->query($sql_total_qty);
-
-$total_qty = 0;
-if ($result_total_qty->num_rows > 0) {
-    $row_total_qty = $result_total_qty->fetch_assoc();
-    $total_qty = $row_total_qty['total_qty'];
-}
-
 $conn->close();
 ?>
 
@@ -564,20 +554,21 @@ body {
     <div class="card bg-grd-danger order-card">
         <div class="card-body">
             <h6 class="text-white">ยอดขายรวม</h6>
-            <h2 class="text-end text-white fs-3"><i class="feather icon-shopping-cart float-start"></i><span><?php echo number_format($total_sales, 2); ?> บาท</span></h2>
+            <h2 class="text-end text-white fs-2"><i class="feather icon-shopping-cart float-start"></i><span><?php echo number_format($total_sales, 2); ?> บาท</span></h2>
             <p class="m-b-0">Completed Orders<span class="float-end">351</span></p>
         </div>
     </div>
 </div>
-<div class="col-md-6 col-xl-3">
-    <div class="card bg-grd-success order-card">
-        <div class="card-body">
-            <h6 class="text-white">จำนวนสินค้าพร้อมขายในสต๊อก</h6>
-            <h2 class="text-end text-white fs-3"><i class="feather icon-tag float-start"></i><span><?php echo number_format($total_qty); ?> ชิ้น</span></h2>
-            <p class="m-b-0">This Month<span class="float-end">213</span></p>
+        <div class="col-md-6 col-xl-3">
+          <div class="card bg-grd-success order-card">
+            <div class="card-body">
+              <h6 class="text-white">Total Sales</h6>
+              <h2 class="text-end text-white"><i class="feather icon-tag float-start"></i><span>1641</span>
+              </h2>
+              <p class="m-b-0">This Month<span class="float-end">213</span></p>
+            </div>
+          </div>
         </div>
-    </div>
-</div>
         <div class="col-md-6 col-xl-3">
           <div class="card bg-grd-warning order-card">
             <div class="card-body">

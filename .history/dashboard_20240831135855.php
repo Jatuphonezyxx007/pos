@@ -2,12 +2,13 @@
 session_start();
 include('connectdb.php');
 
+
 if (empty($_SESSION['aid'])) {
-    echo "<script>";
-    echo "alert('Access Denied !!!');";
-    echo "window.location.href='index.php';";
-    echo "</script>";
-    exit;
+  echo "<script>";
+  echo "alert('Access Denied !!!');";
+  echo "window.location.href='index.php';";
+  echo "</script>";
+  exit;
 }
 
 // ใช้งาน session
@@ -19,8 +20,8 @@ $img = $_SESSION['img'];
 
 // ตรวจสอบว่าค่าที่เก็บใน session มีอยู่หรือไม่
 if (empty($img)) {
-    // กำหนดรูปภาพเริ่มต้นในกรณีที่ไม่มีรูปภาพ
-    $img = 'default.jpg'; 
+  // กำหนดรูปภาพเริ่มต้นในกรณีที่ไม่มีรูปภาพ
+  $img = 'default.jpg'; 
 }
 
 // สร้าง URL สำหรับรูปภาพ
@@ -34,11 +35,11 @@ $selected_paymethod_id = isset($_POST['paymethod_id']) ? $_POST['paymethod_id'] 
 $sql = "SELECT DATE_FORMAT(order_date, '%d-%m-%Y') as formatted_date, SUM(order_total) as total_sales FROM orders WHERE 1=1";
 
 if ($selected_emp_id != 0) {
-    $sql .= " AND emp_id = $selected_emp_id";
+  $sql .= " AND emp_id = $selected_emp_id";
 }
 
 if ($selected_paymethod_id != 0) {
-    $sql .= " AND paymethod_id = $selected_paymethod_id";
+  $sql .= " AND paymethod_id = $selected_paymethod_id";
 }
 
 $sql .= " GROUP BY formatted_date ORDER BY order_date";
@@ -49,30 +50,10 @@ $dates = [];
 $sales = [];
 
 if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $dates[] = $row['formatted_date'];
-        $sales[] = $row['total_sales'];
-    }
-}
-
-// ดึงยอดขายรวมทั้งหมด
-$sql_total_sales = "SELECT SUM(order_total) AS total_sales FROM orders";
-$result_total_sales = $conn->query($sql_total_sales);
-
-$total_sales = 0;
-if ($result_total_sales->num_rows > 0) {
-    $row_total_sales = $result_total_sales->fetch_assoc();
-    $total_sales = $row_total_sales['total_sales'];
-}
-
-// ดึงจำนวนสินค้าคงเหลือทั้งหมดจากตาราง size
-$sql_total_qty = "SELECT SUM(qty) AS total_qty FROM size";
-$result_total_qty = $conn->query($sql_total_qty);
-
-$total_qty = 0;
-if ($result_total_qty->num_rows > 0) {
-    $row_total_qty = $result_total_qty->fetch_assoc();
-    $total_qty = $row_total_qty['total_qty'];
+  while($row = $result->fetch_assoc()) {
+    $dates[] = $row['formatted_date'];
+    $sales[] = $row['total_sales'];
+  }
 }
 
 $conn->close();
@@ -559,25 +540,26 @@ body {
                 </div>
 
                 <div class="row">
-
-                <div class="col-md-6 col-xl-3">
-    <div class="card bg-grd-danger order-card">
-        <div class="card-body">
-            <h6 class="text-white">ยอดขายรวม</h6>
-            <h2 class="text-end text-white fs-3"><i class="feather icon-shopping-cart float-start"></i><span><?php echo number_format($total_sales, 2); ?> บาท</span></h2>
-            <p class="m-b-0">Completed Orders<span class="float-end">351</span></p>
+        <div class="col-md-6 col-xl-3">
+          <div class="card bg-grd-danger order-card">
+            <div class="card-body">
+              <h6 class="text-white">Orders Received</h6>
+              <h2 class="text-end text-white"><i class="feather icon-shopping-cart float-start"></i><span>486</span>
+              </h2>
+              <p class="m-b-0">Completed Orders<span class="float-end">351</span></p>
+            </div>
+          </div>
         </div>
-    </div>
-</div>
-<div class="col-md-6 col-xl-3">
-    <div class="card bg-grd-success order-card">
-        <div class="card-body">
-            <h6 class="text-white">จำนวนสินค้าพร้อมขายในสต๊อก</h6>
-            <h2 class="text-end text-white fs-3"><i class="feather icon-tag float-start"></i><span><?php echo number_format($total_qty); ?> ชิ้น</span></h2>
-            <p class="m-b-0">This Month<span class="float-end">213</span></p>
+        <div class="col-md-6 col-xl-3">
+          <div class="card bg-grd-success order-card">
+            <div class="card-body">
+              <h6 class="text-white">Total Sales</h6>
+              <h2 class="text-end text-white"><i class="feather icon-tag float-start"></i><span>1641</span>
+              </h2>
+              <p class="m-b-0">This Month<span class="float-end">213</span></p>
+            </div>
+          </div>
         </div>
-    </div>
-</div>
         <div class="col-md-6 col-xl-3">
           <div class="card bg-grd-warning order-card">
             <div class="card-body">
