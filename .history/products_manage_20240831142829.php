@@ -1,30 +1,23 @@
 <?php
-session_start();
-include("connectdb.php");
+error_reporting(E_NOTICE);
 
-if (empty($_SESSION['aid'])) {
-    echo "<script>";
-    echo "alert('Access Denied !!!');";
-    echo "window.location.href='index.php';";
-    echo "</script>";
-    exit;
-}
+	@session_start();
+	include("connectdb.php");
+	$sql = "select * from products where id ='{$_GET['id']}' ";
+	$rs = mysqli_query($conn, $sql) ;
+	$data = mysqli_fetch_array($rs);
+	$id = $_GET['id'] ;
+	
+	if(isset($_GET['id'])) {
+		$_SESSION['sid'][$id] = $data['id'];
+		$_SESSION['sname'][$id] = $data['name'];
+		$_SESSION['sprice'][$id] = $data['price'];
+		// $_SESSION['sbarcode'][$id] = $data['barcode'];
+		// $_SESSION['spicture'][$id] = $data['img'];
+		@$_SESSION['sitem'][$id]++;
+	}
 
-// ใช้งาน session
-$aid = $_SESSION['aid'];
-$aname = $_SESSION['aname'];
-$role_id = $_SESSION['role_id'];
-$role_name = $_SESSION['role_name'];
-$img = $_SESSION['img'];
 
-// ตรวจสอบว่าค่าที่เก็บใน session มีอยู่หรือไม่
-if (empty($img)) {
-    // กำหนดรูปภาพเริ่มต้นในกรณีที่ไม่มีรูปภาพ
-    $img = 'default.jpg'; 
-}
-
-// สร้าง URL สำหรับรูปภาพ
-$imagePath = "assets/images/emp/" . $aid . "." . $img;
 ?>
 
 
@@ -539,7 +532,7 @@ while ($data = mysqli_fetch_array($rs)){
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
 
     <input type="hidden" name="id" value="<?= $id ?>">
-    <a href="update_product.php?id=<?= $data['id']; ?>" type="button" class="btn btn-primary">แก้ไข</a>
+    <button class="btn btn-primary me-md-2" type="submit">แก้ไข</button>
 
                                     <!-- <button class="btn btn-primary me-md-2" type="button">แก้ไข</button> -->
                                     <button class="btn btn-danger" type="button">ลบ</button>
@@ -575,6 +568,19 @@ while ($data = mysqli_fetch_array($rs)){
 
 
 
+
+
+  <?php
+// ดึงข้อมูลการซื้อจากหน้า checkout.php
+$product_name = $_POST['product_name'];
+$product_quantity = $_POST['product_quantity'];
+$product_price = $_POST['product_price'];
+$total_price = $product_quantity * $product_price;
+
+// ส่งข้อมูลการซื้อไปยังหน้า detail.php
+// header("Location: detail.php?product_name=$product_name&product_quantity=$product_quantity&product_price=$product_price&total_price=$total_price");
+
+?>
 
   
         <div class="col-sm-6 ms-auto my-1">

@@ -576,7 +576,7 @@ body {
                     <!-- <td width="15%" class="text-center">&nbsp;</td> -->
                     <td width="35%" class="text-start">ชื่อสินค้า</td>
                     <td width="12%" class="text-start">ขนาด</td>
-                    <td width="10%" class="text-center">จำนวน<small>/Restock</small></td>
+                    <td width="10%" class="text-center">จำนวน<small>/จุดรี</small></td>
                     <td width="10%" class="text-center">ราคา (บาท)</td>
                     <td width="15%" class="text-start">หมวดหมู่</td>
                     <td width="10%" class="text-start">สถานะ</td>

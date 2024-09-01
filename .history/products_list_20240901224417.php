@@ -576,7 +576,7 @@ body {
                     <!-- <td width="15%" class="text-center">&nbsp;</td> -->
                     <td width="35%" class="text-start">ชื่อสินค้า</td>
                     <td width="12%" class="text-start">ขนาด</td>
-                    <td width="10%" class="text-center">จำนวน<small>/Restock</small></td>
+                    <td width="10%" class="text-center">จำนวน</td>
                     <td width="10%" class="text-center">ราคา (บาท)</td>
                     <td width="15%" class="text-start">หมวดหมู่</td>
                     <td width="10%" class="text-start">สถานะ</td>
@@ -753,7 +753,7 @@ body {
                     <td>&nbsp;</td>
                     <!-- <td>&nbsp;</td> -->
                     <td class="text-start"><small><?=$data['size_name'];?></small></td>
-                    <td class="text-center"><?=$data['qty'];?><small>/<?=$data['re_stock'];?></small></td>
+                    <td class="text-center"><?=$data['qty'];?></td>
                     <td class="text-center"><?=number_format($data['price']);?></td>
                     <td class="text-center">&nbsp;</td>
                     <td class="text-start"><span class="badge <?=$status_class;?>"><?=$data['status'];?></span></td>                

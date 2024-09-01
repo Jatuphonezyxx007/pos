@@ -539,7 +539,7 @@ while ($data = mysqli_fetch_array($rs)){
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
 
     <input type="hidden" name="id" value="<?= $id ?>">
-    <a href="update_product.php?id=<?= $data['id']; ?>" type="button" class="btn btn-primary">แก้ไข</a>
+    <a href="edit_employee.php?id=<?= $data['id']; ?>" type="button" class="btn btn-primary">แก้ไข</a>
 
                                     <!-- <button class="btn btn-primary me-md-2" type="button">แก้ไข</button> -->
                                     <button class="btn btn-danger" type="button">ลบ</button>

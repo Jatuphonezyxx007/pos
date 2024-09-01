@@ -539,7 +539,7 @@ while ($data = mysqli_fetch_array($rs)){
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
 
     <input type="hidden" name="id" value="<?= $id ?>">
-    <a href="update_product.php?id=<?= $data['id']; ?>" type="button" class="btn btn-primary">แก้ไข</a>
+    <button class="btn btn-primary me-md-2" type="submit">แก้ไข</button>
 
                                     <!-- <button class="btn btn-primary me-md-2" type="button">แก้ไข</button> -->
                                     <button class="btn btn-danger" type="button">ลบ</button>
@@ -575,6 +575,19 @@ while ($data = mysqli_fetch_array($rs)){
 
 
 
+
+
+  <?php
+// ดึงข้อมูลการซื้อจากหน้า checkout.php
+$product_name = $_POST['product_name'];
+$product_quantity = $_POST['product_quantity'];
+$product_price = $_POST['product_price'];
+$total_price = $product_quantity * $product_price;
+
+// ส่งข้อมูลการซื้อไปยังหน้า detail.php
+// header("Location: detail.php?product_name=$product_name&product_quantity=$product_quantity&product_price=$product_price&total_price=$total_price");
+
+?>
 
   
         <div class="col-sm-6 ms-auto my-1">
