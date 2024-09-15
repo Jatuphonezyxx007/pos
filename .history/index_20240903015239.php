@@ -73,7 +73,7 @@ font-family: "IBM Plex Sans Thai Looped", sans-serif;
             
             <form method="post" action="login_db.php">
             <div class="form-group mb-3">
-              <input type="text" class="form-control" id="floatingInput" name="usr" placeholder="ชื่อผู้ใช้">
+              <input type="text" class="form-control" id="floatingInput" name="usr" placeholder="รหัสพนักงาน">
             </div>
             <div class="form-group mb-3">
               <input type="password" class="form-control" id="floatingInput1" name="pwd" placeholder="รหัสผ่าน">
