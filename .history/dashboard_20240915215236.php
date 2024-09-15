@@ -91,14 +91,9 @@ $dates = [];
 $sales = [];
 $employees = [];
 
-// ตรวจสอบว่า query ดึงข้อมูลมาได้หรือไม่
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
-        // แปลงรูปแบบวันที่จาก Datetime เป็น DD/MM/YY
-        $date = $row['formatted_date']; // สมมติว่า 'formatted_date' เป็น Datetime
-        $formatted_date = date('d/m/y', strtotime($date)); // แปลงวันที่
-
-        $dates[] = $formatted_date;
+        $dates[] = $row['formatted_date'];
         $emp_id = $row['emp_id'];
         $emp_name = $row['emp_name'];
         
@@ -106,7 +101,7 @@ if ($result->num_rows > 0) {
             $sales[$emp_id] = [];
         }
 
-        $sales[$emp_id][$formatted_date] = $row['total_sales']; // ใช้ $formatted_date
+        $sales[$emp_id][$row['formatted_date']] = $row['total_sales'];
 
         if (!isset($employees[$emp_id])) {  // แก้ไขตรงนี้
             $employees[$emp_id] = $emp_name; // แก้ไขตรงนี้

@@ -10,165 +10,80 @@ if (empty($_SESSION['aid'])) {
     exit;
 }
 
-// ใช้งาน session
 $aid = $_SESSION['aid'];
 $aname = $_SESSION['aname'];
 $role_id = $_SESSION['role_id'];
 $role_name = $_SESSION['role_name'];
 $img = $_SESSION['img'];
-
-// ตรวจสอบว่าค่าที่เก็บใน session มีอยู่หรือไม่
 if (empty($img)) {
-    // กำหนดรูปภาพเริ่มต้นในกรณีที่ไม่มีรูปภาพ
     $img = 'default.jpg'; 
 }
-
-// สร้าง URL สำหรับรูปภาพ
 $imagePath = "assets/images/emp/" . $aid . "." . $img;
 
-// รับ emp_id และ paymethod_id จากฟอร์ม
 $selected_type_id = isset($_POST['type_id']) ? $_POST['type_id'] : 0;
 $selected_emp_id = isset($_POST['emp_id']) ? $_POST['emp_id'] : 0;
 $selected_paymethod_id = isset($_POST['paymethod_id']) ? $_POST['paymethod_id'] : 0;
 $selected_date = isset($_POST['selected_date']) ? $_POST['selected_date'] : '';
 
-$sql = "SELECT e.emp_id, e.emp_name, DATE_FORMAT(o.order_date, '%d-%m-%Y') as formatted_date, SUM(o.order_total) as total_sales 
-        FROM orders o
-        JOIN orders_detail od ON o.order_id = od.order_id
-        JOIN products p ON od.p_id = p.id
-        JOIN employees e ON o.emp_id = e.emp_id
-        JOIN type t ON p.type_id = t.type_id
-        WHERE 1=1"; // เพื่อให้สามารถเติมเงื่อนไขได้
+if ($selected_date) {
+    // กรณีที่เลือกวัน
+    $sql = "SELECT HOUR(o.order_time) AS sale_hour, SUM(od.quantity * od.price) AS total_sales
+            FROM orders o
+            JOIN order_detail od ON o.order_id = od.order_id
+            WHERE DATE(o.order_date) = '$selected_date'";
 
-if (!empty($selected_date)) {
-    $sql .= " AND DATE(o.order_date) = '$selected_date'";
+    if ($selected_type_id != 0) {
+        $sql .= " AND p.type_id = $selected_type_id";
+    }
+
+    if ($selected_emp_id != 0) {
+        $sql .= " AND o.emp_id = $selected_emp_id";
+    }
+
+    if ($selected_paymethod_id != 0) {
+        $sql .= " AND o.paymethod_id = $selected_paymethod_id";
+    }
+
+    $sql .= " GROUP BY sale_hour ORDER BY sale_hour ASC";
+} else {
+    // กรณีที่ไม่เลือกวัน
+    $sql = "SELECT DATE_FORMAT(o.order_date, '%d-%m-%Y') as formatted_date, SUM(od.quantity * od.price) as total_sales
+            FROM orders o
+            JOIN order_detail od ON o.order_id = od.order_id
+            WHERE 1=1";
+
+    if ($selected_type_id != 0) {
+        $sql .= " AND p.type_id = $selected_type_id";
+    }
+
+    if ($selected_emp_id != 0) {
+        $sql .= " AND o.emp_id = $selected_emp_id";
+    }
+
+    if ($selected_paymethod_id != 0) {
+        $sql .= " AND o.paymethod_id = $selected_paymethod_id";
+    }
+
+    $sql .= " GROUP BY formatted_date ORDER BY o.order_date";
 }
 
-if ($selected_type_id != 0) {
-    $sql .= " AND t.type_id = $selected_type_id";
-}
+$result = mysqli_query($conn, $sql);
 
-if ($selected_emp_id != 0) {
-    $sql .= " AND o.emp_id = $selected_emp_id";
-}
-
-if ($selected_paymethod_id != 0) {
-    $sql .= " AND o.paymethod_id = $selected_paymethod_id";
-}
-
-$sql .= " GROUP BY e.emp_id, formatted_date ORDER BY formatted_date, e.emp_id";
-
-
-
-
-
-
-// if ($selected_date) {
-//   $sql = "SELECT HOUR(o.order_time) AS sale_hour, SUM(od.quantity * od.price) AS total_sales
-//           FROM orders o
-//           JOIN order_detail od ON o.order_id = od.order_id
-//           WHERE DATE(o.order_date) = '$selected_date'
-//           GROUP BY sale_hour
-//           ORDER BY sale_hour ASC";
-
-//   $result = mysqli_query($conn, $sql);
-
-//   $hours = [];
-//   $sales = [];
-
-//   while ($row = mysqli_fetch_assoc($result)) {
-//       $hours[] = $row['sale_hour'];
-//       $sales[] = $row['total_sales'];
-//   }
-// }
-
-// $sql .= " GROUP BY formatted_date ORDER BY o.order_date";
-
-
-$result = $conn->query($sql);
-
-$dates = [];
+$labels = [];
 $sales = [];
-$employees = [];
 
-// ตรวจสอบว่า query ดึงข้อมูลมาได้หรือไม่
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        // แปลงรูปแบบวันที่จาก Datetime เป็น DD/MM/YY
-        $date = $row['formatted_date']; // สมมติว่า 'formatted_date' เป็น Datetime
-        $formatted_date = date('d/m/y', strtotime($date)); // แปลงวันที่
-
-        $dates[] = $formatted_date;
-        $emp_id = $row['emp_id'];
-        $emp_name = $row['emp_name'];
-        
-        if (!isset($sales[$emp_id])) {
-            $sales[$emp_id] = [];
-        }
-
-        $sales[$emp_id][$formatted_date] = $row['total_sales']; // ใช้ $formatted_date
-
-        if (!isset($employees[$emp_id])) {  // แก้ไขตรงนี้
-            $employees[$emp_id] = $emp_name; // แก้ไขตรงนี้
-        }
+while ($row = mysqli_fetch_assoc($result)) {
+    if ($selected_date) {
+        $labels[] = $row['sale_hour'] . ':00'; // แสดงชั่วโมงในรูปแบบ 24 ชั่วโมง
+    } else {
+        $labels[] = $row['formatted_date'];
     }
-}
-
-// ตรวจสอบข้อมูลพนักงานว่าถูกต้องหรือไม่
-// var_dump($employees);
-
-$datasets = [];
-$colors = ['rgb(75, 192, 192)', 'rgb(153, 102, 255)', 'rgb(255, 159, 64)', 'rgb(255, 99, 132)']; 
-
-foreach ($sales as $emp_id => $sales_data) {
-    // เช็คว่ามียอดขายหรือไม่
-    $total_sales = array_sum($sales_data);  // รวมยอดขายของพนักงานแต่ละคน
-    if ($total_sales > 0) {  // ถ้ามียอดขายมากกว่า 0 จึงเพิ่มในกราฟ
-        $datasets[] = [
-            'label' => $employees[$emp_id],  // แสดงชื่อพนักงานตาม emp_id
-            'data' => array_values(array_map(function($date) use ($sales_data) {
-                return isset($sales_data[$date]) ? $sales_data[$date] : 0;
-            }, $dates)),
-            'fill' => false,
-            'borderColor' => $colors[array_search($emp_id, array_keys($sales)) % count($colors)],
-            'tension' => 0.1
-        ];
-    }
-}
-
-
-
-
-
-
-
-// ดึงยอดขายรวมทั้งหมด
-$sql_total_sales = "SELECT SUM(order_total) AS total_sales FROM orders";
-$result_total_sales = $conn->query($sql_total_sales);
-
-$total_sales = 0;
-if ($result_total_sales->num_rows > 0) {
-    $row_total_sales = $result_total_sales->fetch_assoc();
-    $total_sales = $row_total_sales['total_sales'];
-}
-
-
-
-
-
-
-// ดึงจำนวนสินค้าคงเหลือทั้งหมดจากตาราง size
-$sql_total_qty = "SELECT SUM(qty) AS total_qty FROM size";
-$result_total_qty = $conn->query($sql_total_qty);
-
-$total_qty = 0;
-if ($result_total_qty->num_rows > 0) {
-    $row_total_qty = $result_total_qty->fetch_assoc();
-    $total_qty = $row_total_qty['total_qty'];
+    $sales[] = $row['total_sales'];
 }
 
 $conn->close();
 ?>
+
 
 
 <!DOCTYPE html>
@@ -895,24 +810,42 @@ function refreshPage(btn_clear){
 
 
 
+const labels = <?php echo json_encode($labels); ?>;
+const data = {
+  labels: labels,
+  datasets: [{
+    label: 'ยอดขายรวม',
+    data: <?php echo json_encode($sales); ?>,
+    fill: false,
+    borderColor: 'rgb(75, 192, 192)',
+    tension: 0.1
+  }]
+};
 
+const config = {
+  type: 'line',
+  data: data,
+  options: {
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'เวลา' // ถ้าเลือกวันที่จะเป็นวัน
+        }
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'ยอดขาย (บาท)'
+        }
+      }
+    }
+  }
+};
 
+const ctx = document.getElementById('myChart').getContext('2d');
+new Chart(ctx, config);
 
-const labels = <?php echo json_encode($dates); ?>;
-    const datasets = <?php echo json_encode($datasets); ?>;
-
-    const data = {
-        labels: labels,
-        datasets: datasets
-    };
-
-    const config = {
-        type: 'line',
-        data: data,
-    };
-
-    const ctx = document.getElementById('myChart').getContext('2d');
-    new Chart(ctx, config);
 
 
 

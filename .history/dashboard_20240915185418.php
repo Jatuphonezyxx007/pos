@@ -32,16 +32,16 @@ $selected_emp_id = isset($_POST['emp_id']) ? $_POST['emp_id'] : 0;
 $selected_paymethod_id = isset($_POST['paymethod_id']) ? $_POST['paymethod_id'] : 0;
 $selected_date = isset($_POST['selected_date']) ? $_POST['selected_date'] : '';
 
-$sql = "SELECT e.emp_id, e.emp_name, DATE_FORMAT(o.order_date, '%d-%m-%Y') as formatted_date, SUM(o.order_total) as total_sales 
+// ดึงข้อมูลจากตาราง orders และจัดรูปแบบวันที่
+$sql = "SELECT DATE_FORMAT(o.order_date, '%d-%m-%Y') as formatted_date, SUM(o.order_total) as total_sales 
         FROM orders o
         JOIN orders_detail od ON o.order_id = od.order_id
         JOIN products p ON od.p_id = p.id
-        JOIN employees e ON o.emp_id = e.emp_id
         JOIN type t ON p.type_id = t.type_id
         WHERE 1=1"; // เพื่อให้สามารถเติมเงื่อนไขได้
 
 if (!empty($selected_date)) {
-    $sql .= " AND DATE(o.order_date) = '$selected_date'";
+  $sql .= " AND DATE(o.order_date) = '$selected_date'";
 }
 
 if ($selected_type_id != 0) {
@@ -55,9 +55,6 @@ if ($selected_emp_id != 0) {
 if ($selected_paymethod_id != 0) {
     $sql .= " AND o.paymethod_id = $selected_paymethod_id";
 }
-
-$sql .= " GROUP BY e.emp_id, formatted_date ORDER BY formatted_date, e.emp_id";
-
 
 
 
@@ -82,76 +79,67 @@ $sql .= " GROUP BY e.emp_id, formatted_date ORDER BY formatted_date, e.emp_id";
 //   }
 // }
 
-// $sql .= " GROUP BY formatted_date ORDER BY o.order_date";
+$sql .= " GROUP BY formatted_date ORDER BY o.order_date";
 
 
 $result = $conn->query($sql);
 
 $dates = [];
 $sales = [];
-$employees = [];
 
-// ตรวจสอบว่า query ดึงข้อมูลมาได้หรือไม่
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        // แปลงรูปแบบวันที่จาก Datetime เป็น DD/MM/YY
-        $date = $row['formatted_date']; // สมมติว่า 'formatted_date' เป็น Datetime
-        $formatted_date = date('d/m/y', strtotime($date)); // แปลงวันที่
 
-        $dates[] = $formatted_date;
-        $emp_id = $row['emp_id'];
-        $emp_name = $row['emp_name'];
-        
-        if (!isset($sales[$emp_id])) {
-            $sales[$emp_id] = [];
-        }
 
-        $sales[$emp_id][$formatted_date] = $row['total_sales']; // ใช้ $formatted_date
 
-        if (!isset($employees[$emp_id])) {  // แก้ไขตรงนี้
-            $employees[$emp_id] = $emp_name; // แก้ไขตรงนี้
-        }
-    }
+
+
+
+// if ($result->num_rows > 0) {
+//     while($row = $result->fetch_assoc()) {
+//         $dates[] = $row['formatted_date'];
+//         $sales[] = $row['total_sales'];
+//     }
+// }
+
+// // ดึงยอดขายรวมทั้งหมด
+// $sql_total_sales = "SELECT SUM(order_total) AS total_sales FROM orders";
+// $result_total_sales = $conn->query($sql_total_sales);
+
+// $total_sales = 0;
+// if ($result_total_sales->num_rows > 0) {
+//     $row_total_sales = $result_total_sales->fetch_assoc();
+//     $total_sales = $row_total_sales['total_sales'];
+// }
+
+
+$sql_employee_sales = "
+    SELECT e.emp_name, DATE(o.order_date) AS order_date, SUM(o.order_total) AS total_sales
+    FROM orders o
+    JOIN employees e ON o.emp_id = e.emp_id
+    GROUP BY e.emp_name, DATE(o.order_date)
+    ORDER BY e.emp_name, DATE(o.order_date)";
+$result_employee_sales = $conn->query($sql_employee_sales);
+
+$sales_data = [];
+while ($row = $result_employee_sales->fetch_assoc()) {
+    $sales_data[$row['emp_name']]['dates'][] = $row['order_date'];
+    $sales_data[$row['emp_name']]['sales'][] = $row['total_sales'];
 }
 
-// ตรวจสอบข้อมูลพนักงานว่าถูกต้องหรือไม่
-// var_dump($employees);
-
+$employee_names = array_keys($sales_data);
 $datasets = [];
-$colors = ['rgb(75, 192, 192)', 'rgb(153, 102, 255)', 'rgb(255, 159, 64)', 'rgb(255, 99, 132)']; 
-
-foreach ($sales as $emp_id => $sales_data) {
-    // เช็คว่ามียอดขายหรือไม่
-    $total_sales = array_sum($sales_data);  // รวมยอดขายของพนักงานแต่ละคน
-    if ($total_sales > 0) {  // ถ้ามียอดขายมากกว่า 0 จึงเพิ่มในกราฟ
-        $datasets[] = [
-            'label' => $employees[$emp_id],  // แสดงชื่อพนักงานตาม emp_id
-            'data' => array_values(array_map(function($date) use ($sales_data) {
-                return isset($sales_data[$date]) ? $sales_data[$date] : 0;
-            }, $dates)),
-            'fill' => false,
-            'borderColor' => $colors[array_search($emp_id, array_keys($sales)) % count($colors)],
-            'tension' => 0.1
-        ];
-    }
+foreach ($sales_data as $name => $data) {
+    $datasets[] = [
+        'label' => $name,
+        'data' => $data['sales'],
+        'fill' => false,
+        'borderColor' => '#' . dechex(rand(0x000000, 0xFFFFFF)), // Random color for each employee
+        'tension' => 0.1
+    ];
 }
 
-
-
-
-
-
-
-// ดึงยอดขายรวมทั้งหมด
-$sql_total_sales = "SELECT SUM(order_total) AS total_sales FROM orders";
-$result_total_sales = $conn->query($sql_total_sales);
-
-$total_sales = 0;
-if ($result_total_sales->num_rows > 0) {
-    $row_total_sales = $result_total_sales->fetch_assoc();
-    $total_sales = $row_total_sales['total_sales'];
-}
-
+// Ensure that all datasets use the same date labels
+$all_dates = array_unique(array_merge(...array_column($sales_data, 'dates')));
+sort($all_dates);
 
 
 
@@ -829,6 +817,8 @@ body {
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/dist/date-fns.min.js"></script>
+
 
 
 
@@ -898,22 +888,61 @@ function refreshPage(btn_clear){
 
 
 
-const labels = <?php echo json_encode($dates); ?>;
-    const datasets = <?php echo json_encode($datasets); ?>;
+function formatDate(dateString) {
+        return dateFns.format(new Date(dateString), 'dd/MM/yyyy');
+    }
 
+    const labels = <?php echo json_encode($all_dates); ?>.map(date => formatDate(date));
     const data = {
         labels: labels,
-        datasets: datasets
+        datasets: <?php echo json_encode($datasets); ?>
     };
 
     const config = {
         type: 'line',
         data: data,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return tooltipItem.dataset.label + ': ' + tooltipItem.raw;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'day',
+                        displayFormats: {
+                            day: 'DD/MM/YYYY'
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'วันที่'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'ยอดขาย'
+                    }
+                }
+            }
+        }
     };
 
     const ctx = document.getElementById('myChart').getContext('2d');
     new Chart(ctx, config);
 
+    
 
 
 </script>

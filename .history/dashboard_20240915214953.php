@@ -91,14 +91,9 @@ $dates = [];
 $sales = [];
 $employees = [];
 
-// ตรวจสอบว่า query ดึงข้อมูลมาได้หรือไม่
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
-        // แปลงรูปแบบวันที่จาก Datetime เป็น DD/MM/YY
-        $date = $row['formatted_date']; // สมมติว่า 'formatted_date' เป็น Datetime
-        $formatted_date = date('d/m/y', strtotime($date)); // แปลงวันที่
-
-        $dates[] = $formatted_date;
+        $dates[] = $row['formatted_date'];
         $emp_id = $row['emp_id'];
         $emp_name = $row['emp_name'];
         
@@ -106,7 +101,7 @@ if ($result->num_rows > 0) {
             $sales[$emp_id] = [];
         }
 
-        $sales[$emp_id][$formatted_date] = $row['total_sales']; // ใช้ $formatted_date
+        $sales[$emp_id][$row['formatted_date']] = $row['total_sales'];
 
         if (!isset($employees[$emp_id])) {  // แก้ไขตรงนี้
             $employees[$emp_id] = $emp_name; // แก้ไขตรงนี้
@@ -115,27 +110,22 @@ if ($result->num_rows > 0) {
 }
 
 // ตรวจสอบข้อมูลพนักงานว่าถูกต้องหรือไม่
-// var_dump($employees);
+var_dump($employees);
 
 $datasets = [];
 $colors = ['rgb(75, 192, 192)', 'rgb(153, 102, 255)', 'rgb(255, 159, 64)', 'rgb(255, 99, 132)']; 
 
 foreach ($sales as $emp_id => $sales_data) {
-    // เช็คว่ามียอดขายหรือไม่
-    $total_sales = array_sum($sales_data);  // รวมยอดขายของพนักงานแต่ละคน
-    if ($total_sales > 0) {  // ถ้ามียอดขายมากกว่า 0 จึงเพิ่มในกราฟ
-        $datasets[] = [
-            'label' => $employees[$emp_id],  // แสดงชื่อพนักงานตาม emp_id
-            'data' => array_values(array_map(function($date) use ($sales_data) {
-                return isset($sales_data[$date]) ? $sales_data[$date] : 0;
-            }, $dates)),
-            'fill' => false,
-            'borderColor' => $colors[array_search($emp_id, array_keys($sales)) % count($colors)],
-            'tension' => 0.1
-        ];
-    }
+    $datasets[] = [
+        'label' => $employees[$emp_id],  // แก้ไขตรงนี้
+        'data' => array_values(array_map(function($date) use ($sales_data) {
+            return isset($sales_data[$date]) ? $sales_data[$date] : 0;
+        }, $dates)),
+        'fill' => false,
+        'borderColor' => $colors[array_search($emp_id, array_keys($sales)) % count($colors)],
+        'tension' => 0.1
+    ];
 }
-
 
 
 
