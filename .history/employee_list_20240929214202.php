@@ -325,7 +325,7 @@ body {
 
 
 
-        <li class="pc-item pc-caption">
+        <!-- <li class="pc-item pc-caption">
             <label>UI Components</label>
             <i class="ph ph-compass-tool"></i>
         </li>
@@ -426,7 +426,7 @@ body {
 
       </ul>
       <div class="card nav-action-card bg-brand-color-9">
-        <div class="card-body" style="background-image: url('assets/images/layout/nav-card-bg.svg')">
+        <div class="card-body" style="background-image: url('assets/images/layout/nav-card-bg.svg')"> -->
 
         </div>
       </div>
@@ -440,7 +440,7 @@ body {
 <header class="pc-header">
   <div class="m-header">
     <a href="sale.php" class="b-brand text-primary">
-      <img src="assets/images/logo/logo_homeware.png" alt="logo image" class="logo-lg" height="45">
+      <img src="assets/images/logo/logo.png" alt="logo image" class="logo-lg" height="45">
     </a>
   </div>
 
@@ -457,7 +457,7 @@ body {
 
     <!-- เพิ่ม form control ตรงนี้ -->
     <form method="post" class="search-form" onsubmit="return false;">
-      <input type="text" name="src2" placeholder="ค้นหาสินค้า" class="search-input" autofocus>
+      <input type="text" name="src2" placeholder="ค้นหาพนักงาน" class="search-input" autofocus>
       <a class="btn btn-primary"><i class="ph ph-magnifying-glass"></i></a>
     </form>
 
@@ -472,7 +472,7 @@ body {
           <h8 class="text-white text-center" id="date"></h8>
           <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
             aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
-            <img src="assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
+            <img src="<?php echo $imagePath; ?>" alt="user-image" class="user-avtar" style="height: 40px">
           </a>
           <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
             <div class="dropdown-body">
@@ -594,7 +594,7 @@ body {
               <table class="table" width="100%">
   <thead>
   <tr>
-                    <td width="10%" class="text-start">รหัสพนักงาน</td>
+                    <td width="10%" class="text-center">รหัส</td>
                     <td width="17%" class="text-center">รูป</td>
                     <td width="25%" class="text-start">ชื่อ - นามสกุล</td>
                     <td width="10%" class="text-start">สิทธิ์</td>
@@ -636,8 +636,8 @@ while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
                 </td>
                 <td class="text-start"><?=$data['emp_name'];?></td>
                 <td><span class="text-start <?php echo $data['role_class']; ?>"><?php echo $data['role_name']; ?></span></td>                
-                <td class="text-start"><?=$data['emp_email'];?></td>
-                <td class="text-center"><?=$data['emp_phone'];?></td>
+                <td class="text-start"><small><?=$data['emp_email'];?></small></td>
+                <td class="text-center"><small><?=$data['emp_phone'];?></small></td>
                 <td class="text-center">
                 
                 <a href="edit_employee.php?id=<?= $data['emp_id']; ?>" type="button" class="btn btn-primary">แก้ไข</a>

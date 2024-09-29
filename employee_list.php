@@ -636,8 +636,8 @@ while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
                 </td>
                 <td class="text-start"><?=$data['emp_name'];?></td>
                 <td><span class="text-start <?php echo $data['role_class']; ?>"><?php echo $data['role_name']; ?></span></td>                
-                <td class="text-start"><?=$data['emp_email'];?></td>
-                <td class="text-center"><?=$data['emp_phone'];?></td>
+                <td class="text-start"><small><?=$data['emp_email'];?></small></td>
+                <td class="text-center"><small><?=$data['emp_phone'];?></small></td>
                 <td class="text-center">
                 
                 <a href="edit_employee.php?id=<?= $data['emp_id']; ?>" type="button" class="btn btn-primary">แก้ไข</a>
