@@ -270,7 +270,7 @@ body {
     <div class="m-header">
       <a href="dashboard/index.html" class="b-brand text-primary">
         <!-- ========   Change your logo from here   ============ -->
-        <img src="assets/images/logo/logo.png" alt="logo image" class="logo-lg">
+        <img src="assets/images/logo-white.svg" alt="logo image" class="logo-lg">
       </a>
     </div>
     <div class="navbar-content">
@@ -511,15 +511,15 @@ body {
             <div class="dropdown-body">
               <div class="profile-notification-scroll position-relative" style="max-height: calc(100vh - 225px)">
                 <ul class="list-group list-group-flush w-100">
-                  <!-- <li class="list-group-item">
+                  <li class="list-group-item">
                     <a href="https://codedthemes.com/item/gradient-able-admin-template/" class="dropdown-item">
                       <span class="d-flex align-items-center">
                         <i class="ph ph-arrow-circle-down"></i>
                         <span>Download</span>
                       </span>
                     </a>
-                  </li> -->
-                  <!-- <li class="list-group-item">
+                  </li>
+                  <li class="list-group-item">
                     <a href="#" class="dropdown-item">
                       <span class="d-flex align-items-center">
                         <i class="ph ph-user-circle"></i>
@@ -538,14 +538,14 @@ body {
                         <span>Settings</span>
                       </span>
                     </a>
-                  </li> -->
+                  </li>
                   <li class="list-group-item">
-                    <!-- <a href="#" class="dropdown-item">
+                    <a href="#" class="dropdown-item">
                       <span class="d-flex align-items-center">
                         <i class="ph ph-plus-circle"></i>
                         <span>Add account</span>
                       </span>
-                    </a> -->
+                    </a>
                     <a href="logout.php" class="dropdown-item">
                       <span class="d-flex align-items-center">
                         <i class="ph ph-power"></i>
@@ -641,7 +641,7 @@ body {
                                     <p class="mb-0 text-start">ราคา</p>
                                 </div>
                                 <div class="col">
-                                    <p id="price-display" class="mb-0 text-start">0 บาท</p>
+                                    <p id="price-display" class="mb-0 text-start"><strong>0 บาท</strong></p>
                                 </div>
                             </div>
                         </div>
@@ -680,7 +680,7 @@ body {
                 <tfoot>
                     <tr>
                         <td colspan="3" class="text-end"><strong>รวม</strong></td>
-                        <td class="text-center" id="total-price">0 บาท</td>
+                        <td class="text-center" id="total-price"><strong>0 บาท</strong></td>
                     </tr>
                 </tfoot>
             </table>
@@ -743,70 +743,39 @@ body {
         <!-- <div class="container"> -->
 
         <div id="calContainer" style="display: none;">
-    <div class="card">
-        <div class="card-body">
-            <!-- <h5 class="card-title text-center">เครื่องคิดเลข</h5> -->
-            <input class="form-control text-end fs-4 mb-3" type="text" id="result" readonly value="0">
-
-            <div class="row g-2">
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('7')">7</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('8')">8</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('9')">9</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('1000')">1000</button>
-                </div>
-            </div>
-            <div class="row g-2 mb-2">
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('4')">4</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('5')">5</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('6')">6</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('500')">500</button>
-                </div>
-            </div>
-            <div class="row g-2 mb-2">
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('1')">1</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('2')">2</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('3')">3</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('100')">100</button>
-                </div>
-            </div>
-            <div class="row g-2">
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('.')">.</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('0')">0</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-danger w-100" onclick="deleteLastChar()">ลบ</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-success w-100" onclick="calculateTotal()">เต็ม</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- ตารางเครื่องคิดเลข -->
+<table class="table table-bordered" width="100%" id="calcu">
+            <tr>
+                <td colspan="4">
+                    <input class="form-control text-end w-100 fs-4" type="text" id="result" readonly value="0">
+                </td>
+            </tr>
+            <tr>
+                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('7')">7</button></td>
+                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('8')">8</button></td>
+                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('9')">9</button></td>
+                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('1000')">1000</button></td>
+            </tr>
+            <tr>
+                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('4')">4</button></td>
+                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('5')">5</button></td>
+                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('6')">6</button></td>
+                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('500')">500</button></td>
+            </tr>
+            <tr>
+                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('1')">1</button></td>
+                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('2')">2</button></td>
+                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('3')">3</button></td>
+                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('100')">100</button></td>
+            </tr>
+            <tr>
+                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('.')">.</button></td>
+                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('0')">0</button></td>
+                <td><button class="btn btn-secondary w-100" onclick="deleteLastChar()">ลบ</button></td>
+                <td><button class="btn btn-primary w-100" onclick="calculateTotal()">เต็ม</button></td>
+            </tr>
+        </table>
+      </div>
 
 <!-- </div> -->
 
@@ -1180,8 +1149,8 @@ function updateTotalPrice() {
         total += price;
     }
 
-    document.getElementById('total-price').textContent = total.toLocaleString() + " บาท";
-  }
+    document.getElementById('total-price').textContent = total.toLocaleString();
+}
 
 document.getElementById('pay-button').addEventListener('click', function(event) {
     event.preventDefault(); // ป้องกันการรีเฟรชหน้า

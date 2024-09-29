@@ -745,7 +745,7 @@ body {
         <div id="calContainer" style="display: none;">
     <div class="card">
         <div class="card-body">
-            <!-- <h5 class="card-title text-center">เครื่องคิดเลข</h5> -->
+            <h5 class="card-title text-center">เครื่องคิดเลข</h5>
             <input class="form-control text-end fs-4 mb-3" type="text" id="result" readonly value="0">
 
             <div class="row g-2">

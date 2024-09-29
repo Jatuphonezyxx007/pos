@@ -61,38 +61,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     exit;
   }
 
-// ตรวจสอบการรับค่าจากฟอร์ม
-$qty = isset($_POST['qty']) ? $_POST['qty'] : '';
-$re_stock = isset($_POST['re_stock']) ? $_POST['re_stock'] : '';
-$price = isset($_POST['price']) ? str_replace(',', '', $_POST['price']) : ''; // ลบคอมม่าออกจากราคาก่อนส่งไปฐานข้อมูล
+  // ตรวจสอบการรับค่าจากฟอร์ม
+  $qty = isset($_POST['qty']) ? $_POST['qty'] : '';
+  $re_stock = isset($_POST['re_stock']) ? $_POST['re_stock'] : '';
 
-// คำสั่ง SQL สำหรับอัปเดตข้อมูลขนาดสินค้า
-$sql = "UPDATE size SET 
-    qty='$qty', 
-    re_stock='$re_stock', 
-    price='$price'  -- เพิ่ม price เข้ามาในคำสั่ง SQL
-WHERE size_id='$size_id'";
+  // คำสั่ง SQL สำหรับอัปเดตข้อมูลขนาดสินค้า
+  $sql = "UPDATE size SET 
+      qty='$qty', 
+      re_stock='$re_stock'
+  WHERE size_id='$size_id'";
 
-if (mysqli_query($conn, $sql)) {
-    echo "<script>";
-    echo "document.addEventListener('DOMContentLoaded', function() {";
-    echo "  var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {});";
-    echo "document.getElementById('modalMessage').innerHTML = '<div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\"><div class=\"text-center\"><div class=\"spinner-border text-success\" role=\"status\" id=\"spinner\"><span class=\"visually-hidden\">Loading...</span></div><div class=\"mt-2\">กำลังบันทึกข้อมูล</div></div></div>';";
-
-    echo "  myModal.show();";
-    echo "  setTimeout(function() {";
-    echo "    document.getElementById('modalMessage').innerHTML = '<div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\"><div class=\"text-success\"><i class=\"bi bi-check-circle-fill\"></i> ข้อมูลถูกอัปเดตเรียบร้อยแล้ว</div></div>';";
-
-    echo "    setTimeout(function() {";
-    echo "      window.location.href = 'update_product.php?id=$id';"; // เปลี่ยนไปที่หน้า update_product.php พร้อมส่งค่า product_id ที่ถูกต้อง
-    echo "    }, 1000);"; // เปลี่ยน 1000 ให้เป็นเวลาที่ต้องการในมิลลิวินาที
-    echo "  }, 2000);"; // เปลี่ยน 2000 ให้เป็นเวลาที่ต้องการในมิลลิวินาที
-    echo "});";
-    echo "</script>";
-} else {
-    echo "Error updating record: " . mysqli_error($conn);
-}
-
+  if (mysqli_query($conn, $sql)) {
+      echo "<script>";
+      echo "document.addEventListener('DOMContentLoaded', function() {";
+      echo "  var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {});";
+      echo "document.getElementById('modalMessage').innerHTML = '<div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\"><div class=\"text-center\"><div class=\"spinner-border text-success\" role=\"status\" id=\"spinner\"><span class=\"visually-hidden\">Loading...</span></div><div class=\"mt-2\">กำลังบันทึกข้อมูล</div></div></div>';";
+      echo "  myModal.show();";
+      echo "  setTimeout(function() {";
+      echo "    document.getElementById('modalMessage').innerHTML = '<div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\"><div class=\"text-success\"><i class=\"bi bi-check-circle-fill\"></i> ข้อมูลถูกอัปเดตเรียบร้อยแล้ว</div></div>';";
+      echo "    setTimeout(function() {";
+      echo "      window.location.href = 'update_product.php?id=$id';"; // เปลี่ยนไปที่หน้า update_product.php พร้อมส่งค่า product_id ที่ถูกต้อง
+      echo "    }, 1000);"; // เปลี่ยน 1000 ให้เป็นเวลาที่ต้องการในมิลลิวินาที
+      echo "  }, 2000);"; // เปลี่ยน 2000 ให้เป็นเวลาที่ต้องการในมิลลิวินาที
+      echo "});";
+      echo "</script>";
+  } else {
+      echo "Error updating record: " . mysqli_error($conn);
+  }
 }
 
 ?>
@@ -595,16 +590,7 @@ body {
 
       <div class="row">
 
-      <div class="col-md-12">
-        <div class="page-header-title border-bottom pb-2 mb-2 d-flex align-items-center">
-          <a href="products_manage.php" class="breadcrumb-item me-2">
-            <i class="ph ph-arrow-left fs-3"></i>
-          </a>
-          <h4 class="mb-0">แก้ไขข้อมูลสินค้า</h4>
-        </div>
-      </div>
-
-      <!-- <h5 class="card-title fw-semibold mb-4">แก้ไขขข้อมูลสินค้า</h5> -->
+      <h5 class="card-title fw-semibold mb-4">แก้ไขขข้อมูลสินค้า</h5>
 
 
       <div class="col-md-6">

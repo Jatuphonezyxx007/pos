@@ -28,73 +28,103 @@ $imagePath = "assets/images/emp/" . $aid . "." . $img;
 
 // ตรวจสอบว่าตัวแปร $_GET['id'] ถูกกำหนดหรือไม่
 if (isset($_GET['id'])) {
-  $id = $_GET['id']; // เปลี่ยนจาก $emp_id เป็น $id เพื่อให้ตรงกับคำสั่ง SQL
-
-  // สร้างคำสั่ง SQL เพื่อเชื่อมตาราง products และ size
-  $sql = "SELECT products.*, size.*
-          FROM products
-          INNER JOIN size ON products.id = size.id
-          WHERE products.id = '$id'";
-
-  // ดำเนินการคำสั่ง SQL
+  $emp_id = $_GET['id'];
+  $sql = "SELECT employees.*, role.role_name
+          FROM employees 
+          INNER JOIN role ON employees.role_id = role.role_id
+          WHERE employees.emp_id = '$emp_id'";
   $rs = mysqli_query($conn, $sql);
-
   if ($rs) {
-      $data = mysqli_fetch_array($rs); // ดึงข้อมูลที่ได้จากการ query
+      $data = mysqli_fetch_array($rs);
   } else {
-      echo "Error in query: " . mysqli_error($conn); // แสดงข้อความข้อผิดพลาดหาก query ไม่สำเร็จ
+      echo "Error in query: " . mysqli_error($conn);
   }
 } else {
-  echo "No Products available"; // แสดงข้อความเมื่อไม่พบ id ใน URL
+  echo "emp_id is not set.";
 }
-
-
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-  // ตรวจสอบว่าได้ค่า size_id และ product_id จากฟอร์มหรือไม่
-  if (isset($_POST['size_id'])) {
-    $size_id = $_POST['size_id'];
-    // $id = $_POST['id'];
+  $emp_name = $_POST['ep_name'];
+  $emp_user = $_POST['ep_user'];
+  $emp_pwd = $_POST['ep_pwd'];  
+  $emp_email = $_POST['ep_email'];
+  $emp_phone = $_POST['ep_phone'];
+  $role_id = $_POST['ep_role'];
+  $com_id = $data['com_id']; // Assuming com_id is already set and should not be changed
+
+  // ตรวจสอบว่ามีการกรอกรหัสผ่านใหม่หรือไม่
+  if (!empty($emp_pwd)) {
+    $emp_pwd = md5($emp_pwd);  // แปลงรหัสผ่านเป็น MD5
+    $pwd_sql = ", emp_pwd='$emp_pwd'";
   } else {
-    // กรณีที่ไม่พบ size_id หรือ product_id ให้แสดงข้อความหรือ error
-    echo "Error: size_id is not set.";
-    exit;
+    // ใช้รหัสผ่านเดิมถ้าไม่มีการกรอกใหม่
+    $pwd_sql = "";
   }
 
-// ตรวจสอบการรับค่าจากฟอร์ม
-$qty = isset($_POST['qty']) ? $_POST['qty'] : '';
-$re_stock = isset($_POST['re_stock']) ? $_POST['re_stock'] : '';
-$price = isset($_POST['price']) ? str_replace(',', '', $_POST['price']) : ''; // ลบคอมม่าออกจากราคาก่อนส่งไปฐานข้อมูล
+  $img_sql = "";
+  if ($_FILES['ep_pic']['name'] != "") {
+    $allowed = array('gif', 'png', 'jpg', 'jpeg', 'jfif', 'webp');
+    $filename = $_FILES['ep_pic']['name'];
+    $ext = pathinfo($filename, PATHINFO_EXTENSION);
 
-// คำสั่ง SQL สำหรับอัปเดตข้อมูลขนาดสินค้า
-$sql = "UPDATE size SET 
-    qty='$qty', 
-    re_stock='$re_stock', 
-    price='$price'  -- เพิ่ม price เข้ามาในคำสั่ง SQL
-WHERE size_id='$size_id'";
+    if (!in_array($ext, $allowed)) {
+      echo "<script>";
+      echo "alert('แก้ไขข้อมูลพนักงานไม่สำเร็จ! ไฟล์รูปต้องเป็น jpg, gif หรือ png เท่านั้น');";
+      echo "</script>";
+      exit;
+    }
+    $target_file = "assets/images/emp/" . $emp_id . "." . $ext;
+    if (move_uploaded_file($_FILES['ep_pic']['tmp_name'], $target_file)) {
+      $img_sql = ", img='$ext'";
+    } else {
+      echo "Error uploading file.";
+      exit;
+    }
+  }
 
-if (mysqli_query($conn, $sql)) {
-    echo "<script>";
-    echo "document.addEventListener('DOMContentLoaded', function() {";
-    echo "  var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {});";
-    echo "document.getElementById('modalMessage').innerHTML = '<div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\"><div class=\"text-center\"><div class=\"spinner-border text-success\" role=\"status\" id=\"spinner\"><span class=\"visually-hidden\">Loading...</span></div><div class=\"mt-2\">กำลังบันทึกข้อมูล</div></div></div>';";
+  $sql = "UPDATE employees SET 
+      emp_name='$emp_name', 
+      emp_user='$emp_user'
+      $pwd_sql, 
+      emp_email='$emp_email', 
+      emp_phone='$emp_phone', 
+      role_id='$role_id'
+      $img_sql
+  WHERE emp_id='$emp_id'";
 
-    echo "  myModal.show();";
-    echo "  setTimeout(function() {";
-    echo "    document.getElementById('modalMessage').innerHTML = '<div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\"><div class=\"text-success\"><i class=\"bi bi-check-circle-fill\"></i> ข้อมูลถูกอัปเดตเรียบร้อยแล้ว</div></div>';";
-
-    echo "    setTimeout(function() {";
-    echo "      window.location.href = 'update_product.php?id=$id';"; // เปลี่ยนไปที่หน้า update_product.php พร้อมส่งค่า product_id ที่ถูกต้อง
-    echo "    }, 1000);"; // เปลี่ยน 1000 ให้เป็นเวลาที่ต้องการในมิลลิวินาที
-    echo "  }, 2000);"; // เปลี่ยน 2000 ให้เป็นเวลาที่ต้องการในมิลลิวินาที
-    echo "});";
-    echo "</script>";
-} else {
-    echo "Error updating record: " . mysqli_error($conn);
+  if (mysqli_query($conn, $sql)) {
+      echo "<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {});
+    document.getElementById('modalMessage').innerHTML = `
+        <div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\">
+            <div class=\"text-center\">
+                <div class=\"spinner-border text-success\" role=\"status\">
+                    <span class=\"visually-hidden\">Loading...</span>
+                </div>
+                <div class=\"mt-2\">กำลังบันทึกข้อมูล</div>
+            </div>
+        </div>
+    `;
+    myModal.show();
+    setTimeout(function() {
+        document.getElementById('modalMessage').innerHTML = `
+            <div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\">
+                <div class=\"text-success\">
+                    <i class=\"bi bi-check-circle-fill\"></i> ข้อมูลถูกอัปเดตเรียบร้อยแล้ว
+                </div>
+            </div>
+        `;
+        setTimeout(function() {
+            window.location.href = 'employee_list.php';
+        }, 1000);
+    }, 2000);
+});
+</script>";
+  } else {
+      echo "Error updating record: " . mysqli_error($conn);
+  }
 }
-
-}
-
 ?>
 
 
@@ -126,11 +156,9 @@ if (mysqli_query($conn, $sql)) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai+Looped:wght@500&display=swap" rel="stylesheet">
 
-  <!-- Phosphor Icons CSS -->
-  <link href="https://unpkg.com/phosphor-icons/css/phosphor.css" rel="stylesheet">
+
   <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
 
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
 
 <!-- Script -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -255,18 +283,12 @@ body {
 }
 
 .pic{
-  height: 300px;
-  width: 250px;
+  height: 200px;
+  width: 150px;
   display: block;
   margin-left: auto;
   margin-right: auto
 }
-
-
-.custom-input {
-            display: none;
-        }
-
   </style>
 
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
@@ -401,10 +423,10 @@ body {
             <span class="pc-micon"><i class="ph ph-flower-lotus"></i></span>
             <span class="pc-mtext">Icons</span>
           </a>
-        </li>
+        </li> -->
 
 
-        <li class="pc-item pc-caption">
+        <!-- <li class="pc-item pc-caption">
           <label>Pages</label>
           <i class="ph ph-devices"></i>
         </li>
@@ -490,7 +512,7 @@ body {
 </nav>
 <!-- [ Sidebar Menu ] end -->
 
-<!-- [ Header Topbar ] start -->
+ <!-- [ Header Topbar ] start -->
 
 <header class="pc-header">
   <div class="m-header">
@@ -597,16 +619,18 @@ body {
 
       <div class="col-md-12">
         <div class="page-header-title border-bottom pb-2 mb-2 d-flex align-items-center">
-          <a href="products_manage.php" class="breadcrumb-item me-2">
+          <a href="employee_list.php" class="breadcrumb-item me-2">
             <i class="ph ph-arrow-left fs-3"></i>
           </a>
-          <h4 class="mb-0">แก้ไขข้อมูลสินค้า</h4>
+          <h4 class="mb-0">แก้ไขข้อมูลพนักงาน : <?=$data['emp_name'];?></h4>
         </div>
       </div>
 
-      <!-- <h5 class="card-title fw-semibold mb-4">แก้ไขขข้อมูลสินค้า</h5> -->
+
+      <!-- <h5 class="card-title fw-semibold mb-4">แก้ไขข้อมูลพนักงาน : <?=$data['emp_name'];?></h5> -->
 
 
+      <br>
       <div class="col-md-6">
           <div class="card">
             <!-- <div class="card-header">
@@ -616,7 +640,7 @@ body {
               <p class="lead m-t-0">รูปภาพ</p>
 
               <div class="pic">
-                        <img src="assets/images/products_2/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top rounded mx-auto d-block" alt="">
+                        <img src="assets/images/emp/<?=$data['emp_id'];?>.<?=$data['img'];?>" class="card-img-top rounded mx-auto d-block" alt="">
                       </div>
 
                       <br><br><br>
@@ -640,10 +664,10 @@ body {
           <div class="card-header">
             <div class="row align-items-center">
               <div class="col-3">
-                <h5 class="mb-0">รหัสสินค้า</h5>
+                <h5 class="mb-0">รหัสพนักงาน</h5>
               </div>
               <div class="col-9">
-              <input class="form-control" type="text" name="ep_id" placeholder="<?= $data['id']; ?>" aria-label="Disabled input example" disabled>              
+              <input class="form-control" type="text" name="ep_id" placeholder="<?= $data['emp_id']; ?>" aria-label="Disabled input example" disabled>              
             </div>          
             </div>
           </div>
@@ -652,157 +676,32 @@ body {
 
               <div class="row align-items-center">
               <div class="col-3">
-                <p class="text-dark mb-0">เลขที่บาร์โค้ด</p>
-              </div>
-              <div class="col-6">
-                <input name="ep_name" type="text" class="form-control" value="<?= $data['barcode']; ?>"> 
-              </div> 
-
-              <div class="col-3">
-              <a href="#" type="button" class="btn btn-success w-100">ตรวจสอบ</a>
-              </div>                   
-            </div>
-
-            <br>
-            <div class="row align-items-center">
-              <div class="col-3">
-                <p class="text-dark mb-0">ชื่อสินค้า</p>
+                <p class="text-dark mb-0">ชื่อ - นามสกุล</p>
               </div>
               <div class="col-9">
-                <input name="ep_email" type="text" class="form-control" value="<?= $data['name']; ?>"> 
+                <input name="ep_name" type="text" class="form-control" value="<?= $data['emp_name']; ?>"> 
               </div>          
             </div>
-            
+
             <br>
-
             <div class="row align-items-center">
-  <div class="col-3">
-    <p class="text-dark mb-0">ขนาด</p>
-  </div>
-  <div class="col-9">
-    <div class="row g-2 mb-2">
-      <?php
-      // ตรวจสอบว่ามี id หรือไม่
-      if (isset($data['id'])) {
-        // ดึงข้อมูลจากตาราง size
-        $id = $data['id'];
-        $query = "SELECT * FROM size WHERE id = $id";
-        $result = mysqli_query($conn, $query);
-        $count = 0;
-
-        // ตรวจสอบว่ามีขนาดสินค้าหรือไม่
-        if (mysqli_num_rows($result) > 0) {
-          while ($row = mysqli_fetch_assoc($result)) {
-            $modalId = "editSizeModal" . $row['size_id']; // กำหนด ID ที่ไม่ซ้ำกันสำหรับแต่ละ Modal
-            ?>
-            <div class="col-4">
-              <button type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#<?= $modalId; ?>">
-                <small><?= $row['size_name']; ?></small>
-              </button>
+              <div class="col-3">
+                <p class="text-dark mb-0">E - mail</p>
+              </div>
+              <div class="col-9">
+                <input name="ep_email" type="text" class="form-control" value="<?= $data['emp_email']; ?>"> 
+              </div>          
             </div>
 
-            <!-- Modal สำหรับแต่ละขนาด -->
-            <div class="modal fade" id="<?= $modalId; ?>" tabindex="-1" aria-labelledby="<?= $modalId; ?>Label" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="<?= $modalId; ?>Label"><?= $row['size_name']; ?></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <!-- ฟอร์มแก้ไขจำนวนสินค้า -->
-        <form action="#" method="POST">
-
-        <div class="row">
-          <div class="col-12 mb-6">
-            <label for="price-<?= $row['price']; ?>" class="form-label">ราคา/หน่วย (บาท)</label>
-            <!-- เปลี่ยน input จาก number เป็น text -->
-             <input type="text" class="form-control" id="price-<?= $row['price']; ?>" name="price" value="<?= number_format($row['price']); ?>" oninput="formatNumber(this)">
+            <br>
+            <div class="row align-items-center">
+              <div class="col-3">
+                <p class="text-dark mb-0">เบอร์โทรศัพท์</p>
+              </div>
+              <div class="col-9">
+                <input name="ep_phone" type="text" class="form-control" value="<?= $data['emp_phone']; ?>"> 
+              </div>          
             </div>
-          </div>
-
-          <br>
-
-          <div class="row">
-            <!-- คอลัมน์สำหรับ qty -->
-            <div class="col-6 mb-3">
-              <label for="quantity-<?= $row['size_id']; ?>" class="form-label">จำนวนสินค้า</label>
-              <input type="number" class="form-control" id="quantity-<?= $row['size_id']; ?>" name="qty" value="<?= $row['qty']; ?>">
-            </div>
-            <!-- คอลัมน์สำหรับ re_stock -->
-            <div class="col-6 mb-3">
-              <label for="re_stock-<?= $row['size_id']; ?>" class="form-label">จุด Restock</label>
-              <input type="number" class="form-control" id="re_stock-<?= $row['size_id']; ?>" name="re_stock" value="<?= $row['re_stock']; ?>">
-            </div>
-          </div>
-          <input type="hidden" name="size_id" value="<?= $row['size_id']; ?>">
-          <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">ลบขนาด</button>
-            <button type="submit" class="btn btn-primary" name="update_size">บันทึก</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-            <?php
-            $count++;
-
-            // เมื่อมีปุ่มครบ 3 ปุ่ม ให้เริ่มแถวใหม่
-            if ($count % 3 == 0) {
-              echo '</div><div class="row g-2 mb-2">';
-            }
-          }
-        } else {
-          echo "<div class='col-12'>No size data found for this product.</div>";
-        }
-      }
-      ?>
-
-      <!-- ปุ่ม + เพิ่มขนาด -->
-      <div class="col-4">
-        <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#exampleModal"><small>+ เพิ่มขนาด</small></button>
-      </div>
-    </div> <!-- ปิดแถวของปุ่ม -->
-  </div> <!-- ปิด col-9 -->
-</div> <!-- ปิดแถวหลัก -->
-
-<!-- Modal สำหรับเพิ่มขนาดใหม่ -->
-<!-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">เพิ่มขนาดสินค้า</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="mb-3">
-            <label for="sizeName" class="form-label">ชื่อขนาด</label>
-            <input type="text" class="form-control" id="sizeName" placeholder="กรอกชื่อขนาดใหม่">
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div> -->
-
-
-
-
-
-
-
-
-
-
               </div>
 
 
@@ -815,25 +714,25 @@ body {
             <div class="card-header">
               <div class="row align-items-center">
                 <div class="col-3">
-                  <h5 class="mb-0">หมวดหมู่</h5>
+                  <h5 class="mb-0">หน้าที่</h5>
                 </div>
                 <div class="col-9">
 
-                <select class="form-select" id="role" aria-label="role" name="ep_role" onchange="toggleOtherInput()">
-  <?php
+                <select class="form-select" id="role" aria-label="role" name="ep_role">
+<?php
     include("connectdb.php");
-    $sql2 = "SELECT * FROM `type`";
+    $sql2 = "SELECT * FROM `role`";
     $rs2 = mysqli_query($conn, $sql2);
-    while ($data2 = mysqli_fetch_array($rs2)) {
-  ?>
-    <option value="<?=$data2['type_id'];?>"><?=$data2['type_name'];?></option>
-  <?php } ?>
-  <option>ไม่ระบุ</option>
-    <option value="other">อื่นๆ</option>
+    if ($rs2) {
+        while ($data2 = mysqli_fetch_array($rs2)) {
+            $selected = ($data2['role_id'] == $data['role']) ? "selected" : "";
+            echo "<option value='{$data2['role_id']}' $selected>{$data2['role_name']}</option>";
+        }
+    } else {
+        echo "Query failed.";
+    }
+?>
 </select>
-
-<!-- ช่องกรอกข้อมูลสำหรับ "อื่นๆ" -->
-<input type="text" class="form-control mt-2" id="otherInput" name="other_role" placeholder="กรุณากรอกหมวดหมู่" style="display: none;">
 
 
               </div>          
@@ -844,22 +743,22 @@ body {
   
                 <div class="row align-items-center">
                 <div class="col-3">
-                  <p class="text-dark mb-0">หน่วย</p>
+                  <p class="text-dark mb-0">ชื่อผู้ใช้</p>
                 </div>
                 <div class="col-9">
-                  <input name="ep_user" type="text" class="form-control" value="<?= $data['unit']; ?>"> 
+                  <input name="ep_user" type="text" class="form-control" value="<?= $data['emp_user']; ?>"> 
                 </div>          
               </div>
   
               <br>
-              <!-- <div class="row align-items-center">
+              <div class="row align-items-center">
                 <div class="col-3">
                   <p class="text-dark mb-0">รหัสผ่านใหม่</p>
                 </div>
                 <div class="col-9">
-                  <input name="ep_pwd" type="password" class="form-control" value="<?= $data['emp_pwd']; ?>"> 
+                  <input name="ep_pwd" type="password" class="form-control" value=""> 
                 </div>          
-              </div> -->
+              </div>
                 </div>               
               </div>
   
@@ -899,6 +798,7 @@ body {
 
 
     </div>
+
 
   <footer class="pc-footer">
     <div class="footer-wrapper container-fluid">
@@ -974,44 +874,9 @@ document.getElementById('okButton').addEventListener('click', function() {
   window.location.href = 'employee_list.php';
 });
 
-
-
-
-
-
-
-
-
-function toggleOtherInput() {
-    var select = document.getElementById("role");
-    var otherInput = document.getElementById("otherInput");
-
-    if (select.value === "other") {
-        otherInput.style.display = "block";  // แสดงช่องกรอกข้อมูล
-        otherInput.required = true; // ตั้งค่าให้เป็น required หากเลือก "อื่นๆ"
-    } else {
-        otherInput.style.display = "none";  // ซ่อนช่องกรอกข้อมูล
-        otherInput.required = false; // ยกเลิก required หากไม่ได้เลือก "อื่นๆ"
-    }
-}
-
-
-
-// ฟังก์ชันสำหรับใส่คอมม่าคั่นหลักพัน
-function formatNumber(input) {
-    let value = input.value.replace(/,/g, ''); // ลบคอมม่าก่อน
-    if (!isNaN(value) && value !== '') {
-        input.value = Number(value).toLocaleString('en'); // ใส่คอมม่าคั่นตัวเลขใหม่
-    } else {
-        input.value = ''; // ถ้าไม่ใช่ตัวเลข, รีเซ็ตเป็นค่าว่าง
-    }
-}
-
-
 </script>
 
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-
 </body>
 
 </body>

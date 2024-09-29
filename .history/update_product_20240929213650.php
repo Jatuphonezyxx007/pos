@@ -596,13 +596,13 @@ body {
       <div class="row">
 
       <div class="col-md-12">
-        <div class="page-header-title border-bottom pb-2 mb-2 d-flex align-items-center">
-          <a href="products_manage.php" class="breadcrumb-item me-2">
-            <i class="ph ph-arrow-left fs-3"></i>
-          </a>
-          <h4 class="mb-0">แก้ไขข้อมูลสินค้า</h4>
-        </div>
-      </div>
+  <div class="page-header-title border-bottom pb-2 mb-2 d-flex align-items-center">
+    <a href="products_manage.php" class="breadcrumb-item me-2">
+      <i class="ph ph-arrow-left fs-3"></i>
+    </a>
+    <h4 class="mb-0">แก้ไขข้อมูลสินค้า</h4>
+  </div>
+</div>
 
       <!-- <h5 class="card-title fw-semibold mb-4">แก้ไขขข้อมูลสินค้า</h5> -->
 

@@ -382,7 +382,7 @@ $conn->close();
 <!-- [Head] start -->
 
 <head>
-  <title>Dashboard POS | Point of Sale</title>
+  <title>POS | Point of Sale</title>
   <!-- [Meta] -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -863,7 +863,7 @@ body {
         <div class="card-body">
             <h6 class="text-white">ยอดขายรวม</h6>
             <h2 class="text-end text-white fs-5"><i class="feather icon-shopping-cart float-start"></i><span><?php echo number_format($total_sales, 2); ?> บาท</span></h2>
-            <small class="m-b-0">จำนวนที่ขายไปทั้งหมด<span class="float-end"><?php echo number_format($total_sales_count,); ?> บิล</span></small>
+            <p class="m-b-0">จำนวนที่ขายไปทั้งหมด<span class="float-end"><?php echo number_format($total_sales_count,); ?> บิล</span></p>
         </div>
     </div>
 </div>
@@ -872,7 +872,7 @@ body {
         <div class="card-body">
             <h6 class="text-white">จำนวนสินค้าพร้อมขาย</h6>
             <h2 class="text-end text-white fs-5"><i class="feather icon-tag float-start"></i><span><?php echo number_format($total_qty); ?> ชิ้น</span></h2>
-            <small class="m-b-0">สินค้าที่ขายเดือน<?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?><span class="float-end"><?php echo ($total_items_sold); ?> ชิ้น</span></small>
+            <p class="m-b-0">สินค้าที่ขายเดือน<?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?><span class="float-end"><?php echo ($total_items_sold); ?> ชิ้น</span></p>
         </div>
     </div>
 </div>
@@ -881,7 +881,7 @@ body {
             <div class="card-body">
               <h6 class="text-white">ยอดขายมากสุดเดือน<?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?></h6>              
               <h2 class="text-end text-white fs-5"><i class="feather icon-repeat float-start"></i><span><?php echo number_format($max_total_sales, decimals:2); ?> บาท</span></h2>
-              <small class="m-b-0">พนักงานขาย<span class="float-end"><?php echo ($emp_name); ?></span></small>
+              <p class="m-b-0">พนักงานขาย<span class="float-end"><?php echo ($emp_name); ?></span></p>
             </div>
           </div>
         </div>
@@ -891,7 +891,7 @@ body {
             <div class="card-body">
               <h6 class="text-white">ยอดขายเฉลี่ยในเดือน<?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?></h6>
               <h2 class="text-end text-white fs-5"><i class="feather icon-award float-start"></i><span><?php echo number_format($average_sales, decimals:2); ?> บาท</span></h2>
-              <small class="m-b-0">จำนวนขายเดือน<?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?><span class="float-end"><?php echo ($total_bills); ?> บิล</span></small>
+              <p class="m-b-0">จำนวนขายเดือน<?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?><span class="float-end"><?php echo ($total_bills); ?> บิล</span></p>
             </div>
           </div>
         </div>
