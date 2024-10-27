@@ -23,20 +23,20 @@ if (empty($img)) {
 $imagePath = "assets/images/emp/" . $aid . "." . $img;
 
 function thai_day($date) {
-    $dayNames = array("อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์");
-    return $dayNames[date('w', strtotime($date))];
+  $dayNames = array("อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์");
+  return $dayNames[date('w', strtotime($date))];
 }
 
 function thai_month($date) {
-    $monthNames = array(
-        1 => "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", 
-        "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-    );
-    return $monthNames[date('n', strtotime($date))];
+  $monthNames = array(
+      1 => "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", 
+      "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+  );
+  return $monthNames[date('n', strtotime($date))];
 }
 
 function thai_year($date) {
-    return date('Y', strtotime($date)) + 543;
+  return date('Y', strtotime($date)) + 543;
 }
 
 // จำนวนแถวต่อหน้า
@@ -45,46 +45,54 @@ $limit = 10;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $start = ($page - 1) * $limit;
 
-// ตรวจสอบค่าที่เลือกใน dropdown
-$selectedMonth = isset($_GET['month']) ? (int)$_GET['month'] : 0;
+// ดึงค่าจากการเลือกเดือน
+$selected_month = isset($_GET['month']) ? (int)$_GET['month'] : 0;
 
 // สร้าง SQL Query ตามบทบาทของผู้ใช้
 if ($role_name == 'admin') {
-    $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name FROM orders o 
-            JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
-            JOIN employees ep ON o.emp_id = ep.emp_id";
-    
-    // ถ้าเลือกเดือน ให้ปรับ SQL query
-    if ($selectedMonth > 0) {
-        $sql .= " WHERE MONTH(o.order_date) = $selectedMonth";
+    // ถ้าเลือกเดือน ให้แสดงเฉพาะเดือนที่เลือก
+    if ($selected_month > 0) {
+        $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
+                FROM orders o 
+                JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
+                JOIN employees ep ON o.emp_id = ep.emp_id
+                WHERE MONTH(o.order_date) = $selected_month
+                ORDER BY o.order_id DESC LIMIT $start, $limit";
+    } else {
+        // ถ้าไม่เลือกเดือน ให้แสดงยอดขายทั้งหมด
+        $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
+                FROM orders o 
+                JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
+                JOIN employees ep ON o.emp_id = ep.emp_id
+                ORDER BY o.order_id DESC LIMIT $start, $limit";
     }
-
-    $sql .= " ORDER BY o.order_id DESC LIMIT $start, $limit";
 } elseif ($role_name == 'employee') {
-    $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name FROM orders o 
-            JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
-            JOIN employees ep ON o.emp_id = ep.emp_id
-            WHERE o.emp_id = '$aid'";
-    
-    // ถ้าเลือกเดือน ให้ปรับ SQL query
-    if ($selectedMonth > 0) {
-        $sql .= " AND MONTH(o.order_date) = $selectedMonth";
+    if ($selected_month > 0) {
+        $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
+                FROM orders o 
+                JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
+                JOIN employees ep ON o.emp_id = ep.emp_id
+                WHERE o.emp_id = '$aid' AND MONTH(o.order_date) = $selected_month
+                ORDER BY o.order_id DESC LIMIT $start, $limit";
+    } else {
+        $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
+                FROM orders o 
+                JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
+                JOIN employees ep ON o.emp_id = ep.emp_id
+                WHERE o.emp_id = '$aid'
+                ORDER BY o.order_id DESC LIMIT $start, $limit";
     }
-
-    $sql .= " ORDER BY o.order_id DESC LIMIT $start, $limit";
 }
 
 $rs = mysqli_query($conn, $sql);
 
 // จำนวนแถวทั้งหมดสำหรับการคำนวณหน้า
 $totalQuery = "SELECT COUNT(*) as total FROM orders";
-if ($selectedMonth > 0) {
-    $totalQuery .= " WHERE MONTH(order_date) = $selectedMonth";
-}
 $totalResult = mysqli_query($conn, $totalQuery);
 $totalData = mysqli_fetch_assoc($totalResult);
 $totalRows = $totalData['total'];
 $totalPages = ceil($totalRows / $limit);
+
 ?>
 
 <!DOCTYPE html>
@@ -586,9 +594,9 @@ body {
                                 <h4 class="mb-0">ประวัติการขาย</h4>
 
                                 <div class="col-12 col-md-3">
-                                    <form method="get" action="">
+                                    <form method="GET" action="">
                                         <select class="form-select" name="month" aria-label="เลือกเดือน" onchange="this.form.submit()">
-                                            <option value="0">ยอดขายของทุกเดือน</option>
+                                            <option value="0" <?= $selected_month == 0 ? 'selected' : '' ?>>ยอดขายของทุกเดือน</option>
                                             <?php
                                             // สร้าง array ของชื่อเดือน
                                             $months = [
@@ -608,7 +616,7 @@ body {
 
                                             // แสดงตัวเลือกเดือน
                                             foreach ($months as $month_num => $month_name) {
-                                                echo "<option value=\"$month_num\" " . ($month_num == $selectedMonth ? 'selected' : '') . ">$month_name</option>";
+                                                echo "<option value=\"$month_num\" " . ($selected_month == $month_num ? 'selected' : '') . ">$month_name</option>";
                                             }
                                             ?>
                                         </select>
@@ -665,25 +673,35 @@ body {
                         </table>
 
                         <!-- แสดงลิงก์สำหรับเปลี่ยนหน้า -->
-                        <div class="pagination-container text-center mt-3">
-                            <?php if($page > 1): ?>
-                                <a href="?page=<?= $page - 1; ?>&month=<?= $selectedMonth; ?>" class="btn btn-outline-secondary">ก่อนหน้า</a>
-                            <?php endif; ?>
+<!-- แสดงลิงก์สำหรับเปลี่ยนหน้า -->
+<div class="pagination-container text-center mt-3">
+    <?php if($page > 1): ?>
+        <a href="?page=<?= $page - 1; ?>" class="btn btn-light">ก่อนหน้า</a>
+    <?php endif; ?>
+    
+    <?php
+    // กำหนดช่วงหน้าที่จะแสดง
+    $range = 2; // แสดงหน้าใกล้เคียงทั้งสองด้าน
+    $start_page = max(1, $page - $range); // หน้าเริ่มต้น
+    $end_page = min($totalPages, $page + $range); // หน้าสิ้นสุด
 
-                            <?php for($i = 1; $i <= $totalPages; $i++): ?>
-                                <a href="?page=<?= $i; ?>&month=<?= $selectedMonth; ?>" class="btn btn-outline-secondary <?= $i == $page ? 'active' : ''; ?>"><?= $i; ?></a>
-                            <?php endfor; ?>
+    // แสดงหมายเลขหน้า
+    for ($i = $start_page; $i <= $end_page; $i++): ?>
+        <a href="?page=<?= $i; ?>" class="btn btn-light <?= ($i == $page) ? 'active' : ''; ?>"><?= $i; ?></a>
+    <?php endfor; ?>
 
-                            <?php if($page < $totalPages): ?>
-                                <a href="?page=<?= $page + 1; ?>&month=<?= $selectedMonth; ?>" class="btn btn-outline-secondary">ถัดไป</a>
-                            <?php endif; ?>
-                        </div>
+    <?php if($page < $totalPages): ?>
+        <a href="?page=<?= $page + 1; ?>" class="btn btn-light">ถัดไป</a>
+    <?php endif; ?>
+</div>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 
 
   <footer class="pc-footer">

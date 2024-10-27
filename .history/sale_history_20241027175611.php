@@ -23,20 +23,20 @@ if (empty($img)) {
 $imagePath = "assets/images/emp/" . $aid . "." . $img;
 
 function thai_day($date) {
-    $dayNames = array("อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์");
-    return $dayNames[date('w', strtotime($date))];
+  $dayNames = array("อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์");
+  return $dayNames[date('w', strtotime($date))];
 }
 
 function thai_month($date) {
-    $monthNames = array(
-        1 => "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", 
-        "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-    );
-    return $monthNames[date('n', strtotime($date))];
+  $monthNames = array(
+      1 => "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", 
+      "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+  );
+  return $monthNames[date('n', strtotime($date))];
 }
 
 function thai_year($date) {
-    return date('Y', strtotime($date)) + 543;
+  return date('Y', strtotime($date)) + 543;
 }
 
 // จำนวนแถวต่อหน้า
@@ -45,46 +45,31 @@ $limit = 10;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $start = ($page - 1) * $limit;
 
-// ตรวจสอบค่าที่เลือกใน dropdown
-$selectedMonth = isset($_GET['month']) ? (int)$_GET['month'] : 0;
-
 // สร้าง SQL Query ตามบทบาทของผู้ใช้
 if ($role_name == 'admin') {
-    $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name FROM orders o 
-            JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
-            JOIN employees ep ON o.emp_id = ep.emp_id";
-    
-    // ถ้าเลือกเดือน ให้ปรับ SQL query
-    if ($selectedMonth > 0) {
-        $sql .= " WHERE MONTH(o.order_date) = $selectedMonth";
-    }
-
-    $sql .= " ORDER BY o.order_id DESC LIMIT $start, $limit";
-} elseif ($role_name == 'employee') {
-    $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name FROM orders o 
+    $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
+            FROM orders o 
             JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
             JOIN employees ep ON o.emp_id = ep.emp_id
-            WHERE o.emp_id = '$aid'";
-    
-    // ถ้าเลือกเดือน ให้ปรับ SQL query
-    if ($selectedMonth > 0) {
-        $sql .= " AND MONTH(o.order_date) = $selectedMonth";
-    }
-
-    $sql .= " ORDER BY o.order_id DESC LIMIT $start, $limit";
+            ORDER BY o.order_id DESC LIMIT $start, $limit";
+} elseif ($role_name == 'employee') {
+    $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
+            FROM orders o 
+            JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
+            JOIN employees ep ON o.emp_id = ep.emp_id
+            WHERE o.emp_id = '$aid'
+            ORDER BY o.order_id DESC LIMIT $start, $limit";
 }
 
 $rs = mysqli_query($conn, $sql);
 
 // จำนวนแถวทั้งหมดสำหรับการคำนวณหน้า
 $totalQuery = "SELECT COUNT(*) as total FROM orders";
-if ($selectedMonth > 0) {
-    $totalQuery .= " WHERE MONTH(order_date) = $selectedMonth";
-}
 $totalResult = mysqli_query($conn, $totalQuery);
 $totalData = mysqli_fetch_assoc($totalResult);
 $totalRows = $totalData['total'];
 $totalPages = ceil($totalRows / $limit);
+
 ?>
 
 <!DOCTYPE html>
@@ -581,41 +566,39 @@ body {
             <div class="page-block card mb-0">
                 <div class="card-body">
                     <div class="row align-items-center">
-                        <div class="col-md-12">
-                            <div class="page-header-title border-bottom pb-2 mb-2 d-flex justify-content-between align-items-center">
-                                <h4 class="mb-0">ประวัติการขาย</h4>
+                    <div class="col-md-12">
+    <div class="page-header-title border-bottom pb-2 mb-2 d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">ประวัติการขาย</h4>
 
-                                <div class="col-12 col-md-3">
-                                    <form method="get" action="">
-                                        <select class="form-select" name="month" aria-label="เลือกเดือน" onchange="this.form.submit()">
-                                            <option value="0">ยอดขายของทุกเดือน</option>
-                                            <?php
-                                            // สร้าง array ของชื่อเดือน
-                                            $months = [
-                                                1 => 'มกราคม',
-                                                2 => 'กุมภาพันธ์',
-                                                3 => 'มีนาคม',
-                                                4 => 'เมษายน',
-                                                5 => 'พฤษภาคม',
-                                                6 => 'มิถุนายน',
-                                                7 => 'กรกฎาคม',
-                                                8 => 'สิงหาคม',
-                                                9 => 'กันยายน',
-                                                10 => 'ตุลาคม',
-                                                11 => 'พฤศจิกายน',
-                                                12 => 'ธันวาคม'
-                                            ];
+        <div class="col-12 col-md-3">
+    <select class="form-select" name="month" aria-label="เลือกเดือน">
+        <option value="0">เดือน</option>
+        <?php
+        // สร้าง array ของชื่อเดือน
+        $months = [
+            1 => 'มกราคม',
+            2 => 'กุมภาพันธ์',
+            3 => 'มีนาคม',
+            4 => 'เมษายน',
+            5 => 'พฤษภาคม',
+            6 => 'มิถุนายน',
+            7 => 'กรกฎาคม',
+            8 => 'สิงหาคม',
+            9 => 'กันยายน',
+            10 => 'ตุลาคม',
+            11 => 'พฤศจิกายน',
+            12 => 'ธันวาคม'
+        ];
 
-                                            // แสดงตัวเลือกเดือน
-                                            foreach ($months as $month_num => $month_name) {
-                                                echo "<option value=\"$month_num\" " . ($month_num == $selectedMonth ? 'selected' : '') . ">$month_name</option>";
-                                            }
-                                            ?>
-                                        </select>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
+        // แสดงตัวเลือกเดือน
+        foreach ($months as $month_num => $month_name) {
+            echo "<option value=\"$month_num\">$month_name</option>";
+        }
+        ?>
+    </select>
+</div>
+    </div>
+</div>
 
                         <table class="table table-striped table-sm-gap" width="100%">
                             <thead>
@@ -667,15 +650,15 @@ body {
                         <!-- แสดงลิงก์สำหรับเปลี่ยนหน้า -->
                         <div class="pagination-container text-center mt-3">
                             <?php if($page > 1): ?>
-                                <a href="?page=<?= $page - 1; ?>&month=<?= $selectedMonth; ?>" class="btn btn-outline-secondary">ก่อนหน้า</a>
+                                <a href="?page=<?= $page - 1; ?>" class="btn btn-outline-secondary">ก่อนหน้า</a>
                             <?php endif; ?>
 
                             <?php for($i = 1; $i <= $totalPages; $i++): ?>
-                                <a href="?page=<?= $i; ?>&month=<?= $selectedMonth; ?>" class="btn btn-outline-secondary <?= $i == $page ? 'active' : ''; ?>"><?= $i; ?></a>
+                                <a href="?page=<?= $i; ?>" class="btn btn-outline-secondary <?= $i == $page ? 'active' : ''; ?>"><?= $i; ?></a>
                             <?php endfor; ?>
 
                             <?php if($page < $totalPages): ?>
-                                <a href="?page=<?= $page + 1; ?>&month=<?= $selectedMonth; ?>" class="btn btn-outline-secondary">ถัดไป</a>
+                                <a href="?page=<?= $page + 1; ?>" class="btn btn-outline-secondary">ถัดไป</a>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -685,6 +668,9 @@ body {
     </div>
 </div>
 
+<?php
+mysqli_close($conn);
+?>  <!-- [ Main Content ] end -->
 
   <footer class="pc-footer">
     <div class="footer-wrapper container-fluid">
