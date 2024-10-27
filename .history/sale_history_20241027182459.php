@@ -620,13 +620,13 @@ body {
                         <table class="table table-striped table-sm-gap" width="100%">
                             <thead>
                                 <tr>
-                                    <td width="10%" class="text-center"></td>
+                                    <td width="11%" class="text-center"></td>
                                     <td width="10%" class="text-center">เลขที่บิล</td>
-                                    <td width="21%" class="text-start">วันที่ (สร้าง)</td>
+                                    <td width="15%" class="text-start">วันที่ (สร้าง)</td>
                                     <td width="16%" class="text-end">ราคารวม (บาท)</td>
                                     <td width="13%" class="text-center">พนักงาน</td>
                                     <td width="10%" class="text-center">ชำระโดย</td>
-                                    <td width="20%" class="text-center">รายการ</td>
+                                    <td width="25%" class="text-center">รายการ</td>
                                 </tr>
                             </thead>
 
@@ -644,15 +644,14 @@ body {
                                     </td>
                                     <td class="text-center"><?=$data['order_id'];?></td>
                                     <td class="text-start text-muted">
-                                      <small><?= "วัน" . thai_day($data['order_date']) . " " . date('d', strtotime($data['order_date'])) . " " . thai_month($data['order_date']) . " " . thai_year($data['order_date']) . "<br>". "เวลา " . date('H:i', strtotime($data['order_date'])) . " น."; ?>
-                                    </small>
-                                  </td>
-          
+                                        <small><?= "วัน" . thai_day($data['order_date']) . " " . date('d', strtotime($data['order_date'])) . " " . thai_month($data['order_date']) . " " . thai_year($data['order_date']) . " " . date('H:i', strtotime($data['order_date'])) . " น."; ?>
+                                        </small>
+                                    </td>          
                                     <td class="text-end"><?=number_format($data['order_total'], 2);?></td>
                                     <td class="text-center"><small><?=$data['emp_name'];?></small></td>
                                     <td class="text-center"><?=$data['paymethod_name'];?></td>
                                     <td class="text-center">
-                                        <a href="delete.php?id=<?=$data['order_id'];?>" type="button" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?');"><i class="ph ph-trash"></i>ลบ</a>
+                                        <a href="delete.php?id=<?=$data['order_id'];?>" type="button" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?');">คืนสินค้า</a>
                                         <a type="button" class="btn btn-success" onClick="window.open('bill_print.php?b=<?=$data['order_id'];?>', '_blank', 'width=760,height=560')"><i class="ph ph-printer"></i> ใบเสร็จ</a>
 
                                     </td>

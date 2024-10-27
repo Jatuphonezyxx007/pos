@@ -644,10 +644,9 @@ body {
                                     </td>
                                     <td class="text-center"><?=$data['order_id'];?></td>
                                     <td class="text-start text-muted">
-                                      <small><?= "วัน" . thai_day($data['order_date']) . " " . date('d', strtotime($data['order_date'])) . " " . thai_month($data['order_date']) . " " . thai_year($data['order_date']) . "<br>". "เวลา " . date('H:i', strtotime($data['order_date'])) . " น."; ?>
-                                    </small>
-                                  </td>
-          
+                                        <small><?= "วัน" . thai_day($data['order_date']) . " " . date('d', strtotime($data['order_date'])) . " " . thai_month($data['order_date']) . " " . thai_year($data['order_date']) . " " . date('H:i', strtotime($data['order_date'])) . " น."; ?>
+                                        </small>
+                                    </td>          
                                     <td class="text-end"><?=number_format($data['order_total'], 2);?></td>
                                     <td class="text-center"><small><?=$data['emp_name'];?></small></td>
                                     <td class="text-center"><?=$data['paymethod_name'];?></td>

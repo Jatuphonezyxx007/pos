@@ -644,7 +644,7 @@ body {
                                     </td>
                                     <td class="text-center"><?=$data['order_id'];?></td>
                                     <td class="text-start text-muted">
-                                      <small><?= "วัน" . thai_day($data['order_date']) . " " . date('d', strtotime($data['order_date'])) . " " . thai_month($data['order_date']) . " " . thai_year($data['order_date']) . "<br>". "เวลา " . date('H:i', strtotime($data['order_date'])) . " น."; ?>
+                                      <small><?= "วัน" . thai_day($data['order_date']) . " " . date('d', strtotime($data['order_date'])) . " " . thai_month($data['order_date']) . " " . thai_year($data['order_date']) . "<br>" 'เวลา' . date('H:i', strtotime($data['order_date'])) . " น."; ?>
                                     </small>
                                   </td>
           
