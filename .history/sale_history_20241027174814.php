@@ -622,15 +622,15 @@ body {
                         <!-- แสดงลิงก์สำหรับเปลี่ยนหน้า -->
                         <div class="pagination-container text-center mt-3">
                             <?php if($page > 1): ?>
-                                <a href="?page=<?= $page - 1; ?>" class="btn btn-outline-secondary">ก่อนหน้า</a>
+                                <a href="?page=<?= $page - 1; ?>" class="btn btn-primary">ก่อนหน้า</a>
                             <?php endif; ?>
 
                             <?php for($i = 1; $i <= $totalPages; $i++): ?>
-                                <a href="?page=<?= $i; ?>" class="btn btn-outline-secondary <?= $i == $page ? 'active' : ''; ?>"><?= $i; ?></a>
+                                <a href="?page=<?= $i; ?>" class="btn btn-secondary <?= $i == $page ? 'active' : ''; ?>"><?= $i; ?></a>
                             <?php endfor; ?>
 
                             <?php if($page < $totalPages): ?>
-                                <a href="?page=<?= $page + 1; ?>" class="btn btn-outline-secondary">ถัดไป</a>
+                                <a href="?page=<?= $page + 1; ?>" class="btn btn-primary">ถัดไป</a>
                             <?php endif; ?>
                         </div>
                     </div>

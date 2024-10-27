@@ -886,15 +886,16 @@ body {
       </select>
     </div>
 
-    <div class="col-12 col-md-3 d-flex justify-content-md-end justify-content-center ms-auto">
+    <div class="col-12 col-md-3">
+      <!-- อนาคตสามารถใส่ input type="date" ที่นี่ได้ -->
+    </div>
+
+    <div class="col-12 col-md-3 mt-2 mt-md-0 d-flex justify-content-md-end justify-content-center">
       <button class="btn btn-primary w-100 w-md-auto text-white" type="submit">ค้นหา</button>
     </div>
 
   </div>
 </form>
-
-
-
 
                 <br>
 

@@ -48,25 +48,24 @@ $sql = "
         e.emp_id,
         e.emp_name,
         DATE_FORMAT(o.order_date, '%d-%m-%Y') AS formatted_date,
-        COALESCE(SUM(o.order_total), 0) AS total_sales
-    FROM employees e
-    LEFT JOIN orders o ON e.emp_id = o.emp_id AND (";
-
-// เพิ่มเงื่อนไขวันที่
-if (!empty($selected_date)) {
-    $sql .= " MONTH(o.order_date) = $selected_month AND YEAR(o.order_date) = $selected_year";
-} else {
-    $sql .= " MONTH(o.order_date) = $current_month AND YEAR(o.order_date) = $current_year";
-}
-
-$sql .= ")
-    LEFT JOIN orders_detail od ON o.order_id = od.order_id
-    LEFT JOIN products p ON od.p_id = p.id
+        SUM(o.order_total) AS total_sales
+    FROM orders o
+    JOIN orders_detail od ON o.order_id = od.order_id
+    JOIN products p ON od.p_id = p.id
+    JOIN employees e ON o.emp_id = e.emp_id
     WHERE 1=1";
+
+// ถ้ามีการเลือกวันที่ ให้กรองตามเดือนและปี
+if (!empty($selected_date)) {
+    $sql .= " AND MONTH(o.order_date) = $selected_month AND YEAR(o.order_date) = $selected_year";
+} else {
+    // ถ้าไม่มีการเลือกวันที่ ให้ใช้เดือนและปีปัจจุบัน
+    $sql .= " AND MONTH(o.order_date) = $current_month AND YEAR(o.order_date) = $current_year";
+}
 
 // เงื่อนไขตามตัวเลือกจากฟอร์ม
 if ($selected_emp_id != 0) {
-    $sql .= " AND e.emp_id = $selected_emp_id";
+    $sql .= " AND o.emp_id = $selected_emp_id";
 }
 
 if ($selected_paymethod_id != 0) {
@@ -95,8 +94,8 @@ if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $formatted_date = $row['formatted_date'];
         
-        if (!empty($formatted_date) && !in_array($formatted_date, $dates)) {
-            $dates[] = $formatted_date;
+        if (!in_array($formatted_date, $dates)) {
+            $dates[] = $formatted_date; // เพิ่มวันที่
         }
 
         $emp_id = $row['emp_id'];
@@ -107,9 +106,7 @@ if ($result->num_rows > 0) {
         }
 
         // เก็บยอดขายตามพนักงานและวันที่
-        if (!empty($formatted_date)) {
-            $sales[$emp_id][$formatted_date] = $row['total_sales'];
-        }
+        $sales[$emp_id][$formatted_date] = $row['total_sales'];
 
         // เก็บชื่อพนักงาน
         if (!isset($employees[$emp_id])) {
@@ -119,25 +116,16 @@ if ($result->num_rows > 0) {
 }
 
 // เรียงลำดับวันที่
-if (!empty($dates)) {
-    sort($dates);
-}
+$dates = array_unique($dates);
+sort($dates);  // เรียงวันที่
 
 // เตรียมข้อมูลสำหรับกราฟ
 $datasets = [];
 $colors = ['rgb(75, 192, 192)', 'rgb(153, 102, 255)', 'rgb(255, 159, 64)', 'rgb(255, 99, 132)', 'rgb(0, 50, 133)', 'rgb(231, 41, 41)'];
 
-if (empty($sales)) {
-    // ถ้าไม่มีข้อมูลยอดขาย สร้างข้อมูลว่างสำหรับกราฟ
-    $datasets[] = [
-        'label' => 'ไม่มีข้อมูลยอดขาย',
-        'data' => [0],
-        'fill' => false,
-        'borderColor' => $colors[0],
-        'tension' => 0.1
-    ];
-} else {
-    foreach ($sales as $emp_id => $sales_data) {
+foreach ($sales as $emp_id => $sales_data) {
+    $total_sales = array_sum($sales_data);
+    if ($total_sales > 0) {  // แสดงเฉพาะพนักงานที่มียอดขาย
         $datasets[] = [
             'label' => $employees[$emp_id],
             'data' => array_values(array_map(function($date) use ($sales_data) {
@@ -150,129 +138,176 @@ if (empty($sales)) {
     }
 }
 
+// กราฟนี้จะสามารถแสดงยอดขายตามพนักงาน และแยกตามวันที่เลือก หรือเดือนปัจจุบันถ้าไม่มีการเลือกครับ
+
 // ดึงยอดขายรวมทั้งหมด
-$sql_total_sales = "SELECT COALESCE(SUM(order_total), 0) AS total_sales FROM orders";
+$sql_total_sales = "SELECT SUM(order_total) AS total_sales FROM orders";
 $result_total_sales = $conn->query($sql_total_sales);
 
 $total_sales = 0;
-if ($result_total_sales && $result_total_sales->num_rows > 0) {
+if ($result_total_sales->num_rows > 0) {
     $row_total_sales = $result_total_sales->fetch_assoc();
     $total_sales = $row_total_sales['total_sales'];
 }
 
+
+
+
+// ดึงยอดขายรวมทั้งหมด
+$sql_total_sales = "SELECT SUM(order_total) AS total_sales FROM orders";
+$result_total_sales = $conn->query($sql_total_sales);
+
+$total_sales = 0;
+if ($result_total_sales->num_rows > 0) {
+    $row_total_sales = $result_total_sales->fetch_assoc();
+    $total_sales = $row_total_sales['total_sales'];
+}
+
+
 // ดึงจำนวนการขายทั้งหมด
-$sql_total_sales_count = "SELECT COALESCE(COUNT(*), 0) AS total_sales_count FROM orders";
+$sql_total_sales_count = "SELECT COUNT(*) AS total_sales_count FROM orders";
 $result_total_sales_count = $conn->query($sql_total_sales_count);
 
 $total_sales_count = 0;
-if ($result_total_sales_count && $result_total_sales_count->num_rows > 0) {
+if ($result_total_sales_count->num_rows > 0) {
     $row_total_sales_count = $result_total_sales_count->fetch_assoc();
     $total_sales_count = $row_total_sales_count['total_sales_count'];
 }
 
 
-// ดึงยอดขายรวมทั้งหมด (รวมทุกเดือนและทุกปี)
-$sql_total_sales_all_time = "SELECT COALESCE(SUM(order_total), 0) AS total_sales_all_time FROM orders";
-$result_total_sales_all_time = $conn->query($sql_total_sales_all_time);
-
-$total_sales_all_time = 0;
-if ($result_total_sales_all_time && $result_total_sales_all_time->num_rows > 0) {
-    $row_total_sales_all_time = $result_total_sales_all_time->fetch_assoc();
-    $total_sales_all_time = $row_total_sales_all_time['total_sales_all_time'];
-}
 
 
-// ดึงจำนวนสินค้าคงเหลือทั้งหมด
-$sql_total_qty = "SELECT COALESCE(SUM(qty), 0) AS total_qty FROM size";
+// ดึงจำนวนสินค้าคงเหลือทั้งหมดจากตาราง size
+$sql_total_qty = "SELECT SUM(qty) AS total_qty FROM size";
 $result_total_qty = $conn->query($sql_total_qty);
 
 $total_qty = 0;
-if ($result_total_qty && $result_total_qty->num_rows > 0) {
+if ($result_total_qty->num_rows > 0) {
     $row_total_qty = $result_total_qty->fetch_assoc();
     $total_qty = $row_total_qty['total_qty'];
 }
 
-// Query รวมยอดขายของพนักงานแต่ละคนในเดือนปัจจุบัน
+
+// Query รวมยอดขายของพนักงานแต่ละคนในเดือนปัจจุบัน แล้วหาพนักงานที่มียอดขายสูงสุด
 $sql_max_sales_emp = "
-    SELECT o.emp_id, e.emp_name, COALESCE(SUM(o.order_total), 0) AS total_sales
-    FROM employees e
-    LEFT JOIN orders o ON e.emp_id = o.emp_id 
-        AND MONTH(o.order_date) = MONTH(CURRENT_DATE())
-        AND YEAR(o.order_date) = YEAR(CURRENT_DATE())
-    GROUP BY e.emp_id, e.emp_name
-    ORDER BY total_sales DESC
-    LIMIT 1";
+    SELECT o.emp_id, e.emp_name, SUM(o.order_total) AS total_sales
+    FROM orders o
+    JOIN employees e ON o.emp_id = e.emp_id
+    WHERE MONTH(o.order_date) = MONTH(CURRENT_DATE())  -- เงื่อนไขเดือนปัจจุบัน
+    AND YEAR(o.order_date) = YEAR(CURRENT_DATE())  -- เงื่อนไขปีปัจจุบัน
+    GROUP BY o.emp_id  -- รวมยอดขายตามพนักงาน
+    ORDER BY total_sales DESC  -- จัดเรียงยอดขายจากมากไปน้อย
+    LIMIT 1";  // จำกัดให้ดึงพนักงานที่มียอดขายรวมสูงสุด
 
 $result_max_sales_emp = $conn->query($sql_max_sales_emp);
-$max_total_sales = 0;
-$emp_name = 'ไม่มีข้อมูล';
-$emp_id = 0;
 
-if ($result_max_sales_emp && $result_max_sales_emp->num_rows > 0) {
+if ($result_max_sales_emp->num_rows > 0) {
     $row_max_sales_emp = $result_max_sales_emp->fetch_assoc();
-    $max_total_sales = $row_max_sales_emp['total_sales'];
-    $emp_name = $row_max_sales_emp['emp_name'];
-    $emp_id = $row_max_sales_emp['emp_id'];
+    $max_total_sales = $row_max_sales_emp['total_sales'];  // ยอดขายรวมมากที่สุด
+    $emp_name = $row_max_sales_emp['emp_name'];  // ชื่อพนักงานที่มียอดขายสูงสุด
+    $emp_id = $row_max_sales_emp['emp_id'];  // ID พนักงาน
 }
 
-// คำนวณยอดขายรวมของเดือนปัจจุบัน
-$sql_monthly_sales = "
-    SELECT COALESCE(SUM(order_total), 0) AS total_sales,
-           COALESCE(COUNT(DISTINCT DATE(order_date)), 0) AS total_days
+
+// SQL query เพื่อคำนวณยอดขายรวมของเดือนปัจจุบัน
+$sql_total_sales = "
+    SELECT SUM(order_total) AS total_sales
     FROM orders
     WHERE MONTH(order_date) = $current_month
     AND YEAR(order_date) = $current_year";
+$result_total_sales = $conn->query($sql_total_sales);
 
-$result_monthly_sales = $conn->query($sql_monthly_sales);
 $total_sales = 0;
+
+// ตรวจสอบและดึงยอดขายรวม
+if ($result_total_sales->num_rows > 0) {
+    $row_total_sales = $result_total_sales->fetch_assoc();
+    $total_sales = $row_total_sales['total_sales'];
+}
+
+// SQL query เพื่อคำนวณจำนวนวันที่มียอดขายในเดือนปัจจุบัน
+$sql_total_days = "
+    SELECT COUNT(DISTINCT DATE(order_date)) AS total_days
+    FROM orders
+    WHERE MONTH(order_date) = $current_month
+    AND YEAR(order_date) = $current_year";
+$result_total_days = $conn->query($sql_total_days);
+
 $total_days = 0;
 
-if ($result_monthly_sales && $result_monthly_sales->num_rows > 0) {
-    $row_monthly_sales = $result_monthly_sales->fetch_assoc();
-    $total_sales = $row_monthly_sales['total_sales'];
-    $total_days = $row_monthly_sales['total_days'];
+// ตรวจสอบและดึงจำนวนวันที่มียอดขาย
+if ($result_total_days->num_rows > 0) {
+    $row_total_days = $result_total_days->fetch_assoc();
+    $total_days = $row_total_days['total_days'];
 }
 
 // คำนวณยอดขายเฉลี่ย
 $average_sales = ($total_days > 0) ? $total_sales / $total_days : 0;
 
-// ดึงจำนวนบิลและสินค้าที่ขายในเดือนปัจจุบัน
-$sql_monthly_stats = "
-    SELECT 
-        COALESCE(COUNT(DISTINCT o.order_id), 0) AS total_bills,
-        COALESCE(SUM(od.item), 0) AS total_items_sold
-    FROM orders o
-    LEFT JOIN orders_detail od ON o.order_id = od.order_id
-    WHERE MONTH(o.order_date) = ? AND YEAR(o.order_date) = ?";
 
-$stmt = $conn->prepare($sql_monthly_stats);
+// Query ดึงจำนวนบิลทั้งหมดที่ขายในเดือนปัจจุบัน
+$sql = "
+    SELECT COUNT(DISTINCT o.order_id) AS total_bills
+    FROM orders o
+    WHERE MONTH(o.order_date) = ? AND YEAR(o.order_date) = ?
+";
+
+// เตรียม statement
+$stmt = $conn->prepare($sql);
 $stmt->bind_param("ii", $current_month, $current_year);
+
+// Execute statement
 $stmt->execute();
 $result = $stmt->get_result();
 
+// ดึงข้อมูล
 $total_bills = 0;
-$total_items_sold = 0;
-
-if ($result && $result->num_rows > 0) {
+if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $total_bills = $row['total_bills'];
+}
+
+
+
+// Query ดึงจำนวนสินค้าที่ขายออกไปในเดือนปัจจุบัน
+$sql = "
+    SELECT SUM(od.item) AS total_items_sold
+    FROM orders_detail od
+    JOIN orders o ON od.order_id = o.order_id
+    WHERE MONTH(o.order_date) = ? AND YEAR(o.order_date) = ?
+";
+
+// เตรียม statement
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ii", $current_month, $current_year);
+
+// Execute statement
+$stmt->execute();
+$result = $stmt->get_result();
+
+// ดึงข้อมูล
+$total_items_sold = 0;
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
     $total_items_sold = $row['total_items_sold'];
 }
 
-// Array ชื่อเดือนภาษาไทย
+
+
+
 $thai_months = [
-    '01' => 'มกราคม',
-    '02' => 'กุมภาพันธ์',
-    '03' => 'มีนาคม',
-    '04' => 'เมษายน',
-    '05' => 'พฤษภาคม',
-    '06' => 'มิถุนายน',
-    '07' => 'กรกฎาคม',
-    '08' => 'สิงหาคม',
-    '09' => 'กันยายน',
-    '10' => 'ตุลาคม',
-    '11' => 'พฤศจิกายน',
-    '12' => 'ธันวาคม'
+  '01' => 'มกราคม',
+  '02' => 'กุมภาพันธ์',
+  '03' => 'มีนาคม',
+  '04' => 'เมษายน',
+  '05' => 'พฤษภาคม',
+  '06' => 'มิถุนายน',
+  '07' => 'กรกฎาคม',
+  '08' => 'สิงหาคม',
+  '09' => 'กันยายน',
+  '10' => 'ตุลาคม',
+  '11' => 'พฤศจิกายน',
+  '12' => 'ธันวาคม'
 ];
 
 // ดึงเดือนปัจจุบัน
@@ -284,8 +319,11 @@ $month_name_thai = isset($thai_months[$current_month]) ? $thai_months[$current_m
 // สร้างข้อความที่ต้องการแสดง
 $month_message = "$month_name_thai";
 
+
+
 $conn->close();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -562,7 +600,7 @@ body {
 
           <ul class="pc-submenu">
     <li class="pc-item">
-        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/info.php' ? 'active' : '') ?>" href="info.php">ข้อมูลติดต่อ</a>
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/employee_list.php' ? 'active' : '') ?>" href="employee_list.php">ข้อมูลติดต่อ</a>
     </li>
     <!-- <li class="pc-item">
         <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sample-page2.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
@@ -792,7 +830,7 @@ body {
     <div class="card bg-grd-danger order-card">
         <div class="card-body">
             <h6 class="text-white">ยอดขายรวม</h6>
-            <h2 class="text-end text-white fs-5"><i class="feather icon-shopping-cart float-start"></i><span><?php echo number_format($total_sales_all_time, 2); ?> บาท</span></h2>
+            <h2 class="text-end text-white fs-5"><i class="feather icon-shopping-cart float-start"></i><span><?php echo number_format($total_sales, 2); ?> บาท</span></h2>
             <small class="m-b-0">จำนวนที่ขายไปทั้งหมด<span class="float-end"><?php echo number_format($total_sales_count,); ?> บิล</span></small>
         </div>
     </div>
@@ -832,8 +870,8 @@ body {
       
                 <br>
 
-                <form action="" method="post" class="d-flex flex-wrap">
-  <div class="row gx-2 gy-3 align-items-center w-100">
+                <form action="" method="post">
+  <div class="row g-3">
 
     <div class="col-12 col-md-3">
       <select class="form-select" name="type_id" aria-label="Default select example">
@@ -886,15 +924,16 @@ body {
       </select>
     </div>
 
-    <div class="col-12 col-md-3 d-flex justify-content-md-end justify-content-center ms-auto">
+    <div class="col-12 col-md-3">
+      <!-- อนาคตสามารถใส่ input type="date" ที่นี่ได้ -->
+    </div>
+
+    <div class="col-12 col-md-4 d-flex justify-content-md-end justify-content-center">
       <button class="btn btn-primary w-100 w-md-auto text-white" type="submit">ค้นหา</button>
     </div>
 
   </div>
 </form>
-
-
-
 
                 <br>
 

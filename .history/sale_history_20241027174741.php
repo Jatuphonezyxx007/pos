@@ -621,18 +621,25 @@ body {
 
                         <!-- แสดงลิงก์สำหรับเปลี่ยนหน้า -->
                         <div class="pagination-container text-center mt-3">
-                            <?php if($page > 1): ?>
-                                <a href="?page=<?= $page - 1; ?>" class="btn btn-outline-secondary">ก่อนหน้า</a>
-                            <?php endif; ?>
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item">
+                <a class="page-link" href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
 
-                            <?php for($i = 1; $i <= $totalPages; $i++): ?>
-                                <a href="?page=<?= $i; ?>" class="btn btn-outline-secondary <?= $i == $page ? 'active' : ''; ?>"><?= $i; ?></a>
-                            <?php endfor; ?>
-
-                            <?php if($page < $totalPages): ?>
-                                <a href="?page=<?= $page + 1; ?>" class="btn btn-outline-secondary">ถัดไป</a>
-                            <?php endif; ?>
-                        </div>
                     </div>
                 </div>
             </div>

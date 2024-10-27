@@ -2,6 +2,7 @@
 session_start();
 include("connectdb.php");
 
+// ตรวจสอบการเข้าสู่ระบบ
 if (empty($_SESSION['aid'])) {
     echo "<script>";
     echo "alert('Access Denied !!!');";
@@ -10,74 +11,44 @@ if (empty($_SESSION['aid'])) {
     exit;
 }
 
-$aid = $_SESSION['aid'];
-$aname = $_SESSION['aname'];
-$role_id = $_SESSION['role_id'];
-$role_name = $_SESSION['role_name'];
-$img = $_SESSION['img'];
+// ดึงข้อมูลจากตาราง company
+$sql = "SELECT com_id, com_logo FROM company";
+$result = mysqli_query($conn, $sql);
 
-if (empty($img)) {
-    $img = 'default.jpg'; 
+if (!$result) {
+    echo "Error: " . mysqli_error($conn);
+    exit;
 }
 
-$imagePath = "assets/images/emp/" . $aid . "." . $img;
+// แสดงข้อมูล
+while ($row = mysqli_fetch_assoc($result)) {
+    $com_id = $row['com_id'];
+    $com_logo = $row['com_logo'];
 
-function thai_day($date) {
-  $dayNames = array("อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์");
-  return $dayNames[date('w', strtotime($date))];
+    // สร้าง URL สำหรับรูปภาพ
+    $imagePath = "assets/images/logo/" . $com_id . "." . $com_logo;
+
+    // แสดงภาพ
+    echo '<div class="company-logo">';
+    echo '<img src="' . $imagePath . '" alt="Company Logo" style="max-width: 100px; max-height: 100px;"/>'; // กำหนดขนาดที่ต้องการ
+    echo '</div>';
 }
 
-function thai_month($date) {
-  $monthNames = array(
-      1 => "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", 
-      "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-  );
-  return $monthNames[date('n', strtotime($date))];
-}
-
-function thai_year($date) {
-  return date('Y', strtotime($date)) + 543;
-}
-
-// จำนวนแถวต่อหน้า
-$limit = 10;
-// ตรวจสอบหมายเลขหน้าปัจจุบัน
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$start = ($page - 1) * $limit;
-
-// สร้าง SQL Query ตามบทบาทของผู้ใช้
-if ($role_name == 'admin') {
-    $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
-            FROM orders o 
-            JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
-            JOIN employees ep ON o.emp_id = ep.emp_id
-            ORDER BY o.order_id DESC LIMIT $start, $limit";
-} elseif ($role_name == 'employee') {
-    $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
-            FROM orders o 
-            JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
-            JOIN employees ep ON o.emp_id = ep.emp_id
-            WHERE o.emp_id = '$aid'
-            ORDER BY o.order_id DESC LIMIT $start, $limit";
-}
-
-$rs = mysqli_query($conn, $sql);
-
-// จำนวนแถวทั้งหมดสำหรับการคำนวณหน้า
-$totalQuery = "SELECT COUNT(*) as total FROM orders";
-$totalResult = mysqli_query($conn, $totalQuery);
-$totalData = mysqli_fetch_assoc($totalResult);
-$totalRows = $totalData['total'];
-$totalPages = ceil($totalRows / $limit);
-
+// ปิดการเชื่อมต่อ
+mysqli_close($conn);
 ?>
+
+
+
+
+
 
 <!DOCTYPE html>
 <html lang="en">
 <!-- [Head] start -->
 
 <head>
-  <title>Sample Page | Gradient Able Dashboard Template</title>
+  <title>POS | Point of Sale</title>
   <!-- [Meta] -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -99,23 +70,6 @@ $totalPages = ceil($totalRows / $limit);
 
   <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
 
-  <!-- [Favicon] icon -->
-  <link rel="icon" href="assets/images/favicon.svg" type="image/x-icon"> <!-- [Google Font : Poppins] icon -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
-<!-- [Tabler Icons] https://tablericons.com -->
-<link rel="stylesheet" href="assets/fonts/tabler-icons.min.css" >
-<!-- [Feather Icons] https://feathericons.com -->
-<link rel="stylesheet" href="assets/fonts/feather.css" >
-<!-- [Font Awesome Icons] https://fontawesome.com/icons -->
-<link rel="stylesheet" href="assets/fonts/fontawesome.css" >
-<!-- [Material Icons] https://fonts.google.com/icons -->
-<link rel="stylesheet" href="assets/fonts/material.css" >
-<!-- [Template CSS Files] -->
-<link rel="stylesheet" href="assets/css/style.css" id="main-style-link" >
-<link rel="stylesheet" href="assets/css/style-preset.css" >
-
-
 
 <!-- Script -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -129,7 +83,7 @@ $totalPages = ceil($totalRows / $limit);
       // Function to fetch and display products
       function fetchProducts(query) {
         $.ajax({
-          url: "fetch_products.php",
+          url: "fetch_products2.php",
           method: "POST",
           data: { query: query },
           success: function(data) {
@@ -144,6 +98,8 @@ $totalPages = ceil($totalRows / $limit);
         fetchProducts(query);
       });
     });
+
+        
   </script>
 
 
@@ -237,6 +193,13 @@ body {
     font-weight: bold;
 }
 
+.pic{
+  height: 200px;
+  width: 150px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto
+}
   </style>
 
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
@@ -371,10 +334,10 @@ body {
             <span class="pc-micon"><i class="ph ph-flower-lotus"></i></span>
             <span class="pc-mtext">Icons</span>
           </a>
-        </li>
+        </li> -->
 
 
-        <li class="pc-item pc-caption">
+        <!-- <li class="pc-item pc-caption">
           <label>Pages</label>
           <i class="ph ph-devices"></i>
         </li>
@@ -481,13 +444,10 @@ body {
     </div>
 
     <!-- เพิ่ม form control ตรงนี้ -->
-    <form method="post" class="search-form" onsubmit="return false;">
-      <input type="text" name="src2" placeholder="ค้นหาเลขที่ใบสั่งซื้อ" class="search-input" autofocus>
+    <!-- <form method="post" class="search-form" onsubmit="return false;">
+      <input type="text" name="src" placeholder="ค้นหาสินค้า" class="search-input" autofocus>
       <a class="btn btn-primary"><i class="ph ph-magnifying-glass"></i></a>
-    </form>
-
-
-
+    </form> -->
 
     <div class="ms-auto">
       <h7 id="clock" class="text-white text-center">00:00:00</h7>
@@ -556,112 +516,217 @@ body {
 </header>
 <!-- [ Header ] end -->
 
-  <!-- [ Main Content ] start -->
+<div class="col-12 col-sm-8 col-md-12">
+  <div class="pc-container px-1">
 
-  <!-- [ Main Content ] start -->
+  <form method="post" enctype="multipart/form-data">
 
-  <div class="pc-container">
     <div class="pc-content">
-        <div class="page-header">
-            <div class="page-block card mb-0">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-md-12">
-                            <div class="page-header-title border-bottom pb-2 mb-2">
-                                <h4 class="mb-0">ประวัติการขาย</h4>
-                            </div>
-                        </div>
+      
 
-                        <table class="table table-striped table-sm-gap" width="100%">
-                            <thead>
-                                <tr>
-                                    <td width="11%" class="text-center"></td>
-                                    <td width="10%" class="text-center">เลขที่บิล</td>
-                                    <td width="15%" class="text-start">วันที่ (สร้าง)</td>
-                                    <td width="16%" class="text-end">ราคารวม (บาท)</td>
-                                    <td width="13%" class="text-center">พนักงาน</td>
-                                    <td width="10%" class="text-center">ชำระโดย</td>
-                                    <td width="25%" class="text-center">รายการ</td>
-                                </tr>
-                            </thead>
+    <?php if (isset($data)) { ?>
 
-                            <tbody>
-                            <?php
-                            // ตรวจสอบว่ามีผลลัพธ์หรือไม่
-                            if (mysqli_num_rows($rs) > 0) {
-                                while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
-                            ?>
-                                <tr>
-                                    <td class="text-center">
-                                        <small>
-                                        <a href="history_detail.php?a=<?=$data['order_id'];?>">รายละเอียด</a>
-                                        </small>
-                                    </td>
-                                    <td class="text-center"><?=$data['order_id'];?></td>
-                                    <td class="text-start text-muted">
-                                        <small><?= "วัน" . thai_day($data['order_date']) . " " . date('d', strtotime($data['order_date'])) . " " . thai_month($data['order_date']) . " " . thai_year($data['order_date']) . " " . date('H:i', strtotime($data['order_date'])) . " น."; ?>
-                                        </small>
-                                    </td>          
-                                    <td class="text-end"><?=number_format($data['order_total'], 2);?></td>
-                                    <td class="text-center"><small><?=$data['emp_name'];?></small></td>
-                                    <td class="text-center"><?=$data['paymethod_name'];?></td>
-                                    <td class="text-center">
-                                        <a href="delete.php?id=<?=$data['order_id'];?>" type="button" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?');">คืนสินค้า</a>
-                                        <a type="button" class="btn btn-success" onClick="window.open('bill_print.php?b=<?=$data['order_id'];?>', '_blank', 'width=760,height=560')">ใบเสร็จ</a>
-                                    </td>
-                                </tr>
-                            <?php  
-                                }
-                            } else {
-                                echo '<tr><td colspan="7" class="text-center">ไม่มีรายการการขาย</td></tr>';
-                            }
-                            ?>
-                            </tbody>
-                        </table>
+      <div class="row">
 
-                        <!-- แสดงลิงก์สำหรับเปลี่ยนหน้า -->
-                        <div class="pagination-container text-center mt-3">
-                            <?php if($page > 1): ?>
-                                <a href="?page=<?= $page - 1; ?>" class="btn btn-outline-secondary">ก่อนหน้า</a>
-                            <?php endif; ?>
-
-                            <?php for($i = 1; $i <= $totalPages; $i++): ?>
-                                <a href="?page=<?= $i; ?>" class="btn btn-outline-secondary <?= $i == $page ? 'active' : ''; ?>"><?= $i; ?></a>
-                            <?php endfor; ?>
-
-                            <?php if($page < $totalPages): ?>
-                                <a href="?page=<?= $page + 1; ?>" class="btn btn-outline-secondary">ถัดไป</a>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <div class="col-md-12">
+        <div class="page-header-title border-bottom pb-2 mb-2 d-flex align-items-center">
+          <a href="employee_list.php" class="breadcrumb-item me-2">
+            <i class="ph ph-arrow-left fs-3"></i>
+          </a>
+          <h4 class="mb-0">แก้ไขข้อมูลพนักงาน : <?=$data['emp_name'];?></h4>
         </div>
-    </div>
+      </div>
+
+
+      <!-- <h5 class="card-title fw-semibold mb-4">แก้ไขข้อมูลพนักงาน : <?=$data['emp_name'];?></h5> -->
+
+      <div class="col-md-6">
+          <div class="card">
+            <!-- <div class="card-header">
+              <h5>Inline Text Elements</h5>
+            </div> -->
+            <div class="card-body pc-component">
+              <p class="lead m-t-0">รูปภาพ</p>
+
+              <div class="pic">
+                        <img src="assets/images/logo/<?=$data['com_id'];?>.<?=$data['com_logo'];?>" class="card-img-top rounded mx-auto d-block" alt="">
+                      </div>
+
+                      <br><br><br>
+
+                      <div class="col">
+                        <label for="formFile" class="form-label">เปลี่ยนรูปภาพ</label>
+                        <input class="form-control" type="file" name="ep_pic">
+                        <br>
+                        <h6 class="card-subtitle fw-normal mb-4">สำคัญ : สามารถอัพโหลดรูปภาพเฉพาะไฟล์ png, jpg, gif, tfif และ webp</h6>
+                      </div>
+
+
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="col-md-6">
+          <div class="card">
+            
+          <div class="card-header">
+            <div class="row align-items-center">
+              <div class="col-3">
+                <h5 class="mb-0">รหัสพนักงาน</h5>
+              </div>
+              <div class="col-9">
+              <input class="form-control" type="text" name="ep_id" placeholder="<?= $data['emp_id']; ?>" aria-label="Disabled input example" disabled>              
+            </div>          
+            </div>
+          </div>
+
+            <div class="card-body pc-component">
+
+              <div class="row align-items-center">
+              <div class="col-3">
+                <p class="text-dark mb-0">ชื่อ - นามสกุล</p>
+              </div>
+              <div class="col-9">
+                <input name="ep_name" type="text" class="form-control" value="<?= $data['emp_name']; ?>"> 
+              </div>          
+            </div>
+
+            <br>
+            <div class="row align-items-center">
+              <div class="col-3">
+                <p class="text-dark mb-0">E - mail</p>
+              </div>
+              <div class="col-9">
+                <input name="ep_email" type="text" class="form-control" value="<?= $data['emp_email']; ?>"> 
+              </div>          
+            </div>
+
+            <br>
+            <div class="row align-items-center">
+              <div class="col-3">
+                <p class="text-dark mb-0">เบอร์โทรศัพท์</p>
+              </div>
+              <div class="col-9">
+                <input name="ep_phone" type="text" class="form-control" value="<?= $data['emp_phone']; ?>"> 
+              </div>          
+            </div>
+              </div>
+
+
+              
+            </div>
+
+
+            <div class="card">
+            
+            <div class="card-header">
+              <div class="row align-items-center">
+                <div class="col-3">
+                  <h5 class="mb-0">หน้าที่</h5>
+                </div>
+                <div class="col-9">
+
+                <select class="form-select" id="role" aria-label="role" name="ep_role">
+<?php
+    include("connectdb.php");
+    $sql2 = "SELECT * FROM `role`";
+    $rs2 = mysqli_query($conn, $sql2);
+    if ($rs2) {
+        while ($data2 = mysqli_fetch_array($rs2)) {
+            $selected = ($data2['role_id'] == $data['role']) ? "selected" : "";
+            echo "<option value='{$data2['role_id']}' $selected>{$data2['role_name']}</option>";
+        }
+    } else {
+        echo "Query failed.";
+    }
+?>
+</select>
+
+
+              </div>          
+              </div>
+            </div>
+  
+              <div class="card-body pc-component">
+  
+                <div class="row align-items-center">
+                <div class="col-3">
+                  <p class="text-dark mb-0">ชื่อผู้ใช้</p>
+                </div>
+                <div class="col-9">
+                  <input name="ep_user" type="text" class="form-control" value="<?= $data['emp_user']; ?>"> 
+                </div>          
+              </div>
+  
+              <br>
+              <div class="row align-items-center">
+                <div class="col-3">
+                  <p class="text-dark mb-0">รหัสผ่านใหม่</p>
+                </div>
+                <div class="col-9">
+                  <input name="ep_pwd" type="password" class="form-control" value=""> 
+                </div>          
+              </div>
+                </div>               
+              </div>
+  
+
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+  <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">บันทึกข้อมูล</button>
 </div>
 
-<?php
-mysqli_close($conn);
-?>  <!-- [ Main Content ] end -->
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">บันทึกข้อมูล</h5>
+        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+      </div>
+      <div class="modal-body" id="modalMessage">
+        ...
+      </div>
+
+    </div>
+  </div>
+</div>
+
+            </div>
+          </div>
+        </div>
+
+        <?php } else  { ?>
+          <p>No employee data found.</p>
+
+          </form>
+          
+      </div>
+
+      <?php } ?>
+
+
+    </div>
+
 
   <footer class="pc-footer">
     <div class="footer-wrapper container-fluid">
       <div class="row">
 
 
-
-
-
-
   
         <div class="col-sm-6 ms-auto my-1">
           <ul class="list-inline footer-link mb-0 justify-content-sm-end d-flex">
-          <a href="#top" class="text-end">กลับไปบนสุด</a>
+          <!-- <a href="#top" class="text-end">กลับไปบนสุด</a> -->
           </ul>
         </div>
       </div>
     </div>
   </footer>
+
+
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
 
   <!-- Required Js -->
 <script src="assets/js/plugins/popper.min.js"></script>
@@ -714,53 +779,16 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+document.getElementById('okButton').addEventListener('click', function() {
+  window.location.href = 'employee_list.php';
+});
 
 </script>
 
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-
-
-
-<script src="../assets/js/plugins/popper.min.js"></script>
-<script src="../assets/js/plugins/simplebar.min.js"></script>
-<script src="../assets/js/plugins/bootstrap.min.js"></script>
-<script src="../assets/js/fonts/custom-font.js"></script>
-<script src="../assets/js/pcoded.js"></script>
-<script src="../assets/js/plugins/feather.min.js"></script>
-
-
-
-
-
-<script>layout_change('light');</script>
-
-
-
-
-<script>layout_sidebar_change('light');</script>
-
-
-
-<script>change_box_container('false');</script>
-
-
-<script>layout_caption_change('true');</script>
-
-
-
-
-<script>layout_rtl_change('false');</script>
-
-
-<script>preset_change("preset-1");</script>
-
-
-<script>header_change("header-1");</script>
-
-
 </body>
 
-
+</body>
 <!-- [Body] end -->
 
 </html>

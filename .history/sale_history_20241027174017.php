@@ -10,23 +10,31 @@ if (empty($_SESSION['aid'])) {
     exit;
 }
 
+
+// ใช้งาน session
 $aid = $_SESSION['aid'];
 $aname = $_SESSION['aname'];
 $role_id = $_SESSION['role_id'];
 $role_name = $_SESSION['role_name'];
 $img = $_SESSION['img'];
+// $order_date = strtotime($data['order_date']);
 
+// ตรวจสอบว่าค่าที่เก็บใน session มีอยู่หรือไม่
 if (empty($img)) {
+    // กำหนดรูปภาพเริ่มต้นในกรณีที่ไม่มีรูปภาพ
     $img = 'default.jpg'; 
 }
 
+// สร้าง URL สำหรับรูปภาพ
 $imagePath = "assets/images/emp/" . $aid . "." . $img;
 
+// ฟังก์ชันสำหรับแปลงชื่อวันเป็นภาษาไทย
 function thai_day($date) {
   $dayNames = array("อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์");
   return $dayNames[date('w', strtotime($date))];
 }
 
+// ฟังก์ชันสำหรับแปลงชื่อเดือนเป็นภาษาไทย
 function thai_month($date) {
   $monthNames = array(
       1 => "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", 
@@ -35,42 +43,52 @@ function thai_month($date) {
   return $monthNames[date('n', strtotime($date))];
 }
 
+// ฟังก์ชันสำหรับแปลงปีเป็น พ.ศ.
 function thai_year($date) {
   return date('Y', strtotime($date)) + 543;
 }
 
-// จำนวนแถวต่อหน้า
-$limit = 10;
-// ตรวจสอบหมายเลขหน้าปัจจุบัน
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$start = ($page - 1) * $limit;
 
-// สร้าง SQL Query ตามบทบาทของผู้ใช้
+
+
+
+// กำหนดจำนวนแถวที่ต้องการแสดงต่อหน้า
+$rows_per_page = 10;  // แสดง 10 แถวต่อหน้า
+
+// กำหนดหน้าปัจจุบันจาก URL parameter
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = max($page, 1); // ให้เริ่มที่หน้า 1 หากไม่มีการกำหนดหน้า
+
+// คำนวณ offset เพื่อดึงข้อมูลในแต่ละหน้า
+$offset = ($page - 1) * $rows_per_page;
+
+// สร้าง SQL Query เพื่อแสดงข้อมูล โดยมีเงื่อนไขบทบาทผู้ใช้และแบ่งหน้า
 if ($role_name == 'admin') {
     $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
             FROM orders o 
             JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
             JOIN employees ep ON o.emp_id = ep.emp_id
-            ORDER BY o.order_id DESC LIMIT $start, $limit";
+            ORDER BY o.order_id DESC 
+            LIMIT $rows_per_page OFFSET $offset";
 } elseif ($role_name == 'employee') {
     $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
             FROM orders o 
             JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
             JOIN employees ep ON o.emp_id = ep.emp_id
             WHERE o.emp_id = '$aid'
-            ORDER BY o.order_id DESC LIMIT $start, $limit";
+            ORDER BY o.order_id DESC 
+            LIMIT $rows_per_page OFFSET $offset";
 }
 
 $rs = mysqli_query($conn, $sql);
 
-// จำนวนแถวทั้งหมดสำหรับการคำนวณหน้า
-$totalQuery = "SELECT COUNT(*) as total FROM orders";
-$totalResult = mysqli_query($conn, $totalQuery);
-$totalData = mysqli_fetch_assoc($totalResult);
-$totalRows = $totalData['total'];
-$totalPages = ceil($totalRows / $limit);
+// คำนวณจำนวนหน้าทั้งหมด
+$total_rows_result = mysqli_query($conn, "SELECT COUNT(*) AS total FROM orders");
+$total_rows = mysqli_fetch_assoc($total_rows_result)['total'];
+$total_pages = ceil($total_rows / $rows_per_page);
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -562,87 +580,105 @@ body {
 
   <div class="pc-container">
     <div class="pc-content">
-        <div class="page-header">
-            <div class="page-block card mb-0">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-md-12">
-                            <div class="page-header-title border-bottom pb-2 mb-2">
-                                <h4 class="mb-0">ประวัติการขาย</h4>
-                            </div>
-                        </div>
+      <!-- [ breadcrumb ] start -->
 
-                        <table class="table table-striped table-sm-gap" width="100%">
-                            <thead>
-                                <tr>
-                                    <td width="11%" class="text-center"></td>
-                                    <td width="10%" class="text-center">เลขที่บิล</td>
-                                    <td width="15%" class="text-start">วันที่ (สร้าง)</td>
-                                    <td width="16%" class="text-end">ราคารวม (บาท)</td>
-                                    <td width="13%" class="text-center">พนักงาน</td>
-                                    <td width="10%" class="text-center">ชำระโดย</td>
-                                    <td width="25%" class="text-center">รายการ</td>
-                                </tr>
-                            </thead>
+      <?php
+    include("connectdb.php");
+    @$src = $_POST['src2'];
+    $sql = "SELECT * FROM `orders` WHERE (`order_id` LIKE '%{$src}%')";
+    $rs = mysqli_query($conn, $sql);
+    while ($data = mysqli_fetch_array($rs)){
+  ?>
 
-                            <tbody>
-                            <?php
-                            // ตรวจสอบว่ามีผลลัพธ์หรือไม่
-                            if (mysqli_num_rows($rs) > 0) {
-                                while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
-                            ?>
-                                <tr>
-                                    <td class="text-center">
-                                        <small>
-                                        <a href="history_detail.php?a=<?=$data['order_id'];?>">รายละเอียด</a>
-                                        </small>
-                                    </td>
-                                    <td class="text-center"><?=$data['order_id'];?></td>
-                                    <td class="text-start text-muted">
-                                        <small><?= "วัน" . thai_day($data['order_date']) . " " . date('d', strtotime($data['order_date'])) . " " . thai_month($data['order_date']) . " " . thai_year($data['order_date']) . " " . date('H:i', strtotime($data['order_date'])) . " น."; ?>
-                                        </small>
-                                    </td>          
-                                    <td class="text-end"><?=number_format($data['order_total'], 2);?></td>
-                                    <td class="text-center"><small><?=$data['emp_name'];?></small></td>
-                                    <td class="text-center"><?=$data['paymethod_name'];?></td>
-                                    <td class="text-center">
-                                        <a href="delete.php?id=<?=$data['order_id'];?>" type="button" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?');">คืนสินค้า</a>
-                                        <a type="button" class="btn btn-success" onClick="window.open('bill_print.php?b=<?=$data['order_id'];?>', '_blank', 'width=760,height=560')">ใบเสร็จ</a>
-                                    </td>
-                                </tr>
-                            <?php  
-                                }
-                            } else {
-                                echo '<tr><td colspan="7" class="text-center">ไม่มีรายการการขาย</td></tr>';
-                            }
-                            ?>
-                            </tbody>
-                        </table>
-
-                        <!-- แสดงลิงก์สำหรับเปลี่ยนหน้า -->
-                        <div class="pagination-container text-center mt-3">
-                            <?php if($page > 1): ?>
-                                <a href="?page=<?= $page - 1; ?>" class="btn btn-outline-secondary">ก่อนหน้า</a>
-                            <?php endif; ?>
-
-                            <?php for($i = 1; $i <= $totalPages; $i++): ?>
-                                <a href="?page=<?= $i; ?>" class="btn btn-outline-secondary <?= $i == $page ? 'active' : ''; ?>"><?= $i; ?></a>
-                            <?php endfor; ?>
-
-                            <?php if($page < $totalPages): ?>
-                                <a href="?page=<?= $page + 1; ?>" class="btn btn-outline-secondary">ถัดไป</a>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+      <div class="page-header">
+        <div class="page-block card mb-0">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md-12">
+                <div class="page-header-title border-bottom pb-2 mb-2">
+                  <h4 class="mb-0">ประวัติการขาย</h4>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
+              </div>
 
-<?php
-mysqli_close($conn);
-?>  <!-- [ Main Content ] end -->
+<!-- แสดงผลตารางข้อมูล -->
+<table class="table table-striped table-sm-gap" width="100%">
+  <thead>
+    <tr>
+      <td width="11%" class="text-center"></td>
+      <td width="10%" class="text-center">เลขที่บิล</td>
+      <td width="15%" class="text-start">วันที่ (สร้าง)</td>
+      <td width="16%" class="text-end">ราคารวม (บาท)</td>
+      <td width="13%" class="text-center">พนักงาน</td>
+      <td width="10%" class="text-center">ชำระโดย</td>
+      <td width="25%" class="text-center">รายการ</td>
+    </tr>
+  </thead>
+  <tbody>
+  <?php
+  if (mysqli_num_rows($rs) > 0) {
+      while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
+      ?>
+        <tr>
+          <td class="text-center"><small><a href="history_detail.php?a=<?=$data['order_id'];?>">รายละเอียด</a></small></td>
+          <td class="text-center"><?=$data['order_id'];?></td>
+          <td class="text-start text-muted"><small><?= "วัน" . thai_day($data['order_date']) . " " . date('d', strtotime($data['order_date'])) . " " . thai_month($data['order_date']) . " " . thai_year($data['order_date']) . " " . date('H:i', strtotime($data['order_date'])) . " น."; ?></small></td>          
+          <td class="text-end"><?=number_format($data['order_total'], 2);?></td>
+          <td class="text-center"><small><?=$data['emp_name'];?></small></td>
+          <td class="text-center"><?=$data['paymethod_name'];?></td>
+          <td class="text-center">
+            <a href="delete.php?id=<?=$data['order_id'];?>" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?');">คืนสินค้า</a>
+            <a class="btn btn-success" onClick="window.open('bill_print.php?b=<?=$data['order_id'];?>', '_blank', 'width=760,height=560')">ใบเสร็จ</a>
+          </td>
+        </tr>
+      <?php  
+      }
+  } else {
+      echo '<tr><td colspan="8" class="text-center">ไม่มีรายการการขาย</td></tr>';
+  }
+  ?>
+  </tbody>
+</table>
+
+<!-- แสดงการแบ่งหน้า -->
+<nav aria-label="Page navigation example">
+  <ul class="pagination justify-content-center">
+    <?php if($page > 1): ?>
+      <li class="page-item">
+        <a class="page-link" href="?page=<?= $page - 1; ?>">Previous</a>
+      </li>
+    <?php endif; ?>
+
+    <?php for($i = 1; $i <= $total_pages; $i++): ?>
+      <li class="page-item <?= ($i == $page) ? 'active' : ''; ?>">
+        <a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a>
+      </li>
+    <?php endfor; ?>
+
+    <?php if($page < $total_pages): ?>
+      <li class="page-item">
+        <a class="page-link" href="?page=<?= $page + 1; ?>">Next</a>
+      </li>
+    <?php endif; ?>
+  </ul>
+</nav>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- [ breadcrumb ] end -->
+
+      <!-- [ Main Content ] end -->
+    </div>
+
+    <?php
+    }
+    mysqli_close($conn);
+  ?> 
+
+  </div>
+  <!-- [ Main Content ] end -->
 
   <footer class="pc-footer">
     <div class="footer-wrapper container-fluid">

@@ -832,8 +832,8 @@ body {
       
                 <br>
 
-                <form action="" method="post" class="d-flex flex-wrap">
-  <div class="row gx-2 gy-3 align-items-center w-100">
+                <form action="" method="post">
+  <div class="row g-3">
 
     <div class="col-12 col-md-3">
       <select class="form-select" name="type_id" aria-label="Default select example">
@@ -886,15 +886,16 @@ body {
       </select>
     </div>
 
-    <div class="col-12 col-md-3 d-flex justify-content-md-end justify-content-center ms-auto">
+    <div class="col-12 col-md-3">
+      <!-- อนาคตสามารถใส่ input type="date" ที่นี่ได้ -->
+    </div>
+
+    <div class="col-12 col-md-4 d-flex justify-content-md-end justify-content-center">
       <button class="btn btn-primary w-100 w-md-auto text-white" type="submit">ค้นหา</button>
     </div>
 
   </div>
 </form>
-
-
-
 
                 <br>
 

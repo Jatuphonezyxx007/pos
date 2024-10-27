@@ -1,6 +1,6 @@
 <?php
 session_start();
-include("connectdb.php");
+include('connectdb.php');
 
 if (empty($_SESSION['aid'])) {
     echo "<script>";
@@ -10,74 +10,95 @@ if (empty($_SESSION['aid'])) {
     exit;
 }
 
+// ใช้งาน session
 $aid = $_SESSION['aid'];
 $aname = $_SESSION['aname'];
 $role_id = $_SESSION['role_id'];
 $role_name = $_SESSION['role_name'];
 $img = $_SESSION['img'];
 
+// ตรวจสอบว่าค่าที่เก็บใน session มีอยู่หรือไม่
 if (empty($img)) {
     $img = 'default.jpg'; 
 }
 
 $imagePath = "assets/images/emp/" . $aid . "." . $img;
 
-function thai_day($date) {
-  $dayNames = array("อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์");
-  return $dayNames[date('w', strtotime($date))];
+// รับค่า emp_id, paymethod_id, type_id และวันที่จากฟอร์ม
+$selected_emp_id = isset($_POST['emp_id']) ? $_POST['emp_id'] : 0;
+$selected_paymethod_id = isset($_POST['paymethod_id']) ? $_POST['paymethod_id'] : 0;
+$selected_type_id = isset($_POST['type_id']) ? $_POST['type_id'] : 0;
+$selected_date = isset($_POST['selected_date']) ? $_POST['selected_date'] : '';
+
+// ถ้าไม่มีวันที่เลือก ให้ใช้เดือนและปีปัจจุบัน
+if (empty($selected_date)) {
+    $current_month = date('m');
+    $current_year = date('Y');
+} else {
+    $selected_month = date('m', strtotime($selected_date));
+    $selected_year = date('Y', strtotime($selected_date));
 }
 
-function thai_month($date) {
-  $monthNames = array(
-      1 => "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", 
-      "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-  );
-  return $monthNames[date('n', strtotime($date))];
+// SQL เพื่อดึงยอดขาย
+$sql_total_sales = "
+    SELECT SUM(order_total) AS total_sales
+    FROM orders
+    WHERE MONTH(order_date) = $current_month AND YEAR(order_date) = $current_year";
+$result_total_sales = $conn->query($sql_total_sales);
+
+$total_sales = 0;
+
+// ตรวจสอบผลลัพธ์ ถ้าไม่มียอดขาย ให้แสดงเป็น 0
+if ($result_total_sales->num_rows > 0) {
+    $row_total_sales = $result_total_sales->fetch_assoc();
+    $total_sales = $row_total_sales['total_sales'] ?? 0;
 }
 
-function thai_year($date) {
-  return date('Y', strtotime($date)) + 543;
+// ดึงพนักงานที่มียอดขายสูงสุดในเดือนปัจจุบัน
+$sql_max_sales_emp = "
+    SELECT o.emp_id, e.emp_name, SUM(o.order_total) AS total_sales
+    FROM orders o
+    JOIN employees e ON o.emp_id = e.emp_id
+    WHERE MONTH(o.order_date) = $current_month AND YEAR(o.order_date) = $current_year
+    GROUP BY o.emp_id
+    ORDER BY total_sales DESC
+    LIMIT 1";
+$result_max_sales_emp = $conn->query($sql_max_sales_emp);
+
+$emp_name = 'ยังไม่มี';  // ค่าเริ่มต้น
+if ($result_max_sales_emp->num_rows > 0) {
+    $row_max_sales_emp = $result_max_sales_emp->fetch_assoc();
+    $emp_name = $row_max_sales_emp['emp_name'];
 }
 
-// จำนวนแถวต่อหน้า
-$limit = 10;
-// ตรวจสอบหมายเลขหน้าปัจจุบัน
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$start = ($page - 1) * $limit;
+// ดึงข้อมูลสินค้าที่ขายในปัจจุบัน
+$sql_product_sales = "
+    SELECT p.name, SUM(od.quantity) AS total_sold
+    FROM orders o
+    JOIN orders_detail od ON o.order_id = od.order_id
+    JOIN products p ON od.p_id = p.id
+    WHERE MONTH(o.order_date) = $current_month AND YEAR(o.order_date) = $current_year
+    GROUP BY p.id
+    ORDER BY total_sold DESC
+    LIMIT 1";
+$result_product_sales = $conn->query($sql_product_sales);
 
-// สร้าง SQL Query ตามบทบาทของผู้ใช้
-if ($role_name == 'admin') {
-    $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
-            FROM orders o 
-            JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
-            JOIN employees ep ON o.emp_id = ep.emp_id
-            ORDER BY o.order_id DESC LIMIT $start, $limit";
-} elseif ($role_name == 'employee') {
-    $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name
-            FROM orders o 
-            JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
-            JOIN employees ep ON o.emp_id = ep.emp_id
-            WHERE o.emp_id = '$aid'
-            ORDER BY o.order_id DESC LIMIT $start, $limit";
+$product_name = 'ยังไม่มี';  // ค่าเริ่มต้น
+if ($result_product_sales->num_rows > 0) {
+    $row_product_sales = $result_product_sales->fetch_assoc();
+    $product_name = $row_product_sales['name'];
 }
 
-$rs = mysqli_query($conn, $sql);
-
-// จำนวนแถวทั้งหมดสำหรับการคำนวณหน้า
-$totalQuery = "SELECT COUNT(*) as total FROM orders";
-$totalResult = mysqli_query($conn, $totalQuery);
-$totalData = mysqli_fetch_assoc($totalResult);
-$totalRows = $totalData['total'];
-$totalPages = ceil($totalRows / $limit);
-
+// แสดงผลลัพธ์ใน HTML
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
 <!-- [Head] start -->
 
 <head>
-  <title>Sample Page | Gradient Able Dashboard Template</title>
+  <title>Dashboard POS | Point of Sale</title>
   <!-- [Meta] -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -99,28 +120,13 @@ $totalPages = ceil($totalRows / $limit);
 
   <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
 
-  <!-- [Favicon] icon -->
-  <link rel="icon" href="assets/images/favicon.svg" type="image/x-icon"> <!-- [Google Font : Poppins] icon -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
-<!-- [Tabler Icons] https://tablericons.com -->
-<link rel="stylesheet" href="assets/fonts/tabler-icons.min.css" >
-<!-- [Feather Icons] https://feathericons.com -->
-<link rel="stylesheet" href="assets/fonts/feather.css" >
-<!-- [Font Awesome Icons] https://fontawesome.com/icons -->
-<link rel="stylesheet" href="assets/fonts/fontawesome.css" >
-<!-- [Material Icons] https://fonts.google.com/icons -->
-<link rel="stylesheet" href="assets/fonts/material.css" >
-<!-- [Template CSS Files] -->
-<link rel="stylesheet" href="assets/css/style.css" id="main-style-link" >
-<link rel="stylesheet" href="assets/css/style-preset.css" >
-
-
 
 <!-- Script -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js" integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <!-- Add jQuery library -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -144,6 +150,9 @@ $totalPages = ceil($totalRows / $limit);
         fetchProducts(query);
       });
     });
+
+        
+
   </script>
 
 
@@ -447,14 +456,14 @@ body {
             </span>
             <span class="pc-mtext">Sample page</span></a
           ></li
-        >
+        > -->
 
       </ul>
-      <div class="card nav-action-card bg-brand-color-9">
-        <div class="card-body" style="background-image: url('assets/images/layout/nav-card-bg.svg')"> -->
+      <!-- <div class="card nav-action-card bg-brand-color-9">
+        <div class="card-body" style="background-image: url('assets/images/layout/nav-card-bg.svg')">
 
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </nav>
@@ -481,13 +490,10 @@ body {
     </div>
 
     <!-- เพิ่ม form control ตรงนี้ -->
-    <form method="post" class="search-form" onsubmit="return false;">
-      <input type="text" name="src2" placeholder="ค้นหาเลขที่ใบสั่งซื้อ" class="search-input" autofocus>
+    <!-- <form method="post" class="search-form" onsubmit="return false;">
+      <input type="text" name="src" placeholder="ค้นหาสินค้า" class="search-input" autofocus>
       <a class="btn btn-primary"><i class="ph ph-magnifying-glass"></i></a>
-    </form>
-
-
-
+    </form> -->
 
     <div class="ms-auto">
       <h7 id="clock" class="text-white text-center">00:00:00</h7>
@@ -503,15 +509,15 @@ body {
             <div class="dropdown-body">
               <div class="profile-notification-scroll position-relative" style="max-height: calc(100vh - 225px)">
                 <ul class="list-group list-group-flush w-100">
-                  <li class="list-group-item">
+                  <!-- <li class="list-group-item">
                     <a href="https://codedthemes.com/item/gradient-able-admin-template/" class="dropdown-item">
                       <span class="d-flex align-items-center">
                         <i class="ph ph-arrow-circle-down"></i>
                         <span>Download</span>
                       </span>
                     </a>
-                  </li>
-                  <li class="list-group-item">
+                  </li> -->
+                  <!-- <li class="list-group-item">
                     <a href="#" class="dropdown-item">
                       <span class="d-flex align-items-center">
                         <i class="ph ph-user-circle"></i>
@@ -530,15 +536,15 @@ body {
                         <span>Settings</span>
                       </span>
                     </a>
-                  </li>
+                  </li> -->
                   <li class="list-group-item">
-                    <a href="#" class="dropdown-item">
+                    <!-- <a href="#" class="dropdown-item">
                       <span class="d-flex align-items-center">
                         <i class="ph ph-plus-circle"></i>
                         <span>Add account</span>
                       </span>
-                    </a>
-                    <a href="#" class="dropdown-item">
+                    </a> -->
+                    <a href="logout.php" class="dropdown-item">
                       <span class="d-flex align-items-center">
                         <i class="ph ph-power"></i>
                         <span>Logout</span>
@@ -557,103 +563,157 @@ body {
 <!-- [ Header ] end -->
 
   <!-- [ Main Content ] start -->
+  <div class="col-12 col-md-12">
+        <div class="pc-container px-1">
+            <div class="pc-content">
 
-  <!-- [ Main Content ] start -->
-
-  <div class="pc-container">
-    <div class="pc-content">
-        <div class="page-header">
-            <div class="page-block card mb-0">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-md-12">
-                            <div class="page-header-title border-bottom pb-2 mb-2">
-                                <h4 class="mb-0">ประวัติการขาย</h4>
-                            </div>
-                        </div>
-
-                        <table class="table table-striped table-sm-gap" width="100%">
-                            <thead>
-                                <tr>
-                                    <td width="11%" class="text-center"></td>
-                                    <td width="10%" class="text-center">เลขที่บิล</td>
-                                    <td width="15%" class="text-start">วันที่ (สร้าง)</td>
-                                    <td width="16%" class="text-end">ราคารวม (บาท)</td>
-                                    <td width="13%" class="text-center">พนักงาน</td>
-                                    <td width="10%" class="text-center">ชำระโดย</td>
-                                    <td width="25%" class="text-center">รายการ</td>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                            <?php
-                            // ตรวจสอบว่ามีผลลัพธ์หรือไม่
-                            if (mysqli_num_rows($rs) > 0) {
-                                while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
-                            ?>
-                                <tr>
-                                    <td class="text-center">
-                                        <small>
-                                        <a href="history_detail.php?a=<?=$data['order_id'];?>">รายละเอียด</a>
-                                        </small>
-                                    </td>
-                                    <td class="text-center"><?=$data['order_id'];?></td>
-                                    <td class="text-start text-muted">
-                                        <small><?= "วัน" . thai_day($data['order_date']) . " " . date('d', strtotime($data['order_date'])) . " " . thai_month($data['order_date']) . " " . thai_year($data['order_date']) . " " . date('H:i', strtotime($data['order_date'])) . " น."; ?>
-                                        </small>
-                                    </td>          
-                                    <td class="text-end"><?=number_format($data['order_total'], 2);?></td>
-                                    <td class="text-center"><small><?=$data['emp_name'];?></small></td>
-                                    <td class="text-center"><?=$data['paymethod_name'];?></td>
-                                    <td class="text-center">
-                                        <a href="delete.php?id=<?=$data['order_id'];?>" type="button" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?');">คืนสินค้า</a>
-                                        <a type="button" class="btn btn-success" onClick="window.open('bill_print.php?b=<?=$data['order_id'];?>', '_blank', 'width=760,height=560')">ใบเสร็จ</a>
-                                    </td>
-                                </tr>
-                            <?php  
-                                }
-                            } else {
-                                echo '<tr><td colspan="7" class="text-center">ไม่มีรายการการขาย</td></tr>';
-                            }
-                            ?>
-                            </tbody>
-                        </table>
-
-                        <!-- แสดงลิงก์สำหรับเปลี่ยนหน้า -->
-                        <div class="pagination-container text-center mt-3">
-                            <?php if($page > 1): ?>
-                                <a href="?page=<?= $page - 1; ?>" class="btn btn-outline-secondary">ก่อนหน้า</a>
-                            <?php endif; ?>
-
-                            <?php for($i = 1; $i <= $totalPages; $i++): ?>
-                                <a href="?page=<?= $i; ?>" class="btn btn-outline-secondary <?= $i == $page ? 'active' : ''; ?>"><?= $i; ?></a>
-                            <?php endfor; ?>
-
-                            <?php if($page < $totalPages): ?>
-                                <a href="?page=<?= $page + 1; ?>" class="btn btn-outline-secondary">ถัดไป</a>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+                
+                <div class="col-12 col-md-12">
+                <h5>Dashboard</h5>
                 </div>
-            </div>
+
+                <div class="row">
+
+                <div class="col-md-6 col-xl-3">
+    <div class="card bg-grd-danger order-card">
+        <div class="card-body">
+            <h6 class="text-white">ยอดขายรวม</h6>
+            <h2 class="text-end text-white fs-5"><i class="feather icon-shopping-cart float-start"></i><span><?php echo number_format($total_sales, 2); ?> บาท</span></h2>
+            <small class="m-b-0">จำนวนที่ขายไปทั้งหมด<span class="float-end"><?php echo number_format($total_sales_count,); ?> บิล</span></small>
         </div>
     </div>
 </div>
+<div class="col-md-6 col-xl-3">
+    <div class="card bg-grd-success order-card">
+        <div class="card-body">
+            <h6 class="text-white">จำนวนสินค้าพร้อมขาย</h6>
+            <h2 class="text-end text-white fs-5"><i class="feather icon-tag float-start"></i><span><?php echo number_format($total_qty); ?> ชิ้น</span></h2>
+            <small class="m-b-0">สินค้าที่ขายเดือน<?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?><span class="float-end"><?php echo ($total_items_sold); ?> ชิ้น</span></small>
+        </div>
+    </div>
+</div>
+        <div class="col-md-6 col-xl-3">
+          <div class="card bg-grd-warning order-card">
+            <div class="card-body">
+              <h6 class="text-white">ยอดขายมากสุดเดือน<?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?></h6>              
+              <h2 class="text-end text-white fs-5"><i class="feather icon-repeat float-start"></i><span><?php echo number_format($max_total_sales, decimals:2); ?> บาท</span></h2>
+              <small class="m-b-0">พนักงานขาย<span class="float-end"><?php echo ($emp_name); ?></span></small>
+            </div>
+          </div>
+        </div>
 
-<?php
-mysqli_close($conn);
-?>  <!-- [ Main Content ] end -->
+        <div class="col-md-6 col-xl-3">
+          <div class="card bg-grd-primary order-card">
+            <div class="card-body">
+              <h6 class="text-white">ยอดขายเฉลี่ยในเดือน<?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?></h6>
+              <h2 class="text-end text-white fs-5"><i class="feather icon-award float-start"></i><span><?php echo number_format($average_sales, decimals:2); ?> บาท</span></h2>
+              <small class="m-b-0">จำนวนขายเดือน<?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?><span class="float-end"><?php echo ($total_bills); ?> บิล</span></small>
+            </div>
+          </div>
+        </div>
+        <!-- Recent Orders end -->
+      </div>
 
+      
+      
+                <br>
+
+                <form action="" method="post">
+  <div class="row g-3">
+
+    <div class="col-12 col-md-3">
+      <select class="form-select" name="type_id" aria-label="Default select example">
+        <option value="0">ประเภทสินค้า</option>
+        <?php
+        include("connectdb.php");
+        $sql = "SELECT * FROM type";
+        $result = mysqli_query($conn, $sql);
+        while ($row = mysqli_fetch_array($result)) {
+          $type_id = $row['type_id'];
+        ?>
+          <option value="<?=$type_id;?>" <?=($selected_type_id == $type_id) ? 'selected' : '';?>>
+            <?=$row['type_name'];?>
+          </option>
+        <?php } ?>
+      </select>
+    </div>
+
+    <div class="col-12 col-md-3">
+      <select class="form-select" name="paymethod_id" aria-label="Default select example">
+        <option value="0">การชำระเงิน</option>
+        <?php
+        include("connectdb.php");
+        $sql = "SELECT paymethod_id, paymethod_name FROM paymethod";
+        $result = mysqli_query($conn, $sql);
+        while ($row = mysqli_fetch_array($result)) {
+          $paymethod_id = $row['paymethod_id'];
+        ?>
+          <option value="<?=$paymethod_id;?>" <?=($selected_paymethod_id == $paymethod_id) ? 'selected' : '';?>>
+            <?=$row['paymethod_name'];?>
+          </option>
+        <?php } ?>
+      </select>
+    </div>
+
+    <div class="col-12 col-md-3">
+      <select class="form-select" name="emp_id" aria-label="Default select example">
+        <option value="0">พนักงานทั้งหมด</option>
+        <?php
+        include("connectdb.php");
+        $sql = "SELECT emp_id, emp_name FROM employees";
+        $result = mysqli_query($conn, $sql);
+        while ($row = mysqli_fetch_array($result)) {
+          $emp_id = $row['emp_id'];
+        ?>
+          <option value="<?=$emp_id;?>" <?=($selected_emp_id == $emp_id) ? 'selected' : '';?>>
+            <?=$row['emp_name'];?>
+          </option>
+        <?php } ?>
+      </select>
+    </div>
+
+    <div class="col-12 col-md-3">
+      <!-- อนาคตสามารถใส่ input type="date" ที่นี่ได้ -->
+    </div>
+
+    <div class="col-12 col-md-4 d-flex justify-content-md-end justify-content-center">
+      <button class="btn btn-primary w-100 w-md-auto text-white" type="submit">ค้นหา</button>
+    </div>
+
+  </div>
+</form>
+
+                <br>
+
+
+
+                <div class="card">
+            <div class="card-header">
+            </div>
+            <div class="card-body">
+              <div id="world-map-markers" class="set-map" style="height:365px;">
+              <canvas id="myChart" style="width: 100%; height: 100%;"></canvas>
+              </div>
+            </div>
+          </div>
+
+
+        
+
+
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+  <!-- [ Main Content ] end -->
   <footer class="pc-footer">
     <div class="footer-wrapper container-fluid">
       <div class="row">
 
-
-
-
-
-
-  
         <div class="col-sm-6 ms-auto my-1">
           <ul class="list-inline footer-link mb-0 justify-content-sm-end d-flex">
           <a href="#top" class="text-end">กลับไปบนสุด</a>
@@ -677,6 +737,9 @@ mysqli_close($conn);
 <script>layout_rtl_change('false');</script>
 <script>preset_change("preset-1");</script>
 <script>header_change("header-1");</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 
 
@@ -714,6 +777,55 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+function addItem(productId) {
+    // บันทึกสัญญาณรีเฟรชใน localStorage
+    localStorage.setItem('refreshTable', 'true');
+
+    // ส่งข้อความไปยังหน้าต่างที่เปิดอยู่ของ table_sale.php
+    const openTableSaleWindow = window.open('', 'tableSale');
+    if (openTableSaleWindow) {
+        openTableSaleWindow.postMessage('refreshTable', '*');
+    }
+
+    // รีเฟรชหน้า sale.php พร้อมส่ง productId
+    window.location.href = 'sale.php?id=' + encodeURIComponent(productId);
+}
+
+function refreshPage(btn_clear){
+    // บันทึกสัญญาณรีเฟรชใน localStorage
+    localStorage.setItem('refreshTable', 'true');
+
+    // ส่งข้อความไปยังหน้าต่างที่เปิดอยู่ของ table_sale.php
+    const openTableSaleWindow = window.open('', 'tableSale');
+    if (openTableSaleWindow) {
+        openTableSaleWindow.postMessage('refreshTable', '*');
+    }
+
+  
+};
+
+
+
+
+
+
+const labels = <?php echo json_encode($dates); ?>;
+    const datasets = <?php echo json_encode($datasets); ?>;
+
+    const data = {
+        labels: labels,
+        datasets: datasets
+    };
+
+    const config = {
+        type: 'line',
+        data: data,
+    };
+
+    const ctx = document.getElementById('myChart').getContext('2d');
+    new Chart(ctx, config);
+
+
 
 </script>
 
@@ -721,46 +833,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-<script src="../assets/js/plugins/popper.min.js"></script>
-<script src="../assets/js/plugins/simplebar.min.js"></script>
-<script src="../assets/js/plugins/bootstrap.min.js"></script>
-<script src="../assets/js/fonts/custom-font.js"></script>
-<script src="../assets/js/pcoded.js"></script>
-<script src="../assets/js/plugins/feather.min.js"></script>
-
-
-
-
-
-<script>layout_change('light');</script>
-
-
-
-
-<script>layout_sidebar_change('light');</script>
-
-
-
-<script>change_box_container('false');</script>
-
-
-<script>layout_caption_change('true');</script>
-
-
-
-
-<script>layout_rtl_change('false');</script>
-
-
-<script>preset_change("preset-1");</script>
-
-
-<script>header_change("header-1");</script>
-
-
 </body>
 
-
+</body>
 <!-- [Body] end -->
 
 </html>

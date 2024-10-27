@@ -886,13 +886,12 @@ body {
       </select>
     </div>
 
-    <div class="col-12 col-md-3 d-flex justify-content-md-end justify-content-center ms-auto">
+    <div class="col-12 col-md-2 d-flex justify-content-md-end justify-content-center">
       <button class="btn btn-primary w-100 w-md-auto text-white" type="submit">ค้นหา</button>
     </div>
 
   </div>
 </form>
-
 
 
 
