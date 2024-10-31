@@ -1328,19 +1328,11 @@ function calculateTotalPrice() {
     return totalPrice;
 }
 
-// ฟังก์ชันสำหรับฟอร์แมตตัวเลข
-function formatNumber(num) {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
 // ฟังก์ชันคำนวณเงินทอนเมื่อกดปุ่ม "คำนวณ"
 function calculateChange() {
     const display = document.querySelector(".display");
     let totalPrice = calculateTotalPrice();
-    let receivedAmount = parseFloat(display.value.replace(/,/g, '').trim()); // ลบจุลภาคและช่องว่างก่อนแปลงเป็นเลข
-
-    console.log(`Total Price: ${totalPrice}`);
-    console.log(`Received Amount: ${receivedAmount}`);
+    let receivedAmount = parseFloat(display.value); // รับจำนวนเงินจากหน้าจอ
 
     // ตรวจสอบว่าจำนวนเงินที่ได้รับถูกต้องหรือไม่
     if (isNaN(receivedAmount) || receivedAmount < 0) {
@@ -1350,13 +1342,11 @@ function calculateChange() {
     }
 
     let change = receivedAmount - totalPrice; // คำนวณเงินทอน
-    console.log(`Change: ${change}`); // แสดงค่าเงินทอนใน console
-
     if (change < 0) {
         alert("จำนวนเงินที่ได้รับไม่เพียงพอสำหรับการชำระเงิน");
         display.value = '';
     } else {
-        display.value = `ยอดเงินทอน: ${formatNumber(change.toFixed(2))}`; // แสดงข้อความยอดเงินทอนในรูปแบบฟอร์แมต
+        display.value = `ยอดเงินทอน: ${change.toFixed(2)}`; // แสดงข้อความยอดเงินทอน
     }
 }
 
@@ -1406,7 +1396,7 @@ function setupCalculator(display) {
             if (output === "" && ["%", "*", "/", "-", "+", "="].includes(btnValue)) return;
             output += btnValue; // เพิ่มค่าลงใน output
         }
-        display.value = formatNumber(output); // แสดงผลลัพธ์ในหน้าจอพร้อมฟอร์แมต
+        display.value = output; // แสดงผลลัพธ์ในหน้าจอ
     };
 
     buttons.forEach((button) => {

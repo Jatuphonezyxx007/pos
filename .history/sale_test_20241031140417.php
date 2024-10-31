@@ -1337,10 +1337,7 @@ function formatNumber(num) {
 function calculateChange() {
     const display = document.querySelector(".display");
     let totalPrice = calculateTotalPrice();
-    let receivedAmount = parseFloat(display.value.replace(/,/g, '').trim()); // ลบจุลภาคและช่องว่างก่อนแปลงเป็นเลข
-
-    console.log(`Total Price: ${totalPrice}`);
-    console.log(`Received Amount: ${receivedAmount}`);
+    let receivedAmount = parseFloat(display.value.replace(/,/g, '')); // ลบจุลภาคก่อนแปลงเป็นเลข
 
     // ตรวจสอบว่าจำนวนเงินที่ได้รับถูกต้องหรือไม่
     if (isNaN(receivedAmount) || receivedAmount < 0) {
@@ -1350,8 +1347,6 @@ function calculateChange() {
     }
 
     let change = receivedAmount - totalPrice; // คำนวณเงินทอน
-    console.log(`Change: ${change}`); // แสดงค่าเงินทอนใน console
-
     if (change < 0) {
         alert("จำนวนเงินที่ได้รับไม่เพียงพอสำหรับการชำระเงิน");
         display.value = '';
@@ -1359,7 +1354,6 @@ function calculateChange() {
         display.value = `ยอดเงินทอน: ${formatNumber(change.toFixed(2))}`; // แสดงข้อความยอดเงินทอนในรูปแบบฟอร์แมต
     }
 }
-
 
 // ฟังก์ชันที่เรียกเมื่อเลือกวิธีการชำระเงิน
 document.getElementById('paymentMethod').addEventListener('change', function() {
