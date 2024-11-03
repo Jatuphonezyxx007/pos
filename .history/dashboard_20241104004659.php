@@ -482,6 +482,13 @@ body {
             <span class="pc-mtext">Dashboard</span>
           </a>
         </li>
+
+
+        <li class="pc-item">
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/report.php' ? 'active' : '') ?>" href="report.php">รายงานการขาย</a>
+    </li>
+
+    
         <?php endif; ?>
 
 

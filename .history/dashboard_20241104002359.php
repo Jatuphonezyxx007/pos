@@ -571,6 +571,9 @@ body {
     <li class="pc-item">
         <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/info.php' ? 'active' : '') ?>" href="info.php">ข้อมูลติดต่อ</a>
     </li>
+    <!-- <li class="pc-item">
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sample-page2.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
+    </li> -->
 </ul>
         </li>
         <?php endif; ?>
@@ -982,7 +985,7 @@ $("#clock").html(hours + ":" + minutesString + ":" + secondsString);
 }, 1000);
 });
 moment.locale('th');
-document.getElementById('date').innerHTML = moment().format('dddd D MMMM YYYY');
+document.getElementById('date').innerHTML = moment().format('HH:mm:ss | dddd D MMMM YYYY');
 
 
 document.addEventListener('DOMContentLoaded', function() {

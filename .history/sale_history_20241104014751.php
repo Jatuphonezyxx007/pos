@@ -651,7 +651,7 @@ body {
                                             <td class="text-center"><small><?=$data['paymethod_name'];?></small></td>
                                             <td class="text-center">
                                                 <a href="delete.php?id=<?=$data['order_id'];?>" class="btn btn-danger btn-sm" onClick="return confirm('ยืนยันการลบ ?');"><i class="ph ph-trash"></i> ลบ</a>
-                                                <a class="btn btn-success btn-sm" onClick="window.open('bill_vat.php?b=<?=$data['order_id'];?>', '_blank', 'width=960,height=1080')"><i class="ph ph-printer"></i> ใบกำกับภาษี</a>
+                                                <a class="btn btn-success btn-sm" onClick="window.open('bill_print.php?b=<?=$data['order_id'];?>', '_blank', 'width=760,height=560')"><i class="ph ph-printer"></i> ใบกำกับภาษี</a>
                                             </td>
                                         </tr>
                                     <?php  

@@ -571,6 +571,9 @@ body {
     <li class="pc-item">
         <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/info.php' ? 'active' : '') ?>" href="info.php">ข้อมูลติดต่อ</a>
     </li>
+    <!-- <li class="pc-item">
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sample-page2.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
+    </li> -->
 </ul>
         </li>
         <?php endif; ?>
@@ -964,26 +967,17 @@ body {
 
 <script>
 $(document).ready(function() {
-setInterval(function() {
-var date = new Date();
-var hours = date.getHours();
-var minutes = date.getMinutes();
-var seconds = date.getSeconds();
-var secondsString = seconds.toString();
-if (secondsString.length === 1) {
-  secondsString = "0" + secondsString;
-}
-  var minutesString = minutes.toString();
-if (minutesString.length === 1) {
-  minutesString = "0" + minutesString;
-}
+    moment.locale('th');
+    setInterval(function() {
+        var date = moment();
+        var hours = date.hours().toString().padStart(2, '0');
+        var minutes = date.minutes().toString().padStart(2, '0');
+        var seconds = date.seconds().toString().padStart(2, '0');
 
-$("#clock").html(hours + ":" + minutesString + ":" + secondsString);
-}, 1000);
+        $("#clock").html(hours + ":" + minutes + ":" + seconds);
+        $("#date").html(date.format('dddd D MMMM YYYY'));
+    }, 1000);
 });
-moment.locale('th');
-document.getElementById('date').innerHTML = moment().format('dddd D MMMM YYYY');
-
 
 document.addEventListener('DOMContentLoaded', function() {
   var modal = document.getElementById('exampleModal');

@@ -30,7 +30,7 @@ $imagePath = "assets/images/emp/" . $aid . "." . $img;
 $selected_emp_id = isset($_POST['emp_id']) ? $_POST['emp_id'] : 0;
 $selected_paymethod_id = isset($_POST['paymethod_id']) ? $_POST['paymethod_id'] : 0;
 $selected_type_id = isset($_POST['type_id']) ? $_POST['type_id'] : 0;
-// $selected_date = isset($_POST['selected_date']) ? $_POST['selected_date'] : '';
+$selected_date = isset($_POST['selected_date']) ? $_POST['selected_date'] : '';
 
 // ตรวจสอบว่ามีการกดปุ่มค้นหาหรือไม่
 $is_search_button_clicked = isset($_POST['search']); // ตรวจสอบการกดปุ่มค้นหา
@@ -40,10 +40,10 @@ $current_month = date('m');
 $current_year = date('Y');
 
 // แยกปีและเดือนจากวันที่ที่เลือก
-// if (!empty($selected_date)) {
-//     $selected_month = date('m', strtotime($selected_date));
-//     $selected_year = date('Y', strtotime($selected_date));
-// }
+if (!empty($selected_date)) {
+    $selected_month = date('m', strtotime($selected_date));
+    $selected_year = date('Y', strtotime($selected_date));
+}
 
 // เริ่มสร้าง SQL เพื่อดึงข้อมูลยอดขายรวมต่อเดือน
 $sql = "
@@ -290,6 +290,82 @@ $month_name_thai = isset($thai_months[$current_month]) ? $thai_months[$current_m
 
 // สร้างข้อความที่ต้องการแสดง
 $month_message = "$month_name_thai";
+
+
+
+
+
+
+
+
+
+// รับค่าที่เลือกจากฟอร์ม
+$selectedMonth = isset($_GET['month']) ? (int)$_GET['month'] : date('m'); // เปลี่ยนเป็น GET
+$currentYear = date('Y'); // ปีปัจจุบัน
+
+// เริ่มสร้าง SQL เพื่อดึงข้อมูลยอดขายรวมต่อเดือน
+$sql = "
+    SELECT 
+        e.emp_id,
+        e.emp_name,
+        DATE_FORMAT(o.order_date, '%Y-%m-%d') AS sale_date,  -- แปลงวันที่เป็นรูปแบบปี-เดือน-วัน
+        COALESCE(SUM(o.order_total), 0) AS total_sales
+    FROM employees e
+    LEFT JOIN orders o ON e.emp_id = o.emp_id
+    WHERE MONTH(o.order_date) = ? AND YEAR(o.order_date) = ?
+    GROUP BY e.emp_id, sale_date
+    ORDER BY sale_date, e.emp_id";
+
+// เตรียมและรัน SQL
+$stmt = $conn->prepare($sql);
+$stmt->bind_param('ii', $selectedMonth, $currentYear); // Binding parameters
+$stmt->execute();
+$result = $stmt->get_result();
+
+// เตรียมข้อมูลสำหรับกราฟ
+$sales_data = [];
+while ($row = $result->fetch_assoc()) {
+    $sales_data[$row['sale_date']][$row['emp_name']] = $row['total_sales'];
+}
+
+// เตรียมข้อมูลสำหรับการสร้างกราฟ
+$chart_data = [];
+$chart_labels = array_keys($sales_data); // วันที่เป็น label
+
+// สร้างข้อมูลยอดขายรวมจากพนักงานแต่ละคน
+foreach ($sales_data as $date => $employees) {
+    foreach ($employees as $emp_name => $total_sales) {
+        if (!isset($chart_data[$emp_name])) {
+            $chart_data[$emp_name] = array_fill(0, count($chart_labels), 0); // สร้าง array เพื่อเก็บยอดขาย
+        }
+        $index = array_search($date, $chart_labels);
+        if ($index !== false) {
+            $chart_data[$emp_name][$index] = $total_sales; // บันทึกยอดขายในวันที่ตรงกัน
+        }
+    }
+}
+
+// แปลงข้อมูลสำหรับการแสดงผลในกราฟ
+$final_chart_data = [];
+foreach ($chart_data as $emp_name => $data) {
+    $final_chart_data[] = [
+        'label' => $emp_name,
+        'data' => $data,
+        'borderColor' => '#' . dechex(rand(0, 0xFFFFFF)), // สุ่มสีให้กราฟ
+        'fill' => false
+    ];
+}
+
+// แปลงข้อมูลสำหรับ JavaScript
+$chart_data_json = json_encode($final_chart_data);
+$chart_labels_json = json_encode(array_map(function($date) {
+    return date('d-m', strtotime($date));
+}, $chart_labels));
+
+
+
+
+
 
 $conn->close();
 ?>
@@ -571,6 +647,9 @@ body {
     <li class="pc-item">
         <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/info.php' ? 'active' : '') ?>" href="info.php">ข้อมูลติดต่อ</a>
     </li>
+    <!-- <li class="pc-item">
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sample-page2.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
+    </li> -->
 </ul>
         </li>
         <?php endif; ?>
@@ -890,7 +969,34 @@ body {
       </select>
     </div>
 
-    
+    <div class="col-12 col-md-2">
+                                    <form method="get" action="">
+                                        <select class="form-select" name="month" aria-label="เลือกเดือน" onchange="this.form.submit()">
+                                            <option value="0">เดือน</option>
+                                            <?php
+                                            $months = [
+                                                1 => 'มกราคม',
+                                                2 => 'กุมภาพันธ์',
+                                                3 => 'มีนาคม',
+                                                4 => 'เมษายน',
+                                                5 => 'พฤษภาคม',
+                                                6 => 'มิถุนายน',
+                                                7 => 'กรกฎาคม',
+                                                8 => 'สิงหาคม',
+                                                9 => 'กันยายน',
+                                                10 => 'ตุลาคม',
+                                                11 => 'พฤศจิกายน',
+                                                12 => 'ธันวาคม'
+                                            ];
+
+                                            foreach ($months as $month_num => $month_name) {
+                                                echo "<option value=\"$month_num\" " . ($month_num == $selectedMonth ? 'selected' : '') . ">$month_name</option>";
+                                            }
+                                            ?>
+                                        </select>
+                                    </form>
+                                </div>
+
 
     <div class="col-12 col-md-3 d-flex justify-content-md-end justify-content-center ms-auto">
       <button class="btn btn-primary w-100 w-md-auto text-white" type="submit" name="search">ค้นหา</button>

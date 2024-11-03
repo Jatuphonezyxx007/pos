@@ -476,12 +476,36 @@ body {
       <ul class="pc-navbar">
 
       <?php if ($role_name == 'admin') : ?>
-      <li class="pc-item">
+        <li class="pc-item pc-hasmenu">
+        <a href="dashboard.php" class="pc-link">
+            <span class="pc-micon"><i class="ph ph-gauge"></i></span>
+            <span class="pc-mtext">Dashboard</span>
+          </a>
+
+          <ul class="pc-submenu">
+    <li class="pc-item">
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sale.php' ? 'active' : '') ?>" href="sale.php">หน้าขาย</a>
+    </li>
+    <li class="pc-item">
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sale_history.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
+    </li>
+</ul>
+        </li>
+
+
+      <!-- <li class="pc-item">
           <a href="dashboard.php" class="pc-link">
             <span class="pc-micon"><i class="ph ph-gauge"></i></span>
             <span class="pc-mtext">Dashboard</span>
           </a>
-        </li>
+        </li> -->
+
+
+        <li class="pc-item">
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/report.php' ? 'active' : '') ?>" href="report.php">รายงานการขาย</a>
+    </li>
+
+
         <?php endif; ?>
 
 

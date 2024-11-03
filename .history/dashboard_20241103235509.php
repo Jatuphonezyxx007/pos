@@ -30,7 +30,7 @@ $imagePath = "assets/images/emp/" . $aid . "." . $img;
 $selected_emp_id = isset($_POST['emp_id']) ? $_POST['emp_id'] : 0;
 $selected_paymethod_id = isset($_POST['paymethod_id']) ? $_POST['paymethod_id'] : 0;
 $selected_type_id = isset($_POST['type_id']) ? $_POST['type_id'] : 0;
-// $selected_date = isset($_POST['selected_date']) ? $_POST['selected_date'] : '';
+$selected_date = isset($_POST['selected_date']) ? $_POST['selected_date'] : '';
 
 // ตรวจสอบว่ามีการกดปุ่มค้นหาหรือไม่
 $is_search_button_clicked = isset($_POST['search']); // ตรวจสอบการกดปุ่มค้นหา
@@ -40,10 +40,10 @@ $current_month = date('m');
 $current_year = date('Y');
 
 // แยกปีและเดือนจากวันที่ที่เลือก
-// if (!empty($selected_date)) {
-//     $selected_month = date('m', strtotime($selected_date));
-//     $selected_year = date('Y', strtotime($selected_date));
-// }
+if (!empty($selected_date)) {
+    $selected_month = date('m', strtotime($selected_date));
+    $selected_year = date('Y', strtotime($selected_date));
+}
 
 // เริ่มสร้าง SQL เพื่อดึงข้อมูลยอดขายรวมต่อเดือน
 $sql = "
@@ -571,6 +571,9 @@ body {
     <li class="pc-item">
         <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/info.php' ? 'active' : '') ?>" href="info.php">ข้อมูลติดต่อ</a>
     </li>
+    <!-- <li class="pc-item">
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sample-page2.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
+    </li> -->
 </ul>
         </li>
         <?php endif; ?>
@@ -889,8 +892,6 @@ body {
         <?php } ?>
       </select>
     </div>
-
-    
 
     <div class="col-12 col-md-3 d-flex justify-content-md-end justify-content-center ms-auto">
       <button class="btn btn-primary w-100 w-md-auto text-white" type="submit" name="search">ค้นหา</button>

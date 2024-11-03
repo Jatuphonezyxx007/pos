@@ -56,11 +56,11 @@ $sql = "
     LEFT JOIN orders o ON e.emp_id = o.emp_id";
 
 // ตรวจสอบเงื่อนไขวันที่ (ถ้าไม่กดปุ่มค้นหา ใช้เดือน/ปีปัจจุบัน)
-if (!$is_search_button_clicked && empty($selected_date)) {
-    $sql .= " AND MONTH(o.order_date) = $current_month AND YEAR(o.order_date) = $current_year";
-} else if (!empty($selected_date)) {
-    $sql .= " AND MONTH(o.order_date) = $selected_month AND YEAR(o.order_date) = $selected_year";
-}
+// if (!$is_search_button_clicked && empty($selected_date)) {
+//     $sql .= " AND MONTH(o.order_date) = $current_month AND YEAR(o.order_date) = $current_year";
+// } else if (!empty($selected_date)) {
+//     $sql .= " AND MONTH(o.order_date) = $selected_month AND YEAR(o.order_date) = $selected_year";
+// }
 
 $sql .= "
     LEFT JOIN orders_detail od ON o.order_id = od.order_id
@@ -571,6 +571,9 @@ body {
     <li class="pc-item">
         <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/info.php' ? 'active' : '') ?>" href="info.php">ข้อมูลติดต่อ</a>
     </li>
+    <!-- <li class="pc-item">
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sample-page2.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
+    </li> -->
 </ul>
         </li>
         <?php endif; ?>

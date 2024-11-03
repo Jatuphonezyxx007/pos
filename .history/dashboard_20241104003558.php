@@ -571,6 +571,9 @@ body {
     <li class="pc-item">
         <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/info.php' ? 'active' : '') ?>" href="info.php">ข้อมูลติดต่อ</a>
     </li>
+    <li class="pc-item">
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/report.php' ? 'active' : '') ?>" href="report.php">รายงานการขาย</a>
+    </li>
 </ul>
         </li>
         <?php endif; ?>
