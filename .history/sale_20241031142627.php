@@ -270,7 +270,7 @@ body {
     <div class="m-header">
       <a href="dashboard/index.html" class="b-brand text-primary">
         <!-- ========   Change your logo from here   ============ -->
-        <img src="assets/images/logo-white.svg" alt="logo image" class="logo-lg">
+        <img src="assets/images/logo/logo.png" alt="logo image" class="logo-lg">
       </a>
     </div>
     <div class="navbar-content">
@@ -511,15 +511,15 @@ body {
             <div class="dropdown-body">
               <div class="profile-notification-scroll position-relative" style="max-height: calc(100vh - 225px)">
                 <ul class="list-group list-group-flush w-100">
-                  <li class="list-group-item">
+                  <!-- <li class="list-group-item">
                     <a href="https://codedthemes.com/item/gradient-able-admin-template/" class="dropdown-item">
                       <span class="d-flex align-items-center">
                         <i class="ph ph-arrow-circle-down"></i>
                         <span>Download</span>
                       </span>
                     </a>
-                  </li>
-                  <li class="list-group-item">
+                  </li> -->
+                  <!-- <li class="list-group-item">
                     <a href="#" class="dropdown-item">
                       <span class="d-flex align-items-center">
                         <i class="ph ph-user-circle"></i>
@@ -538,14 +538,14 @@ body {
                         <span>Settings</span>
                       </span>
                     </a>
-                  </li>
+                  </li> -->
                   <li class="list-group-item">
-                    <a href="#" class="dropdown-item">
+                    <!-- <a href="#" class="dropdown-item">
                       <span class="d-flex align-items-center">
                         <i class="ph ph-plus-circle"></i>
                         <span>Add account</span>
                       </span>
-                    </a>
+                    </a> -->
                     <a href="logout.php" class="dropdown-item">
                       <span class="d-flex align-items-center">
                         <i class="ph ph-power"></i>
@@ -641,7 +641,7 @@ body {
                                     <p class="mb-0 text-start">ราคา</p>
                                 </div>
                                 <div class="col">
-                                    <p id="price-display" class="mb-0 text-start"><strong>0 บาท</strong></p>
+                                    <p id="price-display" class="mb-0 text-start">0 บาท</p>
                                 </div>
                             </div>
                         </div>
@@ -680,7 +680,7 @@ body {
                 <tfoot>
                     <tr>
                         <td colspan="3" class="text-end"><strong>รวม</strong></td>
-                        <td class="text-center" id="total-price"><strong>0 บาท</strong></td>
+                        <td class="text-center" id="total-price">0 บาท</td>
                     </tr>
                 </tfoot>
             </table>
@@ -715,7 +715,8 @@ body {
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="paymentModalLabel">การชำระเงิน</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- ปุ่มปิด modal -->
+<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="window.location.reload();"></button>
       </div>
 
       <div class="modal-body">
@@ -743,39 +744,111 @@ body {
         <!-- <div class="container"> -->
 
         <div id="calContainer" style="display: none;">
-<!-- ตารางเครื่องคิดเลข -->
-<table class="table table-bordered" width="100%" id="calcu">
-            <tr>
-                <td colspan="4">
-                    <input class="form-control text-end w-100 fs-4" type="text" id="result" readonly value="0">
-                </td>
-            </tr>
-            <tr>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('7')">7</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('8')">8</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('9')">9</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('1000')">1000</button></td>
-            </tr>
-            <tr>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('4')">4</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('5')">5</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('6')">6</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('500')">500</button></td>
-            </tr>
-            <tr>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('1')">1</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('2')">2</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('3')">3</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('100')">100</button></td>
-            </tr>
-            <tr>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('.')">.</button></td>
-                <td><button class="btn btn-outline-secondary w-100" onclick="addToResult('0')">0</button></td>
-                <td><button class="btn btn-secondary w-100" onclick="deleteLastChar()">ลบ</button></td>
-                <td><button class="btn btn-primary w-100" onclick="calculateTotal()">เต็ม</button></td>
-            </tr>
-        </table>
+    <div class="card">
+        <div class="card-body">
+            <div class="mb-3">
+            <input type="text" class="form-control text-end fs-4 mb-3 display" value="0" disabled />
+                <div id="totalDisplay" class="text-end mt-1"></div>
+            </div>
+
+
+            <div class="container mt-4">
+
+    <div class="row g-2 mt-2">
+        <div class="col-3">
+            <button class="btn btn-outline-secondary w-100" data-value="7">7</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-outline-secondary w-100" data-value="8">8</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-outline-secondary w-100" data-value="9">9</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-info w-100" data-value="1000">1,000</button>
+        </div>
+    </div>
+
+    <div class="row g-2 mt-2">
+        <div class="col-3">
+            <button class="btn btn-outline-secondary w-100" data-value="4">4</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-outline-secondary w-100" data-value="5">5</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-outline-secondary w-100" data-value="6">6</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-info w-100" data-value="500">500</button>
+        </div>
+    </div>
+
+    <div class="row g-2 mt-2">
+        <div class="col-3">
+            <button class="btn btn-outline-secondary w-100" data-value="1">1</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-outline-secondary w-100" data-value="2">2</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-outline-secondary w-100" data-value="3">3</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-info w-100" data-value="100">100</button>
+        </div>
+    </div>
+
+    <div class="row g-2 mt-2">
+        <div class="col-3">
+          <button class="btn btn-outline-secondary w-100" data-value=".">.</button>
+            <!-- <button class="btn btn-outline-secondary w-100" data-value="0">0</button> -->
+        </div>
+        <div class="col-3">
+          <button class="btn btn-outline-secondary w-100" data-value="0">0</button>
+            <!-- <button class="btn btn-outline-secondary w-100" data-value="00">00</button> -->
+        </div>
+        <div class="col-3">
+          <button class="btn btn-danger w-100" data-value="DEL">DEL</button>
+          <!-- <button class="btn btn-outline-secondary w-100" data-value=".">.</button> -->
+        </div>
+        <div class="col-3">
+            <button class="btn btn-success w-100" data-value="full">เต็ม</button>
+        </div>
+    </div>
+
+    <div class="row g-2 mt-2">
+      <div class="col-3 ms-auto align-self-end">
+        <button type="button" class="btn btn-primary w-100" id="calculateButton">คำนวณ</button>
       </div>
+
+
+    
+    <!-- <button type="button" class="btn btn-primary w-100" id="paymentButton">ดำเนินการต่อ</button> -->
+
+        <!-- <div class="col-3">
+            <button class="btn btn-danger w-100" data-value="AC">AC</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-warning w-100" data-value="DEL">DEL</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-danger w-100" data-value="%">%</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-danger w-100" data-value="/">/</button>
+        </div> -->
+    </div>
+
+    
+</div>
+
+
+
+
+</div>
+</div>
+</div>
 
 <!-- </div> -->
 
@@ -937,7 +1010,7 @@ function refreshPage(btn_clear){
 
 
 
-
+//แก้ไข
 document.addEventListener('DOMContentLoaded', function() {
     var modal = document.getElementById('exampleModal');
     var priceContainer = modal.querySelector('#price-display');
@@ -1034,7 +1107,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-
+//แก้ไข
 // ฟังก์ชันเพื่อเพิ่มรายการใหม่ในตาราง
 document.getElementById('add-to-order-button').addEventListener('click', function() {
     let quantity = parseInt(quantityInput.value);
@@ -1055,7 +1128,7 @@ document.getElementById('add-to-order-button').addEventListener('click', functio
         existingRow.querySelector('.quantity').textContent = newQuantity;
 
         let existingPrice = parseFloat(existingRow.querySelector('.price').textContent.replace(/[^0-9.-]+/g, ""));
-        let newPrice = (existingPrice / existingQuantity) * newQuantity;
+        let newPrice = pricePerUnit * newQuantity; // คำนวณราคาที่ถูกต้อง
         existingRow.querySelector('.price').textContent = newPrice.toLocaleString();
     } else {
         // ถ้าไม่มีสินค้านี้ในตาราง
@@ -1073,7 +1146,7 @@ document.getElementById('add-to-order-button').addEventListener('click', functio
         orderList.appendChild(newRow);
     }
 
-    updateTotalPrice();
+    updateTotalPrice(); // อัปเดตราคารวม
 
     // เก็บรายการสินค้าลงใน Local Storage
     saveOrderList();
@@ -1081,6 +1154,9 @@ document.getElementById('add-to-order-button').addEventListener('click', functio
     // รีเฟรชหน้า
     window.location.reload();  // รีเฟรชหน้า sale.php
 });
+
+
+
 
 // ฟังก์ชันเพื่อเก็บรายการสินค้าลงใน Local Storage
 function saveOrderList() {
@@ -1149,8 +1225,8 @@ function updateTotalPrice() {
         total += price;
     }
 
-    document.getElementById('total-price').textContent = total.toLocaleString();
-}
+    document.getElementById('total-price').textContent = total.toLocaleString() + " บาท";
+  }
 
 document.getElementById('pay-button').addEventListener('click', function(event) {
     event.preventDefault(); // ป้องกันการรีเฟรชหน้า
@@ -1216,44 +1292,80 @@ document.getElementById('paymentButton').addEventListener('click', function() {
 function calculateTotalPrice() {
     let totalPrice = 0;
     let rows = document.querySelectorAll('#order-list tr');
-
     rows.forEach(row => {
         let quantity = parseInt(row.querySelector('.quantity').textContent);
         let price = parseFloat(row.querySelector('.price').textContent.replace(/[^0-9.-]+/g, ""));
-        totalPrice += price;
+        totalPrice += price; // คำนวณราคารวมโดยไม่ต้องคูณกับจำนวน
     });
-
-    return totalPrice; // ส่งคืนราคารวม
+    return totalPrice;
 }
 
-// ฟังก์ชันที่เรียกเมื่อเลือกวิธีการชำระเงิน
-document.getElementById('paymentMethod').addEventListener('change', function() {
-    var selectedValue = this.value;
-    var qrCodeContainer = document.getElementById('qrCodeContainer');
-    var qrCodeImage = document.getElementById('qrCodeImage');
-    var calContainer = document.getElementById('calContainer');
+// ฟังก์ชันคำนวณเงินทอนเมื่อกดปุ่ม "คำนวณ"
+function calculateChange() {
+    const display = document.querySelector(".display");
+    let totalPrice = calculateTotalPrice();
+    let receivedAmount = parseFloat(display.value.replace(/,/g, '').trim()); // ลบจุลภาคและช่องว่างก่อนแปลงเป็นเลข
 
-    if (selectedValue == '2') { // 2 คือ paymethod_id ของ PromtPay
-        var totalPrice = calculateTotalPrice().toFixed(2); // คำนวณราคารวมและรูปแบบทศนิยมสองตำแหน่ง
-        qrCodeImage.src = `https://promptpay.io/0955426971/${totalPrice}.png?filename=QRCode_${totalPrice}.png`; // ใช้ราคารวมเป็นชื่อไฟล์
-        qrCodeContainer.style.display = 'block'; // แสดง QR Code
-        calContainer.style.display = 'none'; // ซ่อน Calculator Container
-    } else if (selectedValue == '1') { // 1 คือ paymethod_id ของ Cash
-        qrCodeContainer.style.display = 'none'; // ซ่อน QR Code
-        calContainer.style.display = 'block'; // แสดง Calculator Container
+    console.log(`Total Price: ${totalPrice}`);
+    console.log(`Received Amount: ${receivedAmount}`);
+
+    // ตรวจสอบว่าจำนวนเงินที่ได้รับถูกต้องหรือไม่
+    if (isNaN(receivedAmount) || receivedAmount < 0) {
+        alert("กรุณาใส่จำนวนเงินที่ถูกต้อง");
+        display.value = '';
+        return;
+    }
+
+    let change = receivedAmount - totalPrice; // คำนวณเงินทอน
+    console.log(`Change: ${change}`); // แสดงค่าเงินทอนใน console
+
+    if (change < 0) {
+        alert("จำนวนเงินที่ได้รับไม่เพียงพอสำหรับการชำระเงิน");
+        display.value = '';
     } else {
-        qrCodeContainer.style.display = 'none'; // ซ่อน QR Code
-        calContainer.style.display = 'none'; // ซ่อน Calculator Container
+        display.value = `ยอดเงินทอน: ${formatNumber(change.toFixed(2))}`; // แสดงข้อความยอดเงินทอนในรูปแบบฟอร์แมต
+    }
+}
+
+document.getElementById('paymentMethod').addEventListener('change', function() {
+    const selectedValue = this.value;
+    const qrCodeContainer = document.getElementById('qrCodeContainer');
+    const qrCodeImage = document.getElementById('qrCodeImage');
+    const calContainer = document.getElementById('calContainer');
+    const display = document.querySelector(".display");
+
+    // แสดง/ซ่อน QR Code หรือเครื่องคิดเลขตามวิธีการชำระเงิน
+    if (selectedValue === '2') {
+        const totalPrice = calculateTotalPrice().toFixed(2); // ใช้ฟังก์ชันคำนวณราคาทั้งหมด
+        qrCodeImage.src = `https://promptpay.io/0955426971/${totalPrice}.png?filename=QRCode_${totalPrice}.png`;
+        qrCodeContainer.style.display = 'block';
+        calContainer.style.display = 'none';
+    } else if (selectedValue === '1') {
+        qrCodeContainer.style.display = 'none';
+        calContainer.style.display = 'block';
+
+        display.value = '0'; // รีเซ็ตค่าหน้าจอเครื่องคิดเลข
+        setupCalculator(display); // เรียกใช้ฟังก์ชันตั้งค่าเครื่องคิดเลข
+    } else {
+        qrCodeContainer.style.display = 'none';
+        calContainer.style.display = 'none';
     }
 });
 
-// ฟังก์ชันที่เรียกเมื่อปิดหรือออกจาก modal
-document.getElementById('paymentModal').addEventListener('hide.bs.modal', function() {
-    document.getElementById('paymentMethod').value = '1'; // ตั้งค่า select เป็น id 1
-    document.getElementById('qrCodeImage').src = ''; // เคลียร์ QR Code
-    document.getElementById('qrCodeContainer').style.display = 'none'; // ซ่อน QR Code
-    document.getElementById('calContainer').style.display = 'block'; // แสดง Calculator Container
-});
+
+function calculateTotalPrice() {
+    let totalPrice = 0;
+    let rows = document.querySelectorAll('#order-list tr');
+    rows.forEach(row => {
+        let quantity = parseInt(row.querySelector('.quantity').textContent);
+        let price = parseFloat(row.querySelector('.price').textContent.replace(/[^0-9.-]+/g, ""));
+        totalPrice += price; // ใช้ราคาที่ถูกต้อง
+    });
+    return totalPrice; // คืนค่าราคาที่ถูกต้อง
+}
+
+
+
 
 // ฟังก์ชันคำนวณราคารวม (ต้องสร้างฟังก์ชันนี้ให้ทำงานได้ตามต้องการ)
 

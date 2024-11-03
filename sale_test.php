@@ -876,7 +876,7 @@ body {
 
 
 
-<div class="modal" tabindex="-1">
+<!-- <div class="modal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -892,7 +892,7 @@ body {
       </div>
     </div>
   </div>
-</div>
+</div> -->
 
 
 
@@ -1416,84 +1416,7 @@ function setupCalculator(display) {
     // ฟังก์ชันสำหรับคำนวณเงินทอน
     document.getElementById("calculateButton").addEventListener("click", calculateChange);
 }
-
-
-
-
-
-
-
-
-
 });
-
-
-
-
-
-
-
-// let display = document.getElementById('display');
-//         let totalDisplay = document.getElementById('totalDisplay');
-//         let actionButton = document.getElementById('actionButton');
-//         let total = 0;
-//         let isPaymentMode = false;
-
-//         function addNumber(num) {
-//             if (display.value === '0' && num !== '.') {
-//                 display.value = num;
-//             } else {
-//                 display.value += num;
-//             }
-//         }
-
-//         function deleteLastChar() {
-//             if (display.value.length === 1) {
-//                 display.value = '0';
-//             } else {
-//                 display.value = display.value.slice(0, -1);
-//             }
-//         }
-
-//         function handleAction() {
-//             if (!isPaymentMode) {
-//                 เมื่อกดปุ่ม "เต็ม"
-//                 total = parseFloat(display.value);
-//                 totalDisplay.textContent = `ยอดที่ต้องชำระ: ${total.toFixed(2)} บาท`;
-//                 display.value = '0';
-//                 actionButton.textContent = 'คำนวณ';
-//                 isPaymentMode = true;
-//             } else {
-//                 เมื่อกดปุ่ม "คำนวณ"
-//                 let payment = parseFloat(display.value);
-//                 let change = payment - total;
-                
-//                 if (change >= 0) {
-//                     display.value = change.toFixed(2);
-//                     totalDisplay.textContent = `เงินทอน: ${change.toFixed(2)} บาท`;
-//                 } else {
-//                     display.value = 'ยอดเงินไม่พอ';
-//                     setTimeout(() => {
-//                         display.value = payment.toFixed(2);
-//                     }, 1000);
-//                 }
-                
-//                 actionButton.textContent = 'เต็ม';
-//                 isPaymentMode = false;
-//             }
-//         }
-
-// เพิ่ม listener ให้กับปุ่มปิด modal
-// document.getElementById('closeModalButton').addEventListener('click', function() {
-//   document.getElementById('paymentMethod').value = '2'; // ตั้งค่า select เป็น id 1
-//     document.getElementById('qrCodeImage').src = ''; // เคลียร์ QR Code
-//     document.getElementById('qrCodeContainer').style.display = 'none'; // ซ่อน QR Code
-//     document.getElementById('calContainer').style.display = 'block'; // แสดง Calculator Container
-
-//     const display = document.querySelector(".display");
-//     display.value = ''; // เคลียร์ display เมื่อปิด modal
-// });
-
 
 
 

@@ -715,7 +715,8 @@ body {
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="paymentModalLabel">การชำระเงิน</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- ปุ่มปิด modal -->
+<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="window.location.reload();"></button>
       </div>
 
       <div class="modal-body">
@@ -745,67 +746,108 @@ body {
         <div id="calContainer" style="display: none;">
     <div class="card">
         <div class="card-body">
-            <!-- <h5 class="card-title text-center">เครื่องคิดเลข</h5> -->
-            <input class="form-control text-end fs-4 mb-3" type="text" id="result" readonly value="0">
+            <div class="mb-3">
+            <input type="text" class="form-control text-end fs-4 mb-3 display" value="0" disabled />
+                <div id="totalDisplay" class="text-end mt-1"></div>
+            </div>
 
-            <div class="row g-2">
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('7')">7</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('8')">8</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('9')">9</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('1000')">1000</button>
-                </div>
-            </div>
-            <div class="row g-2 mb-2">
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('4')">4</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('5')">5</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('6')">6</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('500')">500</button>
-                </div>
-            </div>
-            <div class="row g-2 mb-2">
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('1')">1</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('2')">2</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('3')">3</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('100')">100</button>
-                </div>
-            </div>
-            <div class="row g-2">
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('.')">.</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-outline-secondary w-100" onclick="addToResult('0')">0</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-danger w-100" onclick="deleteLastChar()">ลบ</button>
-                </div>
-                <div class="col">
-                    <button class="btn btn-success w-100" onclick="calculateTotal()">เต็ม</button>
-                </div>
-            </div>
+
+            <div class="container mt-4">
+
+    <div class="row g-2 mt-2">
+        <div class="col-3">
+            <button class="btn btn-outline-secondary w-100" data-value="7">7</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-outline-secondary w-100" data-value="8">8</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-outline-secondary w-100" data-value="9">9</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-info w-100" data-value="1000">1,000</button>
         </div>
     </div>
+
+    <div class="row g-2 mt-2">
+        <div class="col-3">
+            <button class="btn btn-outline-secondary w-100" data-value="4">4</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-outline-secondary w-100" data-value="5">5</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-outline-secondary w-100" data-value="6">6</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-info w-100" data-value="500">500</button>
+        </div>
+    </div>
+
+    <div class="row g-2 mt-2">
+        <div class="col-3">
+            <button class="btn btn-outline-secondary w-100" data-value="1">1</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-outline-secondary w-100" data-value="2">2</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-outline-secondary w-100" data-value="3">3</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-info w-100" data-value="100">100</button>
+        </div>
+    </div>
+
+    <div class="row g-2 mt-2">
+        <div class="col-3">
+          <button class="btn btn-outline-secondary w-100" data-value=".">.</button>
+            <!-- <button class="btn btn-outline-secondary w-100" data-value="0">0</button> -->
+        </div>
+        <div class="col-3">
+          <button class="btn btn-outline-secondary w-100" data-value="0">0</button>
+            <!-- <button class="btn btn-outline-secondary w-100" data-value="00">00</button> -->
+        </div>
+        <div class="col-3">
+          <button class="btn btn-danger w-100" data-value="DEL">DEL</button>
+          <!-- <button class="btn btn-outline-secondary w-100" data-value=".">.</button> -->
+        </div>
+        <div class="col-3">
+            <button class="btn btn-success w-100" data-value="full">เต็ม</button>
+        </div>
+    </div>
+
+    <div class="row g-2 mt-2">
+      <div class="col-3 ms-auto align-self-end">
+        <button type="button" class="btn btn-primary w-100" id="calculateButton">คำนวณ</button>
+      </div>
+
+
+    
+    <!-- <button type="button" class="btn btn-primary w-100" id="paymentButton">ดำเนินการต่อ</button> -->
+
+        <!-- <div class="col-3">
+            <button class="btn btn-danger w-100" data-value="AC">AC</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-warning w-100" data-value="DEL">DEL</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-danger w-100" data-value="%">%</button>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-danger w-100" data-value="/">/</button>
+        </div> -->
+    </div>
+
+    
+</div>
+
+
+
+
+</div>
+</div>
 </div>
 
 <!-- </div> -->
@@ -968,7 +1010,7 @@ function refreshPage(btn_clear){
 
 
 
-
+//แก้ไข
 document.addEventListener('DOMContentLoaded', function() {
     var modal = document.getElementById('exampleModal');
     var priceContainer = modal.querySelector('#price-display');
@@ -1065,7 +1107,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-
+//แก้ไข
 // ฟังก์ชันเพื่อเพิ่มรายการใหม่ในตาราง
 document.getElementById('add-to-order-button').addEventListener('click', function() {
     let quantity = parseInt(quantityInput.value);
@@ -1112,6 +1154,9 @@ document.getElementById('add-to-order-button').addEventListener('click', functio
     // รีเฟรชหน้า
     window.location.reload();  // รีเฟรชหน้า sale.php
 });
+
+
+
 
 // ฟังก์ชันเพื่อเก็บรายการสินค้าลงใน Local Storage
 function saveOrderList() {
@@ -1247,45 +1292,102 @@ document.getElementById('paymentButton').addEventListener('click', function() {
 function calculateTotalPrice() {
     let totalPrice = 0;
     let rows = document.querySelectorAll('#order-list tr');
-
     rows.forEach(row => {
         let quantity = parseInt(row.querySelector('.quantity').textContent);
         let price = parseFloat(row.querySelector('.price').textContent.replace(/[^0-9.-]+/g, ""));
-        totalPrice += price;
+        totalPrice += quantity * price;
     });
-
-    return totalPrice; // ส่งคืนราคารวม
+    return totalPrice;
 }
+
+// ฟังก์ชันสำหรับฟอร์แมตตัวเลข
+function formatNumber(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+// ฟังก์ชันคำนวณเงินทอนเมื่อกดปุ่ม "คำนวณ"
+function calculateChange() {
+    const display = document.querySelector(".display");
+    let totalPrice = calculateTotalPrice();
+    let receivedAmount = parseFloat(display.value.replace(/,/g, '').trim()); // ลบจุลภาคและช่องว่างก่อนแปลงเป็นเลข
+
+    console.log(`Total Price: ${totalPrice}`);
+    console.log(`Received Amount: ${receivedAmount}`);
+
+    // ตรวจสอบว่าจำนวนเงินที่ได้รับถูกต้องหรือไม่
+    if (isNaN(receivedAmount) || receivedAmount < 0) {
+        alert("กรุณาใส่จำนวนเงินที่ถูกต้อง");
+        display.value = '';
+        return;
+    }
+
+    let change = receivedAmount - totalPrice; // คำนวณเงินทอน
+    console.log(`Change: ${change}`); // แสดงค่าเงินทอนใน console
+
+    if (change < 0) {
+        alert("จำนวนเงินที่ได้รับไม่เพียงพอสำหรับการชำระเงิน");
+        display.value = '';
+    } else {
+        display.value = `ยอดเงินทอน: ${formatNumber(change.toFixed(2))}`; // แสดงข้อความยอดเงินทอนในรูปแบบฟอร์แมต
+    }
+}
+
 
 // ฟังก์ชันที่เรียกเมื่อเลือกวิธีการชำระเงิน
 document.getElementById('paymentMethod').addEventListener('change', function() {
-    var selectedValue = this.value;
-    var qrCodeContainer = document.getElementById('qrCodeContainer');
-    var qrCodeImage = document.getElementById('qrCodeImage');
-    var calContainer = document.getElementById('calContainer');
+    const selectedValue = this.value;
+    const qrCodeContainer = document.getElementById('qrCodeContainer');
+    const qrCodeImage = document.getElementById('qrCodeImage');
+    const calContainer = document.getElementById('calContainer');
+    const display = document.querySelector(".display");
 
-    if (selectedValue == '2') { // 2 คือ paymethod_id ของ PromtPay
-        var totalPrice = calculateTotalPrice().toFixed(2); // คำนวณราคารวมและรูปแบบทศนิยมสองตำแหน่ง
-        qrCodeImage.src = `https://promptpay.io/0955426971/${totalPrice}.png?filename=QRCode_${totalPrice}.png`; // ใช้ราคารวมเป็นชื่อไฟล์
-        qrCodeContainer.style.display = 'block'; // แสดง QR Code
-        calContainer.style.display = 'none'; // ซ่อน Calculator Container
-    } else if (selectedValue == '1') { // 1 คือ paymethod_id ของ Cash
-        qrCodeContainer.style.display = 'none'; // ซ่อน QR Code
-        calContainer.style.display = 'block'; // แสดง Calculator Container
+    // แสดง/ซ่อน QR Code หรือเครื่องคิดเลขตามวิธีการชำระเงิน
+    if (selectedValue === '2') {
+        const totalPrice = calculateTotalPrice().toFixed(2);
+        qrCodeImage.src = `https://promptpay.io/0955426971/${totalPrice}.png?filename=QRCode_${totalPrice}.png`;
+        qrCodeContainer.style.display = 'block';
+        calContainer.style.display = 'none';
+    } else if (selectedValue === '1') {
+        qrCodeContainer.style.display = 'none';
+        calContainer.style.display = 'block';
+
+        display.value = '0'; // รีเซ็ตค่าหน้าจอเครื่องคิดเลข
+        setupCalculator(display); // เรียกใช้ฟังก์ชันตั้งค่าเครื่องคิดเลข
     } else {
-        qrCodeContainer.style.display = 'none'; // ซ่อน QR Code
-        calContainer.style.display = 'none'; // ซ่อน Calculator Container
+        qrCodeContainer.style.display = 'none';
+        calContainer.style.display = 'none';
     }
 });
 
-// ฟังก์ชันที่เรียกเมื่อปิดหรือออกจาก modal
-document.getElementById('paymentModal').addEventListener('hide.bs.modal', function() {
-    document.getElementById('paymentMethod').value = '1'; // ตั้งค่า select เป็น id 1
-    document.getElementById('qrCodeImage').src = ''; // เคลียร์ QR Code
-    document.getElementById('qrCodeContainer').style.display = 'none'; // ซ่อน QR Code
-    document.getElementById('calContainer').style.display = 'block'; // แสดง Calculator Container
-});
+// ฟังก์ชันตั้งค่าเครื่องคิดเลข
+function setupCalculator(display) {
+    const buttons = document.querySelectorAll("button");
+    let output = "";
+    const totalPrice = calculateTotalPrice().toFixed(2);
 
+    const calculate = (btnValue) => {
+        display.focus();
+        if (btnValue === "full") {
+            output = totalPrice; // กรณีต้องการค่าเต็ม
+        } else if (btnValue === "AC") {
+            output = ""; // ล้างหน้าจอ
+        } else if (btnValue === "DEL") {
+            output = output.slice(0, -1); // ลบตัวสุดท้าย
+        } else {
+            // เช็คว่า output ไม่เป็นค่าว่างและไม่สามารถใส่สัญลักษณ์พิเศษได้
+            if (output === "" && ["%", "*", "/", "-", "+", "="].includes(btnValue)) return;
+            output += btnValue; // เพิ่มค่าลงใน output
+        }
+        display.value = formatNumber(output); // แสดงผลลัพธ์ในหน้าจอพร้อมฟอร์แมต
+    };
+
+    buttons.forEach((button) => {
+        button.addEventListener("click", (e) => calculate(e.target.dataset.value));
+    });
+
+    // ฟังก์ชันสำหรับคำนวณเงินทอน
+    document.getElementById("calculateButton").addEventListener("click", calculateChange);
+}
 // ฟังก์ชันคำนวณราคารวม (ต้องสร้างฟังก์ชันนี้ให้ทำงานได้ตามต้องการ)
 
 
