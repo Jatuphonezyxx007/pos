@@ -818,8 +818,8 @@ body {
             <div class="card-body">
               <h6 class="text-white">ยอดขายมากสุดเดือน <?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?></h6>              
               <h2 class="text-end text-white fs-5"><i class="feather icon-repeat float-start"></i><span><?php echo number_format($max_total_sales, decimals:2); ?> บาท</span></h2>
-              <small class="m-b-0">พนักงานขาย<span class="float-end"><?php echo $emp_name . ' ' . $emp_last; ?></span></small>
-              </div>
+              <small class="m-b-0">พนักงานขาย<span class="float-end"><?php echo ($emp_name) ($emp_last); ?></span></small>
+            </div>
           </div>
         </div>
 

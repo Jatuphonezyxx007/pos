@@ -199,26 +199,24 @@ if ($result_total_qty && $result_total_qty->num_rows > 0) {
 
 // Query รวมยอดขายของพนักงานแต่ละคนในเดือนปัจจุบัน
 $sql_max_sales_emp = "
-    SELECT o.emp_id, e.emp_name, e.emp_last, COALESCE(SUM(o.order_total), 0) AS total_sales
+    SELECT o.emp_id, e.emp_name, COALESCE(SUM(o.order_total), 0) AS total_sales
     FROM employees e
     LEFT JOIN orders o ON e.emp_id = o.emp_id 
         AND MONTH(o.order_date) = MONTH(CURRENT_DATE())
         AND YEAR(o.order_date) = YEAR(CURRENT_DATE())
-    GROUP BY e.emp_id, e.emp_name, e.emp_last
+    GROUP BY e.emp_id, e.emp_name
     ORDER BY total_sales DESC
     LIMIT 1";
 
 $result_max_sales_emp = $conn->query($sql_max_sales_emp);
 $max_total_sales = 0;
 $emp_name = 'ไม่มีข้อมูล';
-$emp_last = 'ไม่มีข้อมูล';
 $emp_id = 0;
 
 if ($result_max_sales_emp && $result_max_sales_emp->num_rows > 0) {
     $row_max_sales_emp = $result_max_sales_emp->fetch_assoc();
     $max_total_sales = $row_max_sales_emp['total_sales'];
     $emp_name = $row_max_sales_emp['emp_name'];
-    $emp_last = $row_max_sales_emp['emp_last'];
     $emp_id = $row_max_sales_emp['emp_id'];
 }
 
@@ -809,7 +807,7 @@ body {
         <div class="card-body">
             <h6 class="text-white">จำนวนสินค้าพร้อมขาย</h6>
             <h2 class="text-end text-white fs-5"><i class="feather icon-tag float-start"></i><span><?php echo number_format($total_qty); ?> ชิ้น</span></h2>
-            <small class="m-b-0">สินค้าที่ขายเดือน <?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?><span class="float-end"><?php echo ($total_items_sold); ?> ชิ้น</span></small>
+            <small class="m-b-0">สินค้าที่ขายเดือน<?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?><span class="float-end"><?php echo ($total_items_sold); ?> ชิ้น</span></small>
         </div>
     </div>
 </div>
@@ -818,8 +816,8 @@ body {
             <div class="card-body">
               <h6 class="text-white">ยอดขายมากสุดเดือน <?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?></h6>              
               <h2 class="text-end text-white fs-5"><i class="feather icon-repeat float-start"></i><span><?php echo number_format($max_total_sales, decimals:2); ?> บาท</span></h2>
-              <small class="m-b-0">พนักงานขาย<span class="float-end"><?php echo $emp_name . ' ' . $emp_last; ?></span></small>
-              </div>
+              <small class="m-b-0">พนักงานขาย<span class="float-end"><?php echo ($emp_name); ?></span></small>
+            </div>
           </div>
         </div>
 
@@ -828,7 +826,7 @@ body {
             <div class="card-body">
               <h6 class="text-white">ยอดขายเฉลี่ยในเดือน <?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?></h6>
               <h2 class="text-end text-white fs-5"><i class="feather icon-award float-start"></i><span><?php echo number_format($average_sales, decimals:2); ?> บาท</span></h2>
-              <small class="m-b-0">จำนวนขายเดือน <?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?><span class="float-end"><?php echo ($total_bills); ?> บิล</span></small>
+              <small class="m-b-0">จำนวนขายเดือน<?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?><span class="float-end"><?php echo ($total_bills); ?> บิล</span></small>
             </div>
           </div>
         </div>

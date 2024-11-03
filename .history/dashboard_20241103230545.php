@@ -32,42 +32,39 @@ $selected_paymethod_id = isset($_POST['paymethod_id']) ? $_POST['paymethod_id'] 
 $selected_type_id = isset($_POST['type_id']) ? $_POST['type_id'] : 0;
 $selected_date = isset($_POST['selected_date']) ? $_POST['selected_date'] : '';
 
-// ตรวจสอบว่ามีการกดปุ่มค้นหาหรือไม่
-$is_search_button_clicked = isset($_POST['search']); // ตรวจสอบการกดปุ่มค้นหา
-
-// กำหนดเดือนและปีปัจจุบันเป็นค่าเริ่มต้น
-$current_month = date('m');
-$current_year = date('Y');
-
-// แยกปีและเดือนจากวันที่ที่เลือก
-if (!empty($selected_date)) {
+// ถ้าไม่มีวันที่เลือก ให้ใช้เดือนและปีปัจจุบัน
+if (empty($selected_date)) {
+    $current_month = date('m');
+    $current_year = date('Y');
+} else {
+    // แยกปีและเดือนจากวันที่ที่เลือก
     $selected_month = date('m', strtotime($selected_date));
     $selected_year = date('Y', strtotime($selected_date));
 }
 
-// เริ่มสร้าง SQL เพื่อดึงข้อมูลยอดขายรวมต่อเดือน
+// เริ่มสร้าง SQL เพื่อดึงข้อมูลยอดขาย
 $sql = "
     SELECT 
         e.emp_id,
         e.emp_name,
-        DATE_FORMAT(o.order_date, '%Y-%m') AS formatted_month,  -- แปลงวันที่เป็นรูปแบบปี-เดือน
+        DATE_FORMAT(o.order_date, '%d-%m-%Y') AS formatted_date,
         COALESCE(SUM(o.order_total), 0) AS total_sales
     FROM employees e
-    LEFT JOIN orders o ON e.emp_id = o.emp_id";
+    LEFT JOIN orders o ON e.emp_id = o.emp_id AND (";
 
-// ตรวจสอบเงื่อนไขวันที่ (ถ้าไม่กดปุ่มค้นหา ใช้เดือน/ปีปัจจุบัน)
-if (!$is_search_button_clicked && empty($selected_date)) {
-    $sql .= " AND MONTH(o.order_date) = $current_month AND YEAR(o.order_date) = $current_year";
-} else if (!empty($selected_date)) {
-    $sql .= " AND MONTH(o.order_date) = $selected_month AND YEAR(o.order_date) = $selected_year";
+// เพิ่มเงื่อนไขวันที่
+if (!empty($selected_date)) {
+    $sql .= " MONTH(o.order_date) = $selected_month AND YEAR(o.order_date) = $selected_year";
+} else {
+    $sql .= " MONTH(o.order_date) = $current_month AND YEAR(o.order_date) = $current_year";
 }
 
-$sql .= "
+$sql .= ")
     LEFT JOIN orders_detail od ON o.order_id = od.order_id
     LEFT JOIN products p ON od.p_id = p.id
     WHERE 1=1";
 
-// เพิ่มเงื่อนไขตามตัวเลือกจากฟอร์ม
+// เงื่อนไขตามตัวเลือกจากฟอร์ม
 if ($selected_emp_id != 0) {
     $sql .= " AND e.emp_id = $selected_emp_id";
 }
@@ -80,8 +77,8 @@ if ($selected_type_id != 0) {
     $sql .= " AND p.type_id = $selected_type_id";
 }
 
-// จัดกลุ่มตามพนักงานและเดือน
-$sql .= " GROUP BY e.emp_id, formatted_month ORDER BY formatted_month, e.emp_id";
+// จัดกลุ่มตามพนักงานและวันที่
+$sql .= " GROUP BY e.emp_id, formatted_date ORDER BY formatted_date, e.emp_id";
 
 // เตรียมและรัน SQL
 $stmt = $conn->prepare($sql);
@@ -96,7 +93,7 @@ $employees = [];
 // ตรวจสอบข้อมูลผลลัพธ์
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        $formatted_date = $row['formatted_month'];
+        $formatted_date = $row['formatted_date'];
         
         if (!empty($formatted_date) && !in_array($formatted_date, $dates)) {
             $dates[] = $formatted_date;
@@ -153,8 +150,6 @@ if (empty($sales)) {
     }
 }
 
-// โค้ดที่เหลือสำหรับการดึงข้อมูลเช่นยอดขายทั้งหมด, ยอดขายสูงสุด, และข้อมูลสถิติต่างๆ ไม่จำเป็นต้องแก้ไขจากส่วนนี้
-
 // ดึงยอดขายรวมทั้งหมด
 $sql_total_sales = "SELECT COALESCE(SUM(order_total), 0) AS total_sales FROM orders";
 $result_total_sales = $conn->query($sql_total_sales);
@@ -199,49 +194,47 @@ if ($result_total_qty && $result_total_qty->num_rows > 0) {
 
 // Query รวมยอดขายของพนักงานแต่ละคนในเดือนปัจจุบัน
 $sql_max_sales_emp = "
-    SELECT o.emp_id, e.emp_name, e.emp_last, COALESCE(SUM(o.order_total), 0) AS total_sales
+    SELECT o.emp_id, e.emp_name, COALESCE(SUM(o.order_total), 0) AS total_sales
     FROM employees e
     LEFT JOIN orders o ON e.emp_id = o.emp_id 
         AND MONTH(o.order_date) = MONTH(CURRENT_DATE())
         AND YEAR(o.order_date) = YEAR(CURRENT_DATE())
-    GROUP BY e.emp_id, e.emp_name, e.emp_last
+    GROUP BY e.emp_id, e.emp_name
     ORDER BY total_sales DESC
     LIMIT 1";
 
 $result_max_sales_emp = $conn->query($sql_max_sales_emp);
 $max_total_sales = 0;
 $emp_name = 'ไม่มีข้อมูล';
-$emp_last = 'ไม่มีข้อมูล';
 $emp_id = 0;
 
 if ($result_max_sales_emp && $result_max_sales_emp->num_rows > 0) {
     $row_max_sales_emp = $result_max_sales_emp->fetch_assoc();
     $max_total_sales = $row_max_sales_emp['total_sales'];
     $emp_name = $row_max_sales_emp['emp_name'];
-    $emp_last = $row_max_sales_emp['emp_last'];
     $emp_id = $row_max_sales_emp['emp_id'];
 }
 
-// คำนวณยอดขายรวมและจำนวนบิลทั้งหมดในเดือนปัจจุบัน
+// คำนวณยอดขายรวมของเดือนปัจจุบัน
 $sql_monthly_sales = "
     SELECT COALESCE(SUM(order_total), 0) AS total_sales,
-           COALESCE(COUNT(order_id), 0) AS total_bills
+           COALESCE(COUNT(DISTINCT DATE(order_date)), 0) AS total_days
     FROM orders
     WHERE MONTH(order_date) = $current_month
     AND YEAR(order_date) = $current_year";
 
 $result_monthly_sales = $conn->query($sql_monthly_sales);
 $total_sales = 0;
-$total_bills = 0;
+$total_days = 0;
 
 if ($result_monthly_sales && $result_monthly_sales->num_rows > 0) {
     $row_monthly_sales = $result_monthly_sales->fetch_assoc();
     $total_sales = $row_monthly_sales['total_sales'];
-    $total_bills = $row_monthly_sales['total_bills'];
+    $total_days = $row_monthly_sales['total_days'];
 }
 
-// คำนวณยอดขายเฉลี่ยต่อบิล
-$average_sales = ($total_bills > 0) ? $total_sales / $total_bills : 0;
+// คำนวณยอดขายเฉลี่ย
+$average_sales = ($total_days > 0) ? $total_sales / $total_days : 0;
 
 // ดึงจำนวนบิลและสินค้าที่ขายในเดือนปัจจุบัน
 $sql_monthly_stats = "
@@ -268,18 +261,18 @@ if ($result && $result->num_rows > 0) {
 
 // Array ชื่อเดือนภาษาไทย
 $thai_months = [
-    '01' => 'ม.ค.',
-    '02' => 'ก.พ.',
-    '03' => 'มี.ค.',
-    '04' => 'เม.ย.',
-    '05' => 'พ.ค.',
-    '06' => 'มิ.ย.',
-    '07' => 'ก.ค.',
-    '08' => 'ส.ค.',
-    '09' => 'ก.ย.',
-    '10' => 'ต.ค.',
-    '11' => 'พ.ย.',
-    '12' => 'ธ.ค.'
+    '01' => 'มกราคม',
+    '02' => 'กุมภาพันธ์',
+    '03' => 'มีนาคม',
+    '04' => 'เมษายน',
+    '05' => 'พฤษภาคม',
+    '06' => 'มิถุนายน',
+    '07' => 'กรกฎาคม',
+    '08' => 'สิงหาคม',
+    '09' => 'กันยายน',
+    '10' => 'ตุลาคม',
+    '11' => 'พฤศจิกายน',
+    '12' => 'ธันวาคม'
 ];
 
 // ดึงเดือนปัจจุบัน
@@ -809,26 +802,26 @@ body {
         <div class="card-body">
             <h6 class="text-white">จำนวนสินค้าพร้อมขาย</h6>
             <h2 class="text-end text-white fs-5"><i class="feather icon-tag float-start"></i><span><?php echo number_format($total_qty); ?> ชิ้น</span></h2>
-            <small class="m-b-0">สินค้าที่ขายเดือน <?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?><span class="float-end"><?php echo ($total_items_sold); ?> ชิ้น</span></small>
+            <small class="m-b-0">สินค้าที่ขายเดือน<?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?><span class="float-end"><?php echo ($total_items_sold); ?> ชิ้น</span></small>
         </div>
     </div>
 </div>
         <div class="col-md-6 col-xl-3">
           <div class="card bg-grd-warning order-card">
             <div class="card-body">
-              <h6 class="text-white">ยอดขายมากสุดเดือน <?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?></h6>              
+              <h6 class="text-white">ยอดขายมากสุดเดือน<?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?></h6>              
               <h2 class="text-end text-white fs-5"><i class="feather icon-repeat float-start"></i><span><?php echo number_format($max_total_sales, decimals:2); ?> บาท</span></h2>
-              <small class="m-b-0">พนักงานขาย<span class="float-end"><?php echo $emp_name . ' ' . $emp_last; ?></span></small>
-              </div>
+              <small class="m-b-0">พนักงานขาย<span class="float-end"><?php echo ($emp_name); ?></span></small>
+            </div>
           </div>
         </div>
 
         <div class="col-md-6 col-xl-3">
           <div class="card bg-grd-primary order-card">
             <div class="card-body">
-              <h6 class="text-white">ยอดขายเฉลี่ยในเดือน <?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?></h6>
+              <h6 class="text-white">ยอดขายเฉลี่ยในเดือน<?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?></h6>
               <h2 class="text-end text-white fs-5"><i class="feather icon-award float-start"></i><span><?php echo number_format($average_sales, decimals:2); ?> บาท</span></h2>
-              <small class="m-b-0">จำนวนขายเดือน <?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?><span class="float-end"><?php echo ($total_bills); ?> บิล</span></small>
+              <small class="m-b-0">จำนวนขายเดือน<?php echo htmlspecialchars($month_message, ENT_QUOTES, 'UTF-8'); ?><span class="float-end"><?php echo ($total_bills); ?> บิล</span></small>
             </div>
           </div>
         </div>
