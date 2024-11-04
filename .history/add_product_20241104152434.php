@@ -26,62 +26,31 @@ if (!$result) {
 }
 
 
+// ตัวแปรเพื่อเก็บข้อความผลลัพธ์การตรวจสอบ
+$barcode_message = '';
+$barcode_color = '';
 
-// //บันทึกลงฐานข้อมูล
-// if (isset($_POST['submit'])) {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_POST['check_barcode'])) {
+        // รับค่าจากฟอร์ม
+        $barcode = $conn->real_escape_string($_POST['p_barcode']);
 
-//   // รับค่าจากฟอร์ม
-//   $barcode = $_POST['p_barcode'];
-//   $name = $_POST['p_name'];
-//   $unit = $_POST['unit_product'];
-//   $new_type = $_POST['new_type']; // ตัวแปรสำหรับประเภทใหม่
-//   $img_file = $_FILES['p_pics']['name']; // ชื่อไฟล์ภาพ
-//   $target_dir = "pos/assets/images/Products_2/";
-//   $target_file = $target_dir . basename($img_file);
-  
-//   // เช็คว่ามีการกรอกประเภทใหม่หรือไม่
-//   if (!empty($new_type)) {
-//       // เพิ่มประเภทใหม่ในตาราง type
-//       $stmt = $conn->prepare("INSERT INTO type (type_name) VALUES (?)");
-//       $stmt->bind_param("s", $new_type);
-//       $stmt->execute();
-//       $type_id = $stmt->insert_id; // รับค่า type_id ที่สร้างขึ้นใหม่
-//       $stmt->close();
-//   } else {
-//       // ถ้ามีการเลือกประเภทที่มีอยู่ ให้รับค่า type_id จาก p_type
-//       $type_id = $_POST['p_type'];
-//   }
+        // ค้นหา barcode ในฐานข้อมูล
+        $sql = "SELECT * FROM products WHERE barcode = '$barcode'";
+        $result = $conn->query($sql);
 
-//   // บันทึกข้อมูลลงในตาราง products
-//   $stmt = $conn->prepare("INSERT INTO products (barcode, name, img, unit, type_id) VALUES (?, ?, ?, ?, ?)");
-//   $stmt->bind_param("ssssi", $barcode, $name, $img_file, $unit, $type_id);
-//   $stmt->execute();
-//   $product_id = $stmt->insert_id; // รับ id ของสินค้าใหม่
-//   $stmt->close();
+        if ($result->num_rows > 0) {
+            // barcode ซ้ำ
+            $barcode_message = 'หมายเลข barcode นี้มีอยู่ในระบบแล้ว';
+            $barcode_color = 'red'; // สีแดง
+        } else {
+            // barcode ไม่ซ้ำ
+            $barcode_message = 'หมายเลข barcode นี้สามารถใช้ได้';
+            $barcode_color = 'green'; // สีเขียว
+        }
+    }
+}
 
-//   // อัปโหลดภาพ
-//   move_uploaded_file($_FILES['p_pics']['tmp_name'], $target_file);
-
-//   // บันทึกข้อมูลลงในตาราง size
-//   foreach ($_POST['size'] as $size) {
-//       $size_name = $size['size'];
-//       $qty = $size['quantity'];
-//       $re_stock = $size['restock'];
-//       $price = $size['price'];
-
-//       $stmt = $conn->prepare("INSERT INTO size (id, size_name, qty, re_stock, price) VALUES (?, ?, ?, ?, ?)");
-//       $stmt->bind_param("isidd", $product_id, $size_name, $qty, $re_stock, $price);
-//       $stmt->execute();
-//       $stmt->close();
-//   }
-
-//   // ปิดการเชื่อมต่อ
-//   $conn->close();
-
-//   // เปลี่ยนไปยังหน้าจัดการสินค้า
-//   header("Location: product_manage.php");
-//   exit(); // ใช้ exit เพื่อหยุดการประมวลผลเพิ่มเติม
-// }
 
 ?>
 
@@ -563,17 +532,30 @@ body {
               <div class="card">
                 <div class="card-body">
 
-                <form action="save_product.php" method="post" enctype="multipart/form-data">
-                <div class="mb-3">
+                  <form method="post" action="" enctype="multipart/form-data">
+                    <div class="mb-3">
 
-                      <label for="n_product" class="form-label">สแกนรหัสบาร์โค้ด</label>
+                      <!-- <label for="n_product" class="form-label">สแกนรหัสบาร์โค้ด</label>
                       <div class="input-group">
                       <input name="p_barcode" type="text" class="form-control" autofocus required> 
 
-                      <!-- <button class="btn btn-primary">ตรวจสอบ</button> -->
-                      <!-- <span class="input-group-text" id="rs_txtForJs1">0</span> -->
-                      <!-- <span class="input-group-text">/ 100</span> -->
-                      </div>
+                      <button class="btn btn-primary">ตรวจสอบ</button>
+                      </div> -->
+
+                      <div class="mb-3">
+        <label for="n_product" class="form-label">สแกนรหัสบาร์โค้ด</label>
+        <div class="input-group">
+            <input name="p_barcode" type="text" class="form-control" autofocus required>
+            <button type="submit" name="check_barcode" class="btn btn-primary">ตรวจสอบ</button>
+        </div>
+        <!-- แสดงข้อความการตรวจสอบที่นี่ -->
+        <?php if ($barcode_message): ?>
+            <div style="color: <?= $barcode_color ?>; margin-top: 5px;">
+                <?= $barcode_message ?>
+            </div>
+        <?php endif; ?>
+    </div>
+    
                       <br>
 
                     <label for="d_product" class="form-label">ชื่อสินค้า</label>
@@ -602,7 +584,7 @@ body {
                     <div class="row g-2">
                       <div class="col-md">
                         <div class="form-floating">
-                          <input type="text" name="unit_product" class="form-control" id="unit_product" placeholder="ราคา" required>
+                          <input type="text" name="p_price" class="form-control" id="p_product" placeholder="ราคา" required>
                           <label for="floatingInputGrid">ชื่อหน่วยนับ</label>
                         </div>
                       </div>

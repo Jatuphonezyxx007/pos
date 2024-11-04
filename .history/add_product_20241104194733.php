@@ -610,21 +610,16 @@ body {
 
                       <br>
 
-                      <div class="col-md">
-  <div class="form-floating">
-    <select class="form-select" id="type_product" aria-label="type_product" name="p_type" onchange="toggleNewTypeInput(this)">
-      <option value="" selected disabled>เลือกประเภทสินค้า</option>
-      <?php
-      while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-          echo '<option value="' . $row['type_id'] . '">' . $row['type_name'] . '</option>';
-      }
-      ?>
-      <option value="0">ไม่ระบุ</option>
-      <option value="other">อื่นๆ</option>
-    </select>
-    <label for="type_product">ประเภทสินค้า</label>
-  </div>
-</div>
+                      <div>
+        <label for="p_type">Type</label>
+        <select id="p_type" name="p_type">
+            <?php while($row = $result->fetch_assoc()): ?>
+                <option value="<?php echo $row['type_id']; ?>"><?php echo $row['type_name']; ?></option>
+            <?php endwhile; ?>
+            <option value="new">อื่นๆ</option>
+        </select>
+        <input type="text" id="new_type" name="new_type" placeholder="กรอกประเภทใหม่" style="display:none;">
+    </div>
 
 <div class="col-md" id="newTypeInput" style="display: none;">
   <div class="form-floating">

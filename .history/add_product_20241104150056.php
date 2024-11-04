@@ -25,64 +25,6 @@ if (!$result) {
     die("Query failed: " . mysqli_error($conn));
 }
 
-
-
-// //บันทึกลงฐานข้อมูล
-// if (isset($_POST['submit'])) {
-
-//   // รับค่าจากฟอร์ม
-//   $barcode = $_POST['p_barcode'];
-//   $name = $_POST['p_name'];
-//   $unit = $_POST['unit_product'];
-//   $new_type = $_POST['new_type']; // ตัวแปรสำหรับประเภทใหม่
-//   $img_file = $_FILES['p_pics']['name']; // ชื่อไฟล์ภาพ
-//   $target_dir = "pos/assets/images/Products_2/";
-//   $target_file = $target_dir . basename($img_file);
-  
-//   // เช็คว่ามีการกรอกประเภทใหม่หรือไม่
-//   if (!empty($new_type)) {
-//       // เพิ่มประเภทใหม่ในตาราง type
-//       $stmt = $conn->prepare("INSERT INTO type (type_name) VALUES (?)");
-//       $stmt->bind_param("s", $new_type);
-//       $stmt->execute();
-//       $type_id = $stmt->insert_id; // รับค่า type_id ที่สร้างขึ้นใหม่
-//       $stmt->close();
-//   } else {
-//       // ถ้ามีการเลือกประเภทที่มีอยู่ ให้รับค่า type_id จาก p_type
-//       $type_id = $_POST['p_type'];
-//   }
-
-//   // บันทึกข้อมูลลงในตาราง products
-//   $stmt = $conn->prepare("INSERT INTO products (barcode, name, img, unit, type_id) VALUES (?, ?, ?, ?, ?)");
-//   $stmt->bind_param("ssssi", $barcode, $name, $img_file, $unit, $type_id);
-//   $stmt->execute();
-//   $product_id = $stmt->insert_id; // รับ id ของสินค้าใหม่
-//   $stmt->close();
-
-//   // อัปโหลดภาพ
-//   move_uploaded_file($_FILES['p_pics']['tmp_name'], $target_file);
-
-//   // บันทึกข้อมูลลงในตาราง size
-//   foreach ($_POST['size'] as $size) {
-//       $size_name = $size['size'];
-//       $qty = $size['quantity'];
-//       $re_stock = $size['restock'];
-//       $price = $size['price'];
-
-//       $stmt = $conn->prepare("INSERT INTO size (id, size_name, qty, re_stock, price) VALUES (?, ?, ?, ?, ?)");
-//       $stmt->bind_param("isidd", $product_id, $size_name, $qty, $re_stock, $price);
-//       $stmt->execute();
-//       $stmt->close();
-//   }
-
-//   // ปิดการเชื่อมต่อ
-//   $conn->close();
-
-//   // เปลี่ยนไปยังหน้าจัดการสินค้า
-//   header("Location: product_manage.php");
-//   exit(); // ใช้ exit เพื่อหยุดการประมวลผลเพิ่มเติม
-// }
-
 ?>
 
 
@@ -563,14 +505,14 @@ body {
               <div class="card">
                 <div class="card-body">
 
-                <form action="save_product.php" method="post" enctype="multipart/form-data">
-                <div class="mb-3">
+                  <form method="post" action="" enctype="multipart/form-data">
+                    <div class="mb-3">
 
                       <label for="n_product" class="form-label">สแกนรหัสบาร์โค้ด</label>
                       <div class="input-group">
                       <input name="p_barcode" type="text" class="form-control" autofocus required> 
 
-                      <!-- <button class="btn btn-primary">ตรวจสอบ</button> -->
+                      <button class="btn btn-primary">ตรวจสอบ</button>
                       <!-- <span class="input-group-text" id="rs_txtForJs1">0</span> -->
                       <!-- <span class="input-group-text">/ 100</span> -->
                       </div>
@@ -578,48 +520,29 @@ body {
 
                     <label for="d_product" class="form-label">ชื่อสินค้า</label>
                     <input name="p_name" type="text" class="form-control" autofocus required> 
+                    <!-- <label for="detail_product">ชื่อสินค้า</label> -->
                     <br>
 
-                    <!-- <label for="p_product" class="form-label">ราคาสินค้าต่อชิ้น</label>
+                    <label for="p_product" class="form-label">ราคาสินค้าต่อชิ้น</label>
                     <div class="row g-2">
                       <div class="col-md">
                         <div class="form-floating">
                           <input type="text" name="p_price" class="form-control" id="p_product" placeholder="ราคา" required>
                           <label for="floatingInputGrid">ราคา / บาท</label>
                         </div>
-                      </div> -->
-
-
-                      <div class="col-md">
-  <label for="p_size" class="form-label">เพิ่มขนาดสินค้า</label>
-  <div id="sizeContainer"></div>
-  <button type="button" class="btn btn-secondary mt-2" onclick="addSize()">เพิ่มขนาดสินค้า</button>
-</div>
-
-<br>
-
-                      <!-- <label for="p_product" class="form-label">หน่วยนับ</label> -->
-                    <div class="row g-2">
-                      <div class="col-md">
-                        <div class="form-floating">
-                          <input type="text" name="unit_product" class="form-control" id="unit_product" placeholder="ราคา" required>
-                          <label for="floatingInputGrid">ชื่อหน่วยนับ</label>
-                        </div>
                       </div>
-
-
                       <br>
 
                       <div class="col-md">
   <div class="form-floating">
     <select class="form-select" id="type_product" aria-label="type_product" name="p_type" onchange="toggleNewTypeInput(this)">
       <option value="" selected disabled>เลือกประเภทสินค้า</option>
+      <option value="0">ไม่ระบุ</option>
       <?php
       while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
           echo '<option value="' . $row['type_id'] . '">' . $row['type_name'] . '</option>';
       }
       ?>
-      <option value="0">ไม่ระบุ</option>
       <option value="other">อื่นๆ</option>
     </select>
     <label for="type_product">ประเภทสินค้า</label>
@@ -632,6 +555,7 @@ body {
     <label for="new_type">ระบุประเภทสินค้าใหม่</label>
   </div>
 </div>
+
 
                     </div>
                     <br>
@@ -654,7 +578,8 @@ body {
           </div>
         </div>
       </div>
-
+    </div>
+  </div>
 
 
 
@@ -750,72 +675,6 @@ function toggleNewTypeInput(selectElement) {
   const newTypeInput = document.getElementById("newTypeInput");
   newTypeInput.style.display = selectElement.value === "other" ? "block" : "none";
 }
-
-
-
-//เพิ่มขนาด
-  // ตัวแปรนับขนาดสินค้า
-  let sizeCount = 0;
-
-  // ฟังก์ชันเพิ่มขนาดสินค้าใหม่
-  function addSize() {
-    sizeCount++;
-    const container = document.getElementById('sizeContainer');
-
-    // สร้างแถวใหม่สำหรับขนาดสินค้า
-    const row = document.createElement('div');
-    row.classList.add('row', 'g-2', 'mt-3');
-    row.id = `sizeRow${sizeCount}`;
-
-    
-
-    // ฟิลด์ขนาดสินค้า
-    row.innerHTML = `
-      <div class="col-md-3">
-        <input type="text" name="size[${sizeCount}][size]" class="form-control" placeholder="ชื่อขนาดสินค้า" required>
-      </div>
-      <div class="col-md-2">
-        <input type="number" name="size[${sizeCount}][quantity]" class="form-control" placeholder="จำนวน" required>
-      </div>
-      <div class="col-md-3">
-        <input type="number" name="size[${sizeCount}][restock]" class="form-control" placeholder="จุด Restock" required>
-      </div>
-<div class="col-md-3">
-    <input type="text" name="size[${sizeCount}][price]" class="form-control" placeholder="ราคาต่อหน่วย (รวมภาษี)" required oninput="formatPrice(this)">
-</div>
-      <div class="col-md-1">
-        <button type="button" class="btn btn-danger" onclick="removeSize(${sizeCount})">ลบ</button>
-      </div>
-    `;
-
-    container.appendChild(row);
-  }
-
-  // ฟังก์ชันลบขนาดสินค้า
-  function removeSize(index) {
-    const row = document.getElementById(`sizeRow${index}`);
-    row.remove();
-  }
-
-
-    // ฟังก์ชันสำหรับจัดรูปแบบราคา
-    function formatPrice(input) {
-        // ลบอักขระที่ไม่ใช่ตัวเลขและจุด
-        let value = input.value.replace(/[^0-9.]/g, '');
-        
-        // แยกจำนวนเต็มและทศนิยม
-        const parts = value.split('.');
-        // แปลงจำนวนเต็มให้มี , คั่น
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        
-        // ถ้ามีทศนิยม ให้เก็บไว้ แต่ไม่เกิน 2 ตำแหน่ง
-        if (parts[1]) {
-            parts[1] = parts[1].substring(0, 2); // จำกัดทศนิยมที่ 2 ตำแหน่ง
-        }
-        
-        // ตั้งค่ากลับไปยัง input
-        input.value = parts.join('.');
-    }
 
 </script>
 
