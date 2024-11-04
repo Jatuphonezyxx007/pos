@@ -25,51 +25,6 @@ if (empty($img)) {
 
 // สร้าง URL สำหรับรูปภาพ
 $imagePath = "assets/images/emp/" . $aid . "." . $img;
-
-
-// ตรวจสอบว่ามีการส่ง parameter 'role' มาหรือไม่ ถ้ามีก็ใช้ค่านั้น ถ้าไม่มีก็ตั้งค่าเริ่มต้นเป็น 0
-$selected_role_id = isset($_GET['role']) ? $_GET['role'] : 0;
-
-include("connectdb.php");
-$sql = "SELECT * FROM role";
-$result = mysqli_query($conn, $sql);
-
-// ตรวจสอบว่ามีการเลือก role หรือไม่ ถ้ามีก็ใช้ค่านั้น ถ้าไม่มีก็ตั้งค่าเป็น 0
-$selected_role_id = isset($_GET['role']) ? $_GET['role'] : 0;
-
-// กำหนด SQL โดยใช้เงื่อนไขตามที่เลือก
-if ($selected_role_id == 0) {
-    // แสดงพนักงานทั้งหมดเรียงตาม emp_id
-    $sql = "SELECT employees.*, role.role_name,
-                   CASE
-                     WHEN employees.role_id = '001' THEN 'badge bg-danger'
-                     WHEN employees.role_id = '002' THEN 'badge bg-success'
-                     ELSE 'badge bg-primary'
-                   END AS role_class
-            FROM employees
-            INNER JOIN role ON employees.role_id = role.role_id
-            ORDER BY employees.emp_id ASC";
-} else {
-    // แสดงเฉพาะพนักงานที่มี role_id ตามที่เลือก
-    $sql = "SELECT employees.*, role.role_name,
-                   CASE
-                     WHEN employees.role_id = '001' THEN 'badge bg-danger'
-                     WHEN employees.role_id = '002' THEN 'badge bg-success'
-                     ELSE 'badge bg-primary'
-                   END AS role_class
-            FROM employees
-            INNER JOIN role ON employees.role_id = role.role_id
-            WHERE employees.role_id = '$selected_role_id'
-            ORDER BY employees.emp_id ASC";
-}
-
-$rs = mysqli_query($conn, $sql);
-
-if (!$rs) {
-    die("Query failed: " . mysqli_error($conn));
-}
-
-
 ?>
 
 <!DOCTYPE html>
@@ -629,60 +584,76 @@ body {
             <div class="row align-items-center">
 
 
-            <div class="col-md-12">
-  <div class="page-header-title border-bottom pb-2 mb-2">
-    <form action="" method="GET" class="d-flex justify-content-end">
-      <div class="col-md-2">
-        <select class="form-select" name="role" aria-label="Default select example" onchange="this.form.submit()">
-          <option value="0">สิทธิ์ทั้งหมด</option>
-          <?php
-          while ($row = mysqli_fetch_array($result)) {
-            $role_id = $row['role_id'];
-          ?>
-            <option value="<?=$role_id;?>" <?=($selected_role_id == $role_id) ? 'selected' : '';?>>
-              <?=$row['role_name'];?>
-            </option>
-          <?php } ?>
-        </select>
-      </div>
-    </form>
-  </div>
-</div>
+              <div class="col-md-12">
+                <div class="page-header-title border-bottom pb-2 mb-2">
+                  <h4 class="mb-0">พนักงานทั้งหมด</h4>
+                </div>
+              </div>
+
+              <div class="table-responsive">
+              <table class="table" width="100%">
+  <thead>
+  <tr>
+                    <td width="10%" class="text-center">รหัส</td>
+                    <td width="17%" class="text-center">รูป</td>
+                    <td width="25%" class="text-start">ชื่อ - นามสกุล</td>
+                    <td width="10%" class="text-start">สิทธิ์</td>
+                    <td width="10%" class="text-center">e-mail</td>
+                    <td width="10%" class="text-center">เบอร์โทร</td>
+                    <td width="18%" class="text-center">รายการ</td>
 
 
-<div class="table-responsive">
-  <table class="table" width="100%">
-    <thead>
-      <tr>
-        <td width="10%" class="text-center">รหัส</td>
-        <td width="17%" class="text-center">รูป</td>
-        <td width="25%" class="text-start">ชื่อ - นามสกุล</td>
-        <td width="10%" class="text-start">สิทธิ์</td>
-        <td width="10%" class="text-center">e-mail</td>
-        <td width="10%" class="text-center">เบอร์โทร</td>
-        <td width="18%" class="text-center">รายการ</td>
-      </tr>
-    </thead>
-    <tbody>
-      <?php while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) { ?>
-      <tr>
-        <td class="text-center"><?=$data['emp_id'];?></td>
-        <td class="text-center">
-          <img src="assets/images/emp/<?=$data['emp_id'];?>.<?=$data['img'];?>" class="card-img-top img-icon" alt="">
-        </td>
-        <td class="text-start"><?=$data['emp_name'];?> <?=$data['emp_last'];?></td>
-        <td><span class="text-start <?=$data['role_class'];?>"><?=$data['role_name'];?></span></td>
-        <td class="text-start"><small><?=$data['emp_email'];?></small></td>
-        <td class="text-center"><small><?=$data['emp_phone'];?></small></td>
-        <td class="text-center">
-          <a href="edit_employee.php?id=<?=$data['emp_id'];?>" type="button" class="btn btn-primary">แก้ไข</a>
-          <a href="#" type="button" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?');">ลบ</a>
-        </td>
-      </tr>
-      <?php } ?>
-    </tbody>
-  </table>
+                    <!-- <th width="5%">&nbsp;</th> -->
+                  </tr>
+  </thead>
+
+  <tbody>
+  <?php
+include("connectdb.php");
+
+$sql = "SELECT employees.*, role.role_name,
+               CASE
+                 WHEN employees.role_id = '001' THEN 'badge bg-danger'
+                 WHEN employees.role_id = '002' THEN 'badge bg-success'
+                 ELSE 'badge bg-primary'
+               END AS role_class
+        FROM employees
+        INNER JOIN role ON employees.role_id = role.role_id
+        ORDER BY employees.emp_id ASC";
+
+$rs = mysqli_query($conn, $sql);
+
+if (!$rs) {
+    die("Query failed: " . mysqli_error($conn));
+}
+
+while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
+    ?>
+            <tr>
+                <td class="text-center"><?=$data['emp_id'];?></td>
+                <td class="text-center">
+                    <img src="assets/images/emp/<?=$data['emp_id'];?>.<?=$data['img'];?>" class="card-img-top img-icon" alt="">
+                </td>
+                <td class="text-start"><?=$data['emp_name'];?> <?=$data['emp_last'];?></td>
+                <td><span class="text-start <?php echo $data['role_class']; ?>"><?php echo $data['role_name']; ?></span></td>                
+                <td class="text-start"><small><?=$data['emp_email'];?></small></td>
+                <td class="text-center"><small><?=$data['emp_phone'];?></small></td>
+                <td class="text-center">
+                
+                <a href="edit_employee.php?id=<?= $data['emp_id']; ?>" type="button" class="btn btn-primary">แก้ไข</a>
+                
+                <a href="#" type="button" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?');">ลบ</a>
+
+                </td>
+            </tr>
+        <?php  
+        }  
+        ?>
+        </tbody>
+
+</table>
 </div>
+
 
 
             </div>

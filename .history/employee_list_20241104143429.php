@@ -25,6 +25,16 @@ if (empty($img)) {
 
 // สร้าง URL สำหรับรูปภาพ
 $imagePath = "assets/images/emp/" . $aid . "." . $img;
+
+
+// ตรวจสอบว่ามีการส่ง parameter 'role' มาหรือไม่ ถ้ามีก็ใช้ค่านั้น ถ้าไม่มีก็ตั้งค่าเริ่มต้นเป็น 0
+$selected_role_id = isset($_GET['role']) ? $_GET['role'] : 0;
+
+include("connectdb.php");
+$sql = "SELECT * FROM role";
+$result = mysqli_query($conn, $sql);
+
+
 ?>
 
 <!DOCTYPE html>
@@ -584,11 +594,26 @@ body {
             <div class="row align-items-center">
 
 
-              <div class="col-md-12">
-                <!-- <div class="page-header-title border-bottom pb-2 mb-2">
-                  <h4 class="mb-0">พนักงานทั้งหมด</h4>
-                </div> -->
-              </div>
+            <div class="col-md-12">
+  <div class="page-header-title border-bottom pb-2 mb-2">
+    <form action="" method="GET" class="d-flex justify-content-end">
+      <div class="col-md-2">
+        <select class="form-select" name="role" aria-label="Default select example" onchange="this.form.submit()">
+          <option value="0">สิทธิ์การเข้าถึง</option>
+          <?php
+          while ($row = mysqli_fetch_array($result)) {
+            $role_id = $row['role_id'];
+          ?>
+            <option value="<?=$role_id;?>" <?=($selected_role_id == $role_id) ? 'selected' : '';?>>
+              <?=$row['role_name'];?>
+            </option>
+          <?php } ?>
+        </select>
+      </div>
+    </form>
+  </div>
+</div>
+
 
               <div class="table-responsive">
               <table class="table" width="100%">
@@ -634,7 +659,7 @@ while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
                 <td class="text-center">
                     <img src="assets/images/emp/<?=$data['emp_id'];?>.<?=$data['img'];?>" class="card-img-top img-icon" alt="">
                 </td>
-                <td class="text-start"><?=$data['emp_name'];?></td>
+                <td class="text-start"><?=$data['emp_name'];?> <?=$data['emp_last'];?></td>
                 <td><span class="text-start <?php echo $data['role_class']; ?>"><?php echo $data['role_name']; ?></span></td>                
                 <td class="text-start"><small><?=$data['emp_email'];?></small></td>
                 <td class="text-center"><small><?=$data['emp_phone'];?></small></td>

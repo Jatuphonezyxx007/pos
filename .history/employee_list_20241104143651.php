@@ -634,7 +634,7 @@ body {
     <form action="" method="GET" class="d-flex justify-content-end">
       <div class="col-md-2">
         <select class="form-select" name="role" aria-label="Default select example" onchange="this.form.submit()">
-          <option value="0">สิทธิ์ทั้งหมด</option>
+          <option value="0">สิทธิ์การเข้าถึงทั้งหมด</option>
           <?php
           while ($row = mysqli_fetch_array($result)) {
             $role_id = $row['role_id'];
