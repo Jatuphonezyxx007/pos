@@ -5,28 +5,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $barcode = $_POST['p_barcode'];
     $name = $_POST['p_name'];
     $unit = $_POST['unit_product'];
-    $type = $_POST['p_type']; // option ที่เลือก
-    $newType = isset($_POST['new_type']) ? $_POST['new_type'] : ''; // option ใหม่ที่กรอก
+    $type = $_POST['p_type'];
+    $newType = isset($_POST['new_type']) ? $_POST['new_type'] : '';
     $img = pathinfo($_FILES['p_pics']['name'], PATHINFO_EXTENSION);
 
-    // ตรวจสอบว่าเป็นการกรอก new_type หรือไม่
-    if (!empty($newType)) {
+    // ตรวจสอบและเพิ่มประเภทใหม่ในตาราง type หากเลือกประเภทเป็น "new"
+    if ($type === 'new' && !empty($newType)) {
         // เพิ่มประเภทใหม่ลงในตาราง type
         $stmt = $conn->prepare("INSERT INTO type (type_name) VALUES (?)");
         $stmt->bind_param("s", $newType);
         $stmt->execute();
-        
-        // รับ type_id ของประเภทที่เพิ่มใหม่
-        $type_id = $stmt->insert_id; 
+        $type_id = $stmt->insert_id; // รับค่า type_id ที่สร้างขึ้นใหม่
         $stmt->close();
     } else {
-        // ถ้าเลือกประเภทที่มีอยู่แล้ว ให้ใช้ค่า type_id จากตัวแปร $type
-        $type_id = intval($type);
+        // กรณีมีการเลือกประเภทที่มีอยู่แล้ว
+        $type_id = intval($type); // กำหนดให้ type_id เป็นค่าจาก type ที่ส่งมา และแปลงเป็นตัวเลข
     }
 
     // เพิ่มสินค้าลงในตาราง products
     $stmt = $conn->prepare("INSERT INTO products (barcode, name, img, unit, type_id) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssi", $barcode, $name, $img, $unit, $type_id); // ใช้ $type_id ที่ได้จากการสร้างหรือเลือก
+    $stmt->bind_param("ssssi", $barcode, $name, $img, $unit, $type_id); // เปลี่ยน `$type` เป็น `$type_id`
+    
     if ($stmt->execute()) {
         $productId = $stmt->insert_id; // ดึง id ของสินค้าที่เพิ่มใหม่
 
