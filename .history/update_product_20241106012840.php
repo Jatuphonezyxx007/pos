@@ -40,7 +40,6 @@ if (isset($_GET['id'])) {
           LEFT JOIN type ON products.type_id = type.type_id
           WHERE products.id = '$id'";
 
-
 $unitQuery = "SELECT unit FROM products WHERE id = '$id'";
 $unitResult = mysqli_query($conn, $unitQuery);
 $unitData = mysqli_fetch_assoc($unitResult);  // เก็บค่า unit แค่ครั้งเดียว
@@ -78,110 +77,70 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       exit;
   }
 
+  // จัดการการอัปโหลดภาพ
+  $img_sql = "";
+  if ($_FILES['ep_pic']['name'] != "") {
+      $allowed = array('gif', 'png', 'jpg', 'jpeg', 'jfif', 'webp');
+      $filename = $_FILES['ep_pic']['name'];
+      $ext = pathinfo($filename, PATHINFO_EXTENSION);
 
-// จัดการการอัปโหลดภาพ
-$img_sql = "";
-if ($_FILES['p_pics']['name'] != "") {
-    $allowed = array('gif', 'png', 'jpg', 'jpeg', 'jfif', 'webp');
-    $filename = $_FILES['p_pics']['name'];
-    $ext = pathinfo($filename, PATHINFO_EXTENSION);
+      // ตรวจสอบนามสกุลไฟล์
+      if (!in_array($ext, $allowed)) {
+          echo "<script>alert('ไฟล์ภาพต้องเป็น jpg, gif หรือ png เท่านั้น');</script>";
+          exit;
+      }
 
-    // ตรวจสอบนามสกุลไฟล์
-    if (!in_array($ext, $allowed)) {
-        echo "<script>alert('ไฟล์ภาพต้องเป็น jpg, gif หรือ png เท่านั้น');</script>";
-        exit;
-    }
+      // ลบภาพเก่าออก ถ้ามีภาพเก่าอยู่ในระบบ
+      $old_image_path = "assets/images/Product_2/" . $product_id . "." . $ext;
+      if (file_exists($old_image_path)) {
+          unlink($old_image_path); // ลบไฟล์ภาพเก่า
+      }
 
-    // ตรวจสอบและสร้างโฟลเดอร์ถ้ายังไม่มี
-    $target_dir = "assets/images/Products_2/";
-    if (!file_exists($target_dir)) {
-        mkdir($target_dir, 0777, true); // สร้างโฟลเดอร์พร้อมกำหนดสิทธิ์เป็น 0777
-    }
-
-    // กำหนดชื่อไฟล์ตาม id ของ product โดยลบภาพเก่าทุกนามสกุลออกก่อนอัปโหลดใหม่
-    $old_image_pattern = $target_dir . $product_id . ".*";
-    foreach (glob($old_image_pattern) as $old_file) {
-        if (is_file($old_file)) {
-            unlink($old_file); // ลบภาพเก่าทั้งหมดที่ตรงกับชื่อไฟล์
-        }
-    }
-
-    // อัปโหลดไฟล์ภาพใหม่และอัปเดตข้อมูลในฐานข้อมูล
-    $target_file = $target_dir . $product_id . "." . $ext;
-    if (move_uploaded_file($_FILES['p_pics']['tmp_name'], $target_file)) {
-        // อัปเดตนามสกุลไฟล์ใหม่ในฐานข้อมูล
-        $img_sql = ", img='$ext'";
-    } else {
-        echo "<script>alert('เกิดข้อผิดพลาดในการอัปโหลดไฟล์');</script>";
-        exit;
-    }
-} else {
-    // ถ้าไม่ได้อัปโหลดภาพใหม่ ให้เก็บภาพเดิมในระบบโดยไม่เปลี่ยนแปลง
-    $img_sql = ""; // ไม่ต้องอัปเดตฟิลด์ img ในฐานข้อมูล
-}
-
-
+      // อัปโหลดไฟล์ภาพใหม่
+      $target_file = "assets/images/Product_2/" . $product_id . "." . $ext;
+      if (move_uploaded_file($_FILES['ep_pic']['tmp_name'], $target_file)) {
+          // อัปเดตนามสกุลไฟล์ในฐานข้อมูล
+          $img_sql = ", img='$ext'";
+      } else {
+          echo "<script>alert('เกิดข้อผิดพลาดในการอัปโหลดไฟล์');</script>";
+          exit;
+      }
+  }
 
   // อัปเดทข้อมูลในตาราง products รวมถึงหน่วยนับ (unit)
   $sql_product = "UPDATE products SET name='$p_name', type_id='$p_type', unit='$unit' $img_sql WHERE id='$product_id'";
   mysqli_query($conn, $sql_product);
 
+  // อัปเดทหรือเพิ่มข้อมูลในตาราง size
+  for ($i = 0; $i < count($size_name); $i++) {
+      $current_size_name = $size_name[$i];
+      $current_qty = $size_qty[$i];
+      $current_restock = $size_restock[$i];
+      $current_price = $size_price[$i];
 
-// อัปเดต/เพิ่มข้อมูลในตาราง size
-for ($i = 0; $i < count($size_name); $i++) {
-  $name = $size_name[$i];
-  $qty = $size_qty[$i];
-  $restock = $size_restock[$i];
-  $price = $size_price[$i];
+      // ตรวจสอบว่ามีขนาดนี้ในฐานข้อมูลหรือไม่
+      $size_query = "SELECT size_id FROM size WHERE size_name='$current_size_name' AND id='$product_id'";
+      $result = mysqli_query($conn, $size_query);
 
-  // ตรวจสอบว่ามี size_name นี้อยู่ในตารางหรือไม่
-  $check_sql = "SELECT id FROM size WHERE size_name = ? AND id = ?";
-  $stmt = $conn->prepare($check_sql);
-  $stmt->bind_param("si", $name, $product_id);
-  $stmt->execute();
-  $stmt->store_result();
-  
-  if ($stmt->num_rows > 0) {
-      // ถ้ามี size_name นี้อยู่ในตารางแล้ว ให้ทำการ UPDATE ข้อมูล
-      $update_sql = "UPDATE size SET qty = ?, re_stock = ?, price = ? WHERE size_name = ? AND id = ?";
-      $stmt = $conn->prepare($update_sql);
-      $stmt->bind_param("iisii", $qty, $restock, $price, $name, $product_id);
-
-      if (!$stmt->execute()) {
-          echo "เกิดข้อผิดพลาดในการอัปเดตข้อมูล";
+      if (mysqli_num_rows($result) > 0) {
+          // ถ้ามีขนาดอยู่แล้ว อัปเดท
+          $size_id = mysqli_fetch_assoc($result)['size_id'];
+          $update_size = "UPDATE size SET qty='$current_qty', re_stock='$current_restock', price='$current_price' WHERE size_id='$size_id'";
+          mysqli_query($conn, $update_size);
+      } else {
+          // ถ้าไม่มีขนาดนี้ เพิ่มขนาดใหม่
+          $insert_size = "INSERT INTO size (id, size_name, qty, re_stock, price) VALUES ('$product_id', '$current_size_name', '$current_qty', '$current_restock', '$current_price')";
+          mysqli_query($conn, $insert_size);
       }
-      $stmt->close();
-  } else {
-      // ถ้าไม่มี size_name นี้ในตาราง ให้ทำการ INSERT ข้อมูลใหม่
-      $insert_sql = "INSERT INTO size (id, size_name, qty, re_stock, price) VALUES (?, ?, ?, ?, ?)";
-      $stmt = $conn->prepare($insert_sql);
-      $stmt->bind_param("isiii", $product_id, $name, $qty, $restock, $price);
-
-      if (!$stmt->execute()) {
-          echo "เกิดข้อผิดพลาดในการเพิ่มข้อมูลใหม่";
-      }
-      $stmt->close();
   }
-}
-
-// ตรวจสอบและลบข้อมูลที่ไม่อยู่ใน `$size_name`
-$delete_sql = "DELETE FROM size WHERE id = ? AND size_name NOT IN (" . implode(',', array_fill(0, count($size_name), '?')) . ")";
-$stmt = $conn->prepare($delete_sql);
-$types = str_repeat('s', count($size_name)); // กำหนดประเภทข้อมูลสำหรับ parameters
-$stmt->bind_param("i" . $types, $product_id, ...$size_name);
-
-if (!$stmt->execute()) {
-  echo "เกิดข้อผิดพลาดในการลบข้อมูล";
-}
-$stmt->close();
-
 
   // แสดงข้อความยืนยันหลังการอัปเดตข้อมูลสำเร็จ
   echo "<script>
-      alert('อัปเดตข้อมูลสำเร็จ');
-      window.location.href = 'products_manage.php';
+  alert('อัปเดตข้อมูลสำเร็จ');
+  window.location.href = 'products_manage.php'; // เปลี่ยนไปยังหน้ารายการผลิตภัณฑ์
   </script>";
 }
+
 
 
 
@@ -708,7 +667,7 @@ body {
         <p class="text-dark mb-0">หน่วยนับ</p>
       </div>
       <div class="col-10">
-        <input name="unit" type="text" class="form-control" value="<?= htmlspecialchars($unitData['unit']); ?>"> 
+        <input name="ep_user" type="text" class="form-control" value="<?= htmlspecialchars($unitData['unit']); ?>"> 
       </div>
 
       <!-- หมวดหมู่ -->
