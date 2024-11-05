@@ -614,7 +614,7 @@ body {
               echo "<option>ไม่สามารถดึงข้อมูลได้</option>";
             }
           ?>
-          <!-- <option value="">ไม่ระบุ</option> -->
+          <option value="">ไม่ระบุ</option>
           <option value="other">อื่นๆ</option>
         </select>
         

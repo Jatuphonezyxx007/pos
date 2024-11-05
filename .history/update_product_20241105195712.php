@@ -581,56 +581,69 @@ body {
 
     
     
-<div class="card">
-  <div class="card-header">
-    <!-- Start Section: หน่วยนับ และ หมวดหมู่ -->
-    <div class="row align-items-center text-start">
-      
-      <!-- หน่วยนับ -->
-      <div class="col-2">
-        <p class="text-dark mb-0">หน่วยนับ</p>
-      </div>
-      <div class="col-10">
-        <input name="ep_user" type="text" class="form-control" value="<?= htmlspecialchars($unitData['unit']); ?>"> 
-      </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="row align-items-center">
 
-      <!-- หมวดหมู่ -->
-      <div class="col-2 mt-3">
-        <p class="text-dark mb-0">หมวดหมู่</p>
-      </div>
-      <div class="col-10 mt-3">
-        <select class="form-select" id="role" aria-label="role" name="ep_role" onchange="toggleOtherInput()">
-          <?php
-            // ดึงข้อมูลหมวดหมู่จากตาราง type
-            $sql2 = "SELECT * FROM `type`";
-            $rs2 = mysqli_query($conn, $sql2);
-            if ($rs2) {
-              while ($data2 = mysqli_fetch_array($rs2)) {
-                // ตั้งค่า selected ถ้า type_id ตรงกับ type_id ของสินค้า
+            <!-- ส่วนแสดงฟิลด์หน่วย ที่ไม่อยู่ใน loop -->
+    <!-- <div class="card-body pc-component"> -->
+      <!-- <div class="row align-items-start"> -->
+        <div class="row mb-3">
+        <div class="col-2">
+          <p class="text-dark mb-0">หน่วยนับ</p>
+        </div>
+        <div class="col-10">
+          <input name="ep_user" type="text" class="form-control" value="<?= htmlspecialchars($unitData['unit']); ?>"> 
+        </div>          
+      <!-- </div> -->
+    <!-- </div> -->
+
+    <br>
+    
+          <div class="col-2">
+          <p class="text-dark mb-0">หมวดหมู่</p>
+          </div>
+          <div class="col-10">
+            <select class="form-select" id="role" aria-label="role" name="ep_role" onchange="toggleOtherInput()">
+              
+              <?php
+              // ดึงข้อมูล role ทั้งหมดจากตาราง role
+              $sql2 = "SELECT * FROM `type`";
+              $rs2 = mysqli_query($conn, $sql2);
+              if ($rs2) {
+                while ($data2 = mysqli_fetch_array($rs2)) {
+                // ตั้งค่า selected ถ้า role_id ตรงกับ role_id ของพนักงาน
                 $selected = ($data2['type_id'] == $p_type_id) ? "selected" : "";
                 echo "<option value='{$data2['type_id']}' $selected>{$data2['type_name']}</option>";
-              }
-            } else {
-              echo "<option>ไม่สามารถดึงข้อมูลได้</option>";
             }
-          ?>
-          <!-- <option value="">ไม่ระบุ</option> -->
-          <option value="other">อื่นๆ</option>
-        </select>
+        } else {
+            echo "Query failed.";
+        }
+        ?>
+                <option>ไม่ระบุ</option>
+                <option value="other">อื่นๆ</option>
+              </select>
+              
+              <!-- ช่องกรอกข้อมูลสำหรับ "อื่นๆ" -->
+              <input type="text" class="form-control mt-2" id="otherInput" name="other_role" placeholder="กรุณากรอกหมวดหมู่" style="display: none;">
+            </div>
+            </div>          
+          </div>
+        </div>
         
-        <!-- ช่องกรอกข้อมูลสำหรับ "อื่นๆ" -->
-        <input type="text" class="form-control mt-2" id="otherInput" name="other_role" placeholder="กรุณากรอกหมวดหมู่" style="display: none;">
+        <!-- <div class="card-body pc-component">
+          <div class="row align-items-center">
+            <div class="col-3">
+              <p class="text-dark mb-0">หน่วย</p>
+            </div>
+            <div class="col-9">
+              <input name="ep_user" type="text" class="form-control" value="<?= $productData['unit']; ?>"> 
+            </div>          
+          </div>
+          
+          <br>
+        </div>                -->
       </div>
-
-    </div>
-    <!-- End Section: หน่วยนับ และ หมวดหมู่ -->
-  </div>
-
-  <div class="card-body pc-component">
-    <!-- ใส่ข้อมูลอื่นๆของสินค้า -->
-  </div>
-</div>
-
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
         <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">บันทึกข้อมูล</button>
       </div>

@@ -28,37 +28,34 @@ $imagePath = "assets/images/emp/" . $aid . "." . $img;
 
 
 
-
 // ตรวจสอบว่าตัวแปร $_GET['id'] ถูกกำหนดหรือไม่
 if (isset($_GET['id'])) {
   $id = $_GET['id']; // เปลี่ยนจาก $emp_id เป็น $id เพื่อให้ตรงกับคำสั่ง SQL
 
-  // สร้างคำสั่ง SQL เพื่อเชื่อมตาราง products และ size
-  $sql = "SELECT products.*, size.size_name, size.qty, size.re_stock, size.price, type.type_name
-          FROM products
-          INNER JOIN size ON products.id = size.id
-          LEFT JOIN type ON products.type_id = type.type_id
-          WHERE products.id = '$id'";
+  // สร้างคำสั่ง SQL เพื่อเชื่อมตาราง products, size, และ type
+  $sql = "SELECT products.*, size.*, type.type_name 
+          FROM products 
+          INNER JOIN size ON products.id = size.id 
+          INNER JOIN type ON products.type_id = type.type_id 
+          WHERE products.id = ?";
 
-$unitQuery = "SELECT unit FROM products WHERE id = '$id'";
-$unitResult = mysqli_query($conn, $unitQuery);
-$unitData = mysqli_fetch_assoc($unitResult);  // เก็บค่า unit แค่ครั้งเดียว
+  // ใช้ prepared statement เพื่อป้องกัน SQL injection
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("i", $id); // กำหนดประเภทของ $id เป็น integer
+  $stmt->execute();
+  $rs = $stmt->get_result();
 
-  // ดำเนินการคำสั่ง SQL
-  $rs = mysqli_query($conn, $sql);
-
-  if ($rs && mysqli_num_rows($rs) > 0) {
-    $productData = mysqli_fetch_array($rs); // ดึงข้อมูลสินค้าและขนาด
-    $p_type_id = $productData['type_id'];
+  
+  if ($rs) {
+      $data = $rs->fetch_array(MYSQLI_ASSOC); // ดึงข้อมูลที่ได้จากการ query
+      $productStatus = $data['status']; // ดึงสถานะของสินค้ามาเก็บไว้ในตัวแปร $productStatus
+  } else {
+      echo "Error in query: " . mysqli_error($conn); // แสดงข้อความข้อผิดพลาดหาก query ไม่สำเร็จ
+  }
+  $stmt->close(); // ปิด statement
 } else {
-    echo "Error in query: " . mysqli_error($conn);
+  echo "No Products available"; // แสดงข้อความเมื่อไม่พบ id ใน URL
 }
-} else {
-echo "No Products available"; // แสดงข้อความเมื่อไม่พบ id ใน URL
-}
-
-
-
 
 ?>
 
@@ -446,7 +443,7 @@ body {
   <div class="pc-container px-1">
   <form method="post" enctype="multipart/form-data">
     <div class="pc-content">
-      <?php if (isset($productData)) { ?>
+      <?php if (isset($data)) { ?>
         <div class="row">
           <div class="col-md-12">
             <div class="page-header-title border-bottom pb-2 mb-2 d-flex align-items-center">
@@ -470,7 +467,7 @@ body {
     <div class="card-body pc-component">
       <p class="lead m-t-0">รูปภาพ</p>
       <div class="pic">
-        <img src="assets/images/products_2/<?=$productData['id'];?>.<?=$productData['img'];?>" class="card-img-top rounded mx-auto d-block" alt="">
+        <img src="assets/images/products_2/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top rounded mx-auto d-block" alt="">
       </div>
       <br><br><br>
       <div class="col">
@@ -492,7 +489,7 @@ body {
           <h5 class="mb-0">รหัสสินค้า</h5>
         </div>
         <div class="col-10">
-          <input class="form-control" type="text" name="ep_id" placeholder="<?= $productData['id']; ?>" aria-label="Disabled input example" disabled>              
+          <input class="form-control" type="text" name="ep_id" placeholder="<?= $data['id']; ?>" aria-label="Disabled input example" disabled>              
         </div>          
       </div>
     </div>
@@ -502,135 +499,70 @@ body {
           <p class="text-dark mb-0">เลขที่บาร์โค้ด</p>
         </div>
         <div class="col-10">
-          <input id="barcodeInput" name="barcode" type="text" class="form-control" value="<?= $productData['barcode']; ?>" aria-label="Disabled input example" disabled> 
+          <input id="barcodeInput" name="barcode" type="text" class="form-control" value="<?= $data['barcode']; ?>" aria-label="Disabled input example" disabled> 
         </div> 
       </div>
-      <div id="barcodeMessage"></div>
+      <div id="barcodeMessage"></div> <!-- ส่วนสำหรับแสดงข้อความ -->
       <br>
       <div class="row align-items-center">
         <div class="col-2">
           <p class="text-dark mb-0">ชื่อสินค้า</p>
         </div>
         <div class="col-10">
-          <input name="p_name" type="text" class="form-control" value="<?= $productData['name']; ?>"> 
+          <input name="p_name" type="text" class="form-control" value="<?= $data['name']; ?>"> 
         </div>          
       </div>
       <br>
-    
-    </div>
-    </div>
 
 
-    <div class="card">
-    <div class="card-header">
-      <div class="row align-items-center">
-        <div class="col-2">
-          <h5 class="mb-0">ขนาด</h5>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="card-body pc-component">
-  <div class="row align-items-center">
-    <?php do { ?>
-      <div class="row mb-3">
-        <div class="col-4">
-          <div class="form-floating">
-            <input type="text" name="size_name" class="form-control" id="size_name" placeholder="ชื่อขนาด" value="<?= htmlspecialchars($productData['size_name']); ?>" required>
-            <label for="size_name">ชื่อขนาด</label>
-          </div>
-        </div>
-        <div class="col-2">
-          <div class="form-floating">
-            <input type="number" name="size_qty" class="form-control" id="size_qty" placeholder="จำนวน" value="<?= htmlspecialchars($productData['qty']); ?>" required>
-            <label for="size_qty">จำนวน</label>
-          </div>
-        </div>
-        <div class="col-2">
-          <div class="form-floating">
-            <input type="number" name="size_restock" class="form-control" id="size_restock" placeholder="จุดรีสต๊อก" value="<?= htmlspecialchars($productData['re_stock']); ?>" required>
-            <label for="size_restock">จุดรีสต๊อก</label>
-          </div>
-        </div>
-        <div class="col-2">
-          <div class="form-floating">
-            <input type="text" name="size_price" class="form-control" id="size_price" placeholder="ราคา" value="<?= htmlspecialchars($productData['price']); ?>" required>
-            <label for="size_price">ราคา</label>
-          </div>
-        </div>
-        <div class="col-2 d-flex align-items-center justify-content-center">
-          <button type="button" class="btn btn-danger form-control">
-            <i class="ph ph-trash"></i>
-          </button>
-        </div>
-      </div>
-    <?php } while ($productData = mysqli_fetch_array($rs)); ?>
-
-  </div>
-</div>
-    
 
 
-    
-    </div>
-
-
-<br>
-
-
-    
-    
-<div class="card">
-  <div class="card-header">
-    <!-- Start Section: หน่วยนับ และ หมวดหมู่ -->
-    <div class="row align-items-center text-start">
-      
-      <!-- หน่วยนับ -->
-      <div class="col-2">
-        <p class="text-dark mb-0">หน่วยนับ</p>
-      </div>
-      <div class="col-10">
-        <input name="ep_user" type="text" class="form-control" value="<?= htmlspecialchars($unitData['unit']); ?>"> 
-      </div>
-
-      <!-- หมวดหมู่ -->
-      <div class="col-2 mt-3">
-        <p class="text-dark mb-0">หมวดหมู่</p>
-      </div>
-      <div class="col-10 mt-3">
-        <select class="form-select" id="role" aria-label="role" name="ep_role" onchange="toggleOtherInput()">
-          <?php
-            // ดึงข้อมูลหมวดหมู่จากตาราง type
-            $sql2 = "SELECT * FROM `type`";
-            $rs2 = mysqli_query($conn, $sql2);
-            if ($rs2) {
-              while ($data2 = mysqli_fetch_array($rs2)) {
-                // ตั้งค่า selected ถ้า type_id ตรงกับ type_id ของสินค้า
-                $selected = ($data2['type_id'] == $p_type_id) ? "selected" : "";
-                echo "<option value='{$data2['type_id']}' $selected>{$data2['type_name']}</option>";
-              }
-            } else {
-              echo "<option>ไม่สามารถดึงข้อมูลได้</option>";
-            }
-          ?>
-          <!-- <option value="">ไม่ระบุ</option> -->
-          <option value="other">อื่นๆ</option>
-        </select>
         
-        <!-- ช่องกรอกข้อมูลสำหรับ "อื่นๆ" -->
-        <input type="text" class="form-control mt-2" id="otherInput" name="other_role" placeholder="กรุณากรอกหมวดหมู่" style="display: none;">
-      </div>
-
+        <!-- ปิด col-9 -->
+      </div> <!-- ปิดแถวหลัก -->
+    
     </div>
-    <!-- End Section: หน่วยนับ และ หมวดหมู่ -->
-  </div>
-
-  <div class="card-body pc-component">
-    <!-- ใส่ข้อมูลอื่นๆของสินค้า -->
-  </div>
-</div>
-
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
+        <div class="row align-items-center">
+          <div class="col-3">
+            <h5 class="mb-0">หมวดหมู่</h5>
+          </div>
+          <div class="col-9">
+            <select class="form-select" id="role" aria-label="role" name="ep_role" onchange="toggleOtherInput()">
+              <?php
+              include("connectdb.php");
+              $sql2 = "SELECT * FROM `type`";
+              $rs2 = mysqli_query($conn, $sql2);
+              while ($data2 = mysqli_fetch_array($rs2)) {
+                ?>
+                <option value="<?=$data2['type_id'];?>"><?=$data2['type_name'];?></option>
+                <?php } ?>
+                <option>ไม่ระบุ</option>
+                <option value="other">อื่นๆ</option>
+              </select>
+              
+              <!-- ช่องกรอกข้อมูลสำหรับ "อื่นๆ" -->
+              <input type="text" class="form-control mt-2" id="otherInput" name="other_role" placeholder="กรุณากรอกหมวดหมู่" style="display: none;">
+            </div>          
+          </div>
+        </div>
+        
+        <div class="card-body pc-component">
+          <div class="row align-items-center">
+            <div class="col-3">
+              <p class="text-dark mb-0">หน่วย</p>
+            </div>
+            <div class="col-9">
+              <input name="ep_user" type="text" class="form-control" value="<?= $data['unit']; ?>"> 
+            </div>          
+          </div>
+          
+          <br>
+        </div>               
+      </div>
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
         <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">บันทึกข้อมูล</button>
       </div>
@@ -639,10 +571,10 @@ body {
 </div>
 
 <?php } else  { ?>
-  <p>No product data found.</p>
-  <?php } ?>
+  <p>No employee data found.</p>
 </form>
 </div>
+<?php } ?>
 </div>
 
 

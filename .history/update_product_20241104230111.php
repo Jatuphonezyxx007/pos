@@ -28,38 +28,34 @@ $imagePath = "assets/images/emp/" . $aid . "." . $img;
 
 
 
-
 // ตรวจสอบว่าตัวแปร $_GET['id'] ถูกกำหนดหรือไม่
 if (isset($_GET['id'])) {
   $id = $_GET['id']; // เปลี่ยนจาก $emp_id เป็น $id เพื่อให้ตรงกับคำสั่ง SQL
 
-  // สร้างคำสั่ง SQL เพื่อเชื่อมตาราง products และ size
-  $sql = "SELECT products.*, size.size_name, size.qty, size.re_stock, size.price, type.type_name
-          FROM products
-          INNER JOIN size ON products.id = size.id
-          LEFT JOIN type ON products.type_id = type.type_id
-          WHERE products.id = '$id'";
+  // สร้างคำสั่ง SQL เพื่อเชื่อมตาราง products, size, และ type
+  $sql = "SELECT products.*, size.*, type.type_name 
+          FROM products 
+          INNER JOIN size ON products.id = size.id 
+          INNER JOIN type ON products.type_id = type.type_id 
+          WHERE products.id = ?";
 
-$unitQuery = "SELECT unit FROM products WHERE id = '$id'";
-$unitResult = mysqli_query($conn, $unitQuery);
-$unitData = mysqli_fetch_assoc($unitResult);  // เก็บค่า unit แค่ครั้งเดียว
+  // ใช้ prepared statement เพื่อป้องกัน SQL injection
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("i", $id); // กำหนดประเภทของ $id เป็น integer
+  $stmt->execute();
+  $rs = $stmt->get_result();
 
-  // ดำเนินการคำสั่ง SQL
-  $rs = mysqli_query($conn, $sql);
-
-  if ($rs && mysqli_num_rows($rs) > 0) {
-    $productData = mysqli_fetch_array($rs); // ดึงข้อมูลสินค้าและขนาด
-    $p_type_id = $productData['type_id'];
+  
+  if ($rs) {
+      $data = $rs->fetch_array(MYSQLI_ASSOC); // ดึงข้อมูลที่ได้จากการ query
+      $productStatus = $data['status']; // ดึงสถานะของสินค้ามาเก็บไว้ในตัวแปร $productStatus
+  } else {
+      echo "Error in query: " . mysqli_error($conn); // แสดงข้อความข้อผิดพลาดหาก query ไม่สำเร็จ
+  }
+  $stmt->close(); // ปิด statement
 } else {
-    echo "Error in query: " . mysqli_error($conn);
+  echo "No Products available"; // แสดงข้อความเมื่อไม่พบ id ใน URL
 }
-} else {
-echo "No Products available"; // แสดงข้อความเมื่อไม่พบ id ใน URL
-}
-
-
-
-
 ?>
 
 
@@ -342,6 +338,112 @@ body {
 </ul>
         </li>
         <?php endif; ?>
+
+
+
+        <!-- <li class="pc-item pc-caption">
+            <label>UI Components</label>
+            <i class="ph ph-compass-tool"></i>
+        </li>
+        <li class="pc-item">
+          <a href="elements/bc_typography.html" class="pc-link">
+            <span class="pc-micon"><i class="ph ph-text-aa"></i></span>
+            <span class="pc-mtext">Typography</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="elements/bc_color.html" class="pc-link">
+            <span class="pc-micon"><i class="ph ph-palette"></i></span>
+            <span class="pc-mtext">Color</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="elements/icon-feather.html" class="pc-link">
+            <span class="pc-micon"><i class="ph ph-flower-lotus"></i></span>
+            <span class="pc-mtext">Icons</span>
+          </a>
+        </li>
+
+
+        <li class="pc-item pc-caption">
+          <label>Pages</label>
+          <i class="ph ph-devices"></i>
+        </li>
+        <li class="pc-item">
+          <a href="pages/login-v1.html" class="pc-link">
+            <span class="pc-micon"><i class="ph ph-lock"></i></span>
+            <span class="pc-mtext">Login</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="pages/register-v1.html" class="pc-link">
+            <span class="pc-micon"><i class="ph ph-user-circle-plus"></i></span>
+            <span class="pc-mtext">Register</span>
+          </a>
+        </li>
+        <li class="pc-item pc-caption">
+          <label>Other</label>
+          <i class="ph ph-suitcase"></i>
+        </li>
+        <li class="pc-item pc-hasmenu">
+          <a href="#!" class="pc-link"
+            ><span class="pc-micon">
+              <i class="ph ph-tree-structure"></i> </span
+            ><span class="pc-mtext">Menu levels</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span
+          ></a>
+          <ul class="pc-submenu">
+            <li class="pc-item"><a class="pc-link" href="#!">Level 2.1</a></li>
+            <li class="pc-item pc-hasmenu">
+              <a href="#!" class="pc-link"
+                >Level 2.2<span class="pc-arrow"><i data-feather="chevron-right"></i></span
+              ></a>
+              <ul class="pc-submenu">
+                <li class="pc-item"><a class="pc-link" href="#!">Level 3.1</a></li>
+                <li class="pc-item"><a class="pc-link" href="#!">Level 3.2</a></li>
+                <li class="pc-item pc-hasmenu">
+                  <a href="#!" class="pc-link"
+                    >Level 3.3<span class="pc-arrow"><i data-feather="chevron-right"></i></span
+                  ></a>
+                  <ul class="pc-submenu">
+                    <li class="pc-item"><a class="pc-link" href="#!">Level 4.1</a></li>
+                    <li class="pc-item"><a class="pc-link" href="#!">Level 4.2</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li class="pc-item pc-hasmenu">
+              <a href="#!" class="pc-link"
+                >Level 2.3<span class="pc-arrow"><i data-feather="chevron-right"></i></span
+              ></a>
+              <ul class="pc-submenu">
+                <li class="pc-item"><a class="pc-link" href="#!">Level 3.1</a></li>
+                <li class="pc-item"><a class="pc-link" href="#!">Level 3.2</a></li>
+                <li class="pc-item pc-hasmenu">
+                  <a href="#!" class="pc-link"
+                    >Level 3.3<span class="pc-arrow"><i data-feather="chevron-right"></i></span
+                  ></a>
+                  <ul class="pc-submenu">
+                    <li class="pc-item"><a class="pc-link" href="#!">Level 4.1</a></li>
+                    <li class="pc-item"><a class="pc-link" href="#!">Level 4.2</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li class="pc-item"
+          ><a href="other/sample-page.html" class="pc-link">
+            <span class="pc-micon">
+              <i class="ph ph-desktop"></i>
+            </span>
+            <span class="pc-mtext">Sample page</span></a
+          ></li
+        >
+
+      </ul>
+      <div class="card nav-action-card bg-brand-color-9">
+        <div class="card-body" style="background-image: url('assets/images/layout/nav-card-bg.svg')"> -->
+
         </div>
       </div>
     </div>
@@ -444,206 +546,417 @@ body {
 
 <div class="col-12 col-sm-8 col-md-12">
   <div class="pc-container px-1">
+
   <form method="post" enctype="multipart/form-data">
+
     <div class="pc-content">
-      <?php if (isset($productData)) { ?>
-        <div class="row">
-          <div class="col-md-12">
-            <div class="page-header-title border-bottom pb-2 mb-2 d-flex align-items-center">
-              <a href="products_manage.php" class="breadcrumb-item me-2">
-                <i class="ph ph-arrow-left fs-3"></i>
-              </a>
-              <h4 class="mb-0">แก้ไขข้อมูลสินค้า</h4>
-              <!-- <div class="ms-auto form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="statusSwitch" 
-                onchange="toggleStatus(this)"
+      
+
+    <?php if (isset($data)) { ?>
+
+      <div class="row">
+
+      <div class="col-md-12">
+    <div class="page-header-title border-bottom pb-2 mb-2 d-flex align-items-center">
+        <a href="products_manage.php" class="breadcrumb-item me-2">
+            <i class="ph ph-arrow-left fs-3"></i>
+        </a>
+        <h4 class="mb-0">แก้ไขข้อมูลสินค้า</h4>
+        <div class="ms-auto form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="statusSwitch" 
+                   onchange="toggleStatus(this)"
                    <?php echo (isset($productStatus) && $productStatus === 'active') ? 'checked' : ''; ?>>
             <label class="form-check-label" for="statusSwitch">
                 <?php echo (isset($productStatus) && $productStatus === 'active') ? 'เปิดขาย' : 'ปิดการขาย'; ?>
             </label>
-        </div> -->
+        </div>
     </div>
 </div>
 
-<div class="col-md-4">
-  <div class="card">
-    <div class="card-body pc-component">
-      <p class="lead m-t-0">รูปภาพ</p>
-      <div class="pic">
-        <img src="assets/images/products_2/<?=$productData['id'];?>.<?=$productData['img'];?>" class="card-img-top rounded mx-auto d-block" alt="">
-      </div>
-      <br><br><br>
-      <div class="col">
-        <label for="formFile" class="form-label">เปลี่ยนรูปภาพ</label>
-        <input class="form-control" type="file" name="ep_pic">
-        <br>
-        <h6 class="card-subtitle fw-normal mb-4">สำคัญ : สามารถอัพโหลดรูปภาพเฉพาะไฟล์ png, jpg, gif, tfif และ webp</h6>
-      </div>
-    </div>
-  </div>
-</div>
 
 
-<div class="col-md-8">
-  <div class="card">
-    <div class="card-header">
-      <div class="row align-items-center">
-        <div class="col-2">
-          <h5 class="mb-0">รหัสสินค้า</h5>
-        </div>
-        <div class="col-10">
-          <input class="form-control" type="text" name="ep_id" placeholder="<?= $productData['id']; ?>" aria-label="Disabled input example" disabled>              
-        </div>          
-      </div>
-    </div>
-    <div class="card-body pc-component">
-      <div class="row align-items-center">
-        <div class="col-2">
-          <p class="text-dark mb-0">เลขที่บาร์โค้ด</p>
-        </div>
-        <div class="col-10">
-          <input id="barcodeInput" name="barcode" type="text" class="form-control" value="<?= $productData['barcode']; ?>" aria-label="Disabled input example" disabled> 
-        </div> 
-      </div>
-      <div id="barcodeMessage"></div>
-      <br>
-      <div class="row align-items-center">
-        <div class="col-2">
-          <p class="text-dark mb-0">ชื่อสินค้า</p>
-        </div>
-        <div class="col-10">
-          <input name="p_name" type="text" class="form-control" value="<?= $productData['name']; ?>"> 
-        </div>          
-      </div>
-      <br>
-    
-    </div>
-    </div>
 
 
-    <div class="card">
-    <div class="card-header">
-      <div class="row align-items-center">
-        <div class="col-2">
-          <h5 class="mb-0">ขนาด</h5>
-        </div>
+      <!-- <h5 class="card-title fw-semibold mb-4">แก้ไขขข้อมูลสินค้า</h5> -->
 
-      </div>
-    </div>
 
-    <div class="card-body pc-component">
-  <div class="row align-items-center">
-    <?php do { ?>
-      <div class="row mb-3">
-        <div class="col-4">
-          <div class="form-floating">
-            <input type="text" name="size_name" class="form-control" id="size_name" placeholder="ชื่อขนาด" value="<?= htmlspecialchars($productData['size_name']); ?>" required>
-            <label for="size_name">ชื่อขนาด</label>
+      <div class="col-md-6">
+          <div class="card">
+            <!-- <div class="card-header">
+              <h5>Inline Text Elements</h5>
+            </div> -->
+            <div class="card-body pc-component">
+              <p class="lead m-t-0">รูปภาพ</p>
+
+              <div class="pic">
+                        <img src="assets/images/products_2/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top rounded mx-auto d-block" alt="">
+                      </div>
+
+                      <br><br><br>
+
+                      <div class="col">
+                        <label for="formFile" class="form-label">เปลี่ยนรูปภาพ</label>
+                        <input class="form-control" type="file" name="ep_pic">
+                        <br>
+                        <h6 class="card-subtitle fw-normal mb-4">สำคัญ : สามารถอัพโหลดรูปภาพเฉพาะไฟล์ png, jpg, gif, tfif และ webp</h6>
+                      </div>
+
+
+            </div>
           </div>
         </div>
-        <div class="col-2">
-          <div class="form-floating">
-            <input type="number" name="size_qty" class="form-control" id="size_qty" placeholder="จำนวน" value="<?= htmlspecialchars($productData['qty']); ?>" required>
-            <label for="size_qty">จำนวน</label>
-          </div>
-        </div>
-        <div class="col-2">
-          <div class="form-floating">
-            <input type="number" name="size_restock" class="form-control" id="size_restock" placeholder="จุดรีสต๊อก" value="<?= htmlspecialchars($productData['re_stock']); ?>" required>
-            <label for="size_restock">จุดรีสต๊อก</label>
-          </div>
-        </div>
-        <div class="col-2">
-          <div class="form-floating">
-            <input type="text" name="size_price" class="form-control" id="size_price" placeholder="ราคา" value="<?= htmlspecialchars($productData['price']); ?>" required>
-            <label for="size_price">ราคา</label>
-          </div>
-        </div>
-        <div class="col-2 d-flex align-items-center justify-content-center">
-          <button type="button" class="btn btn-danger form-control">
-            <i class="ph ph-trash"></i>
-          </button>
-        </div>
-      </div>
-    <?php } while ($productData = mysqli_fetch_array($rs)); ?>
 
-  </div>
-</div>
-    
-
-
-    
-    </div>
-
-
-<br>
-
-
-    
-    
-<div class="card">
-  <div class="card-header">
-    <!-- Start Section: หน่วยนับ และ หมวดหมู่ -->
-    <div class="row align-items-center text-start">
-      
-      <!-- หน่วยนับ -->
-      <div class="col-2">
-        <p class="text-dark mb-0">หน่วยนับ</p>
-      </div>
-      <div class="col-10">
-        <input name="ep_user" type="text" class="form-control" value="<?= htmlspecialchars($unitData['unit']); ?>"> 
-      </div>
-
-      <!-- หมวดหมู่ -->
-      <div class="col-2 mt-3">
-        <p class="text-dark mb-0">หมวดหมู่</p>
-      </div>
-      <div class="col-10 mt-3">
-        <select class="form-select" id="role" aria-label="role" name="ep_role" onchange="toggleOtherInput()">
-          <?php
-            // ดึงข้อมูลหมวดหมู่จากตาราง type
-            $sql2 = "SELECT * FROM `type`";
-            $rs2 = mysqli_query($conn, $sql2);
-            if ($rs2) {
-              while ($data2 = mysqli_fetch_array($rs2)) {
-                // ตั้งค่า selected ถ้า type_id ตรงกับ type_id ของสินค้า
-                $selected = ($data2['type_id'] == $p_type_id) ? "selected" : "";
-                echo "<option value='{$data2['type_id']}' $selected>{$data2['type_name']}</option>";
-              }
-            } else {
-              echo "<option>ไม่สามารถดึงข้อมูลได้</option>";
-            }
-          ?>
-          <!-- <option value="">ไม่ระบุ</option> -->
-          <option value="other">อื่นๆ</option>
-        </select>
         
-        <!-- ช่องกรอกข้อมูลสำหรับ "อื่นๆ" -->
-        <input type="text" class="form-control mt-2" id="otherInput" name="other_role" placeholder="กรุณากรอกหมวดหมู่" style="display: none;">
+        <div class="col-md-6">
+          <div class="card">
+            
+          <div class="card-header">
+            <div class="row align-items-center">
+              <div class="col-3">
+                <h5 class="mb-0">รหัสสินค้า</h5>
+              </div>
+              <div class="col-9">
+              <input class="form-control" type="text" name="ep_id" placeholder="<?= $data['id']; ?>" aria-label="Disabled input example" disabled>              
+            </div>          
+            </div>
+          </div>
+
+            <div class="card-body pc-component">
+
+            <div class="row align-items-center">
+    <div class="col-3">
+        <p class="text-dark mb-0">เลขที่บาร์โค้ด</p>
+    </div>
+    <div class="col-9">
+        <input id="barcodeInput" name="barcode" type="text" class="form-control" value="<?= $data['barcode']; ?>" aria-label="Disabled input example" disabled> 
+    </div> 
+    <!-- <div class="col-3">
+        <button id="checkBarcodeBtn" type="button" class="btn btn-success w-100">ตรวจสอบ</button>
+    </div>   -->
+</div>
+<div id="barcodeMessage"></div> <!-- ส่วนสำหรับแสดงข้อความ -->
+
+            <br>
+            <div class="row align-items-center">
+              <div class="col-3">
+                <p class="text-dark mb-0">ชื่อสินค้า</p>
+              </div>
+              <div class="col-9">
+                <input name="p_name" type="text" class="form-control" value="<?= $data['name']; ?>"> 
+              </div>          
+            </div>
+            
+            <br>
+
+            <!-- <div class="row align-items-center">
+  <div class="col-3">
+    <p class="text-dark mb-0">ขนาด</p>
+  </div>
+  <div class="col-9">
+    <div class="row g-2 mb-2">
+      <?php
+      // ตรวจสอบว่ามี id หรือไม่
+      if (isset($data['id'])) {
+        // ดึงข้อมูลจากตาราง size
+        $id = $data['id'];
+        $query = "SELECT * FROM size WHERE id = $id";
+        $result = mysqli_query($conn, $query);
+        $count = 0;
+
+        // ตรวจสอบว่ามีขนาดสินค้าหรือไม่
+        if (mysqli_num_rows($result) > 0) {
+          while ($row = mysqli_fetch_assoc($result)) {
+            $modalId = "editSizeModal" . $row['size_id']; // กำหนด ID ที่ไม่ซ้ำกันสำหรับแต่ละ Modal
+            ?>
+            <div class="col-4">
+              <button type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#<?= $modalId; ?>">
+                <small><?= $row['size_name']; ?></small>
+              </button>
+            </div> -->
+
+            <!-- Modal สำหรับแต่ละขนาด -->
+            <!-- <div class="modal fade" id="<?= $modalId; ?>" tabindex="-1" aria-labelledby="<?= $modalId; ?>Label" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="<?= $modalId; ?>Label"><?= $row['size_name']; ?></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body"> -->
+        <!-- ฟอร์มแก้ไขจำนวนสินค้า -->
+        <!-- <form action="#" method="POST">
+
+        <div class="row">
+          <div class="col-12 mb-6">
+            <label for="price-<?= $row['price']; ?>" class="form-label">ราคา/หน่วย (บาท)</label> -->
+            <!-- เปลี่ยน input จาก number เป็น text -->
+             <!-- <input type="text" class="form-control" id="price-<?= $row['price']; ?>" name="price" value="<?= number_format($row['price']); ?>" oninput="formatNumber(this)">
+            </div>
+          </div>
+
+          <br>
+
+          <div class="row"> -->
+            <!-- คอลัมน์สำหรับ qty -->
+            <!-- <div class="col-6 mb-3">
+              <label for="quantity-<?= $row['size_id']; ?>" class="form-label">จำนวนสินค้า</label>
+              <input type="number" class="form-control" id="quantity-<?= $row['size_id']; ?>" name="qty" value="<?= $row['qty']; ?>">
+            </div> -->
+            <!-- คอลัมน์สำหรับ re_stock -->
+            <!-- <div class="col-6 mb-3">
+              <label for="re_stock-<?= $row['size_id']; ?>" class="form-label">จุด Restock</label>
+              <input type="number" class="form-control" id="re_stock-<?= $row['size_id']; ?>" name="re_stock" value="<?= $row['re_stock']; ?>">
+            </div>
+          </div>
+          <input type="hidden" name="size_id" value="<?= $row['size_id']; ?>">
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">ลบขนาด</button>
+            <button type="submit" class="btn btn-primary" name="update_size">บันทึก</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+
+
+            <!-- <?php
+            $count++;
+
+            // เมื่อมีปุ่มครบ 3 ปุ่ม ให้เริ่มแถวใหม่
+            if ($count % 3 == 0) {
+              echo '</div><div class="row g-2 mb-2">';
+            }
+          }
+        } else {
+          echo "<div class='col-12'>No size data found for this product.</div>";
+        }
+      }
+      ?> -->
+
+      <!-- ปุ่ม + เพิ่มขนาด -->
+      <!-- <div class="col-4">
+        <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#exampleModal"><small>+ เพิ่มขนาด</small></button>
       </div>
 
-    </div>
-    <!-- End Section: หน่วยนับ และ หมวดหมู่ -->
-  </div>
 
-  <div class="card-body pc-component">
-    <!-- ใส่ข้อมูลอื่นๆของสินค้า -->
-  </div>
+      <div class="col-md">
+  <div id="sizeContainer"></div>
+  <button type="button" class="btn btn-secondary mt-2" onclick="addSize()">เพิ่มขนาดสินค้า</button>
+</div> -->
+
+
+<!-- ปุ่ม + เพิ่มขนาด -->
+<!-- <div class="col-4">
+    <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        <small>+ เพิ่มขนาด</small>
+    </button>
 </div>
 
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">บันทึกข้อมูล</button>
+<div class="col-md">
+    <div id="sizeContainer"></div>
+    <button type="button" class="btn btn-secondary mt-2" onclick="addSize()">เพิ่มขนาดสินค้า</button>
+</div> -->
+
+
+<!-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">เพิ่มขนาด</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="sizeForm">
+          <div class="mb-3">
+            <label for="sizeName" class="form-label">ชื่อขนาดสินค้า</label>
+            <input type="text" class="form-control" id="sizeName" required>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <label for="quantity" class="form-label">จำนวน</label>
+              <input type="number" class="form-control" id="quantity" required>
+            </div>
+            <div class="col">
+              <label for="reorderPoint" class="form-label">จุดรีสต๊อก</label>
+              <input type="number" class="form-control" id="reorderPoint" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="priceWithTax" class="form-label">ราคาที่รวมภาษี/หน่วย</label>
+            <input type="number" class="form-control" id="priceWithTax" step="0.01" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" form="sizeForm">บันทึก</button>
       </div>
     </div>
   </div>
-</div>
+</div> -->
 
-<?php } else  { ?>
-  <p>No product data found.</p>
+
+    </div> <!-- ปิดแถวของปุ่ม -->
+  </div> <!-- ปิด col-9 -->
+</div> <!-- ปิดแถวหลัก -->
+
+
+
+<!-- Modal สำหรับเพิ่มขนาดใหม่ -->
+<!-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">เพิ่มขนาดสินค้า</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="sizeName" class="form-label">ชื่อขนาด</label>
+            <input type="text" class="form-control" id="sizeName" placeholder="กรอกชื่อขนาดใหม่">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+
+              </div>
+
+
+              
+            </div>
+
+
+            <div class="card">
+            
+            <div class="card-header">
+              <div class="row align-items-center">
+                <div class="col-3">
+                  <h5 class="mb-0">หมวดหมู่</h5>
+                </div>
+                <div class="col-9">
+
+                <select class="form-select" id="role" aria-label="role" name="ep_role" onchange="toggleOtherInput()">
+  <?php
+    include("connectdb.php");
+    $sql2 = "SELECT * FROM `type`";
+    $rs2 = mysqli_query($conn, $sql2);
+    while ($data2 = mysqli_fetch_array($rs2)) {
+  ?>
+    <option value="<?=$data2['type_id'];?>"><?=$data2['type_name'];?></option>
   <?php } ?>
-</form>
+  <option>ไม่ระบุ</option>
+    <option value="other">อื่นๆ</option>
+</select>
+
+<!-- ช่องกรอกข้อมูลสำหรับ "อื่นๆ" -->
+<input type="text" class="form-control mt-2" id="otherInput" name="other_role" placeholder="กรุณากรอกหมวดหมู่" style="display: none;">
+
+
+              </div>          
+              </div>
+            </div>
+  
+              <div class="card-body pc-component">
+  
+                <div class="row align-items-center">
+                <div class="col-3">
+                  <p class="text-dark mb-0">หน่วย</p>
+                </div>
+                <div class="col-9">
+                  <input name="ep_user" type="text" class="form-control" value="<?= $data['unit']; ?>"> 
+                </div>          
+              </div>
+  
+              <br>
+              <!-- <div class="row align-items-center">
+                <div class="col-3">
+                  <p class="text-dark mb-0">รหัสผ่านใหม่</p>
+                </div>
+                <div class="col-9">
+                  <input name="ep_pwd" type="password" class="form-control" value="<?= $data['emp_pwd']; ?>"> 
+                </div>          
+              </div> -->
+                </div>               
+              </div>
+  
+
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+  <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">บันทึกข้อมูล</button>
 </div>
-</div>
+
+<!-- Modal -->
+<!-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">เพิ่มขนาด</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="sizeForm">
+          <div class="mb-3">
+            <label for="sizeName" class="form-label">ชื่อขนาดสินค้า</label>
+            <input type="text" class="form-control" id="sizeName" required>
+          </div>
+          <div class="mb-3">
+            <label for="quantity" class="form-label">จำนวน</label>
+            <input type="number" class="form-control" id="quantity" required>
+          </div>
+          <div class="mb-3">
+            <label for="reorderPoint" class="form-label">จุดรีสต๊อก</label>
+            <input type="number" class="form-control" id="reorderPoint" required>
+          </div>
+          <div class="mb-3">
+            <label for="priceWithTax" class="form-label">ราคาที่รวมภาษี/หน่วย</label>
+            <input type="number" class="form-control" id="priceWithTax" step="0.01" required>
+          </div>
+          <button type="submit" class="btn btn-primary">บันทึก</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+
+            </div>
+          </div>
+        </div>
+
+        <?php } else  { ?>
+          <p>No employee data found.</p>
+
+          </form>
+          
+      </div>
+
+      <?php } ?>
+
+
+    </div>
+
+  <footer class="pc-footer">
+    <div class="footer-wrapper container-fluid">
+      <div class="row">
+
+
+  
+        <div class="col-sm-6 ms-auto my-1">
+          <ul class="list-inline footer-link mb-0 justify-content-sm-end d-flex">
+          <!-- <a href="#top" class="text-end">กลับไปบนสุด</a> -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
 
 
 

@@ -26,40 +26,106 @@ if (empty($img)) {
 // สร้าง URL สำหรับรูปภาพ
 $imagePath = "assets/images/emp/" . $aid . "." . $img;
 
-
-
-
-// ตรวจสอบว่าตัวแปร $_GET['id'] ถูกกำหนดหรือไม่
+// ดึงข้อมูลพนักงานที่เลือกมาแสดง
 if (isset($_GET['id'])) {
-  $id = $_GET['id']; // เปลี่ยนจาก $emp_id เป็น $id เพื่อให้ตรงกับคำสั่ง SQL
-
-  // สร้างคำสั่ง SQL เพื่อเชื่อมตาราง products และ size
-  $sql = "SELECT products.*, size.size_name, size.qty, size.re_stock, size.price, type.type_name
-          FROM products
-          INNER JOIN size ON products.id = size.id
-          LEFT JOIN type ON products.type_id = type.type_id
-          WHERE products.id = '$id'";
-
-$unitQuery = "SELECT unit FROM products WHERE id = '$id'";
-$unitResult = mysqli_query($conn, $unitQuery);
-$unitData = mysqli_fetch_assoc($unitResult);  // เก็บค่า unit แค่ครั้งเดียว
-
-  // ดำเนินการคำสั่ง SQL
+  $emp_id = $_GET['id'];
+  $sql = "SELECT employees.*, role.role_name
+          FROM employees 
+          INNER JOIN role ON employees.role_id = role.role_id
+          WHERE employees.emp_id = '$emp_id'";
   $rs = mysqli_query($conn, $sql);
-
-  if ($rs && mysqli_num_rows($rs) > 0) {
-    $productData = mysqli_fetch_array($rs); // ดึงข้อมูลสินค้าและขนาด
-    $p_type_id = $productData['type_id'];
+  if ($rs) {
+      $data = mysqli_fetch_array($rs);
+      $emp_role_id = $data['role_id']; // เก็บ role_id ของพนักงานเพื่อใช้เป็น default
+  } else {
+      echo "Error in query: " . mysqli_error($conn);
+  }
 } else {
-    echo "Error in query: " . mysqli_error($conn);
-}
-} else {
-echo "No Products available"; // แสดงข้อความเมื่อไม่พบ id ใน URL
+  echo "emp_id is not set.";
 }
 
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+  $emp_name = $_POST['ep_name'];
+  $emp_user = $_POST['ep_user'];
+  $emp_pwd = $_POST['ep_pwd'];  
+  $emp_email = $_POST['ep_email'];
+  $emp_phone = $_POST['ep_phone'];
+  $role_id = $_POST['ep_role'];
+  $com_id = $data['com_id']; // Assuming com_id is already set and should not be changed
 
+  // ตรวจสอบว่ามีการกรอกรหัสผ่านใหม่หรือไม่
+  if (!empty($emp_pwd)) {
+    $emp_pwd = md5($emp_pwd);  // แปลงรหัสผ่านเป็น MD5
+    $pwd_sql = ", emp_pwd='$emp_pwd'";
+  } else {
+    // ใช้รหัสผ่านเดิมถ้าไม่มีการกรอกใหม่
+    $pwd_sql = "";
+  }
 
+  $img_sql = "";
+  if ($_FILES['ep_pic']['name'] != "") {
+    $allowed = array('gif', 'png', 'jpg', 'jpeg', 'jfif', 'webp');
+    $filename = $_FILES['ep_pic']['name'];
+    $ext = pathinfo($filename, PATHINFO_EXTENSION);
 
+    if (!in_array($ext, $allowed)) {
+      echo "<script>";
+      echo "alert('แก้ไขข้อมูลพนักงานไม่สำเร็จ! ไฟล์รูปต้องเป็น jpg, gif หรือ png เท่านั้น');";
+      echo "</script>";
+      exit;
+    }
+    $target_file = "assets/images/emp/" . $emp_id . "." . $ext;
+    if (move_uploaded_file($_FILES['ep_pic']['tmp_name'], $target_file)) {
+      $img_sql = ", img='$ext'";
+    } else {
+      echo "Error uploading file.";
+      exit;
+    }
+  }
+
+  $sql = "UPDATE employees SET 
+      emp_name='$emp_name', 
+      emp_user='$emp_user'
+      $pwd_sql, 
+      emp_email='$emp_email', 
+      emp_phone='$emp_phone', 
+      role_id='$role_id'
+      $img_sql
+  WHERE emp_id='$emp_id'";
+
+  if (mysqli_query($conn, $sql)) {
+      echo "<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {});
+    document.getElementById('modalMessage').innerHTML = `
+        <div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\">
+            <div class=\"text-center\">
+                <div class=\"spinner-border text-success\" role=\"status\">
+                    <span class=\"visually-hidden\">Loading...</span>
+                </div>
+                <div class=\"mt-2\">กำลังบันทึกข้อมูล</div>
+            </div>
+        </div>
+    `;
+    myModal.show();
+    setTimeout(function() {
+        document.getElementById('modalMessage').innerHTML = `
+            <div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\">
+                <div class=\"text-success\">
+                    <i class=\"bi bi-check-circle-fill\"></i> ข้อมูลถูกอัปเดตเรียบร้อยแล้ว
+                </div>
+            </div>
+        `;
+        setTimeout(function() {
+            window.location.href = 'employee_list.php';
+        }, 1000);
+    }, 2000);
+});
+</script>";
+  } else {
+      echo "Error updating record: " . mysqli_error($conn);
+  }
+}
 ?>
 
 
@@ -91,11 +157,9 @@ echo "No Products available"; // แสดงข้อความเมื่�
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai+Looped:wght@500&display=swap" rel="stylesheet">
 
-  <!-- Phosphor Icons CSS -->
-  <link href="https://unpkg.com/phosphor-icons/css/phosphor.css" rel="stylesheet">
+
   <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
 
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
 
 <!-- Script -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -220,18 +284,12 @@ body {
 }
 
 .pic{
-  height: 300px;
-  width: 250px;
+  height: 200px;
+  width: 150px;
   display: block;
   margin-left: auto;
   margin-right: auto
 }
-
-
-.custom-input {
-            display: none;
-        }
-
   </style>
 
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
@@ -342,6 +400,112 @@ body {
 </ul>
         </li>
         <?php endif; ?>
+
+
+
+        <!-- <li class="pc-item pc-caption">
+            <label>UI Components</label>
+            <i class="ph ph-compass-tool"></i>
+        </li>
+        <li class="pc-item">
+          <a href="elements/bc_typography.html" class="pc-link">
+            <span class="pc-micon"><i class="ph ph-text-aa"></i></span>
+            <span class="pc-mtext">Typography</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="elements/bc_color.html" class="pc-link">
+            <span class="pc-micon"><i class="ph ph-palette"></i></span>
+            <span class="pc-mtext">Color</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="elements/icon-feather.html" class="pc-link">
+            <span class="pc-micon"><i class="ph ph-flower-lotus"></i></span>
+            <span class="pc-mtext">Icons</span>
+          </a>
+        </li> -->
+
+
+        <!-- <li class="pc-item pc-caption">
+          <label>Pages</label>
+          <i class="ph ph-devices"></i>
+        </li>
+        <li class="pc-item">
+          <a href="pages/login-v1.html" class="pc-link">
+            <span class="pc-micon"><i class="ph ph-lock"></i></span>
+            <span class="pc-mtext">Login</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="pages/register-v1.html" class="pc-link">
+            <span class="pc-micon"><i class="ph ph-user-circle-plus"></i></span>
+            <span class="pc-mtext">Register</span>
+          </a>
+        </li>
+        <li class="pc-item pc-caption">
+          <label>Other</label>
+          <i class="ph ph-suitcase"></i>
+        </li>
+        <li class="pc-item pc-hasmenu">
+          <a href="#!" class="pc-link"
+            ><span class="pc-micon">
+              <i class="ph ph-tree-structure"></i> </span
+            ><span class="pc-mtext">Menu levels</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span
+          ></a>
+          <ul class="pc-submenu">
+            <li class="pc-item"><a class="pc-link" href="#!">Level 2.1</a></li>
+            <li class="pc-item pc-hasmenu">
+              <a href="#!" class="pc-link"
+                >Level 2.2<span class="pc-arrow"><i data-feather="chevron-right"></i></span
+              ></a>
+              <ul class="pc-submenu">
+                <li class="pc-item"><a class="pc-link" href="#!">Level 3.1</a></li>
+                <li class="pc-item"><a class="pc-link" href="#!">Level 3.2</a></li>
+                <li class="pc-item pc-hasmenu">
+                  <a href="#!" class="pc-link"
+                    >Level 3.3<span class="pc-arrow"><i data-feather="chevron-right"></i></span
+                  ></a>
+                  <ul class="pc-submenu">
+                    <li class="pc-item"><a class="pc-link" href="#!">Level 4.1</a></li>
+                    <li class="pc-item"><a class="pc-link" href="#!">Level 4.2</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li class="pc-item pc-hasmenu">
+              <a href="#!" class="pc-link"
+                >Level 2.3<span class="pc-arrow"><i data-feather="chevron-right"></i></span
+              ></a>
+              <ul class="pc-submenu">
+                <li class="pc-item"><a class="pc-link" href="#!">Level 3.1</a></li>
+                <li class="pc-item"><a class="pc-link" href="#!">Level 3.2</a></li>
+                <li class="pc-item pc-hasmenu">
+                  <a href="#!" class="pc-link"
+                    >Level 3.3<span class="pc-arrow"><i data-feather="chevron-right"></i></span
+                  ></a>
+                  <ul class="pc-submenu">
+                    <li class="pc-item"><a class="pc-link" href="#!">Level 4.1</a></li>
+                    <li class="pc-item"><a class="pc-link" href="#!">Level 4.2</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li class="pc-item"
+          ><a href="other/sample-page.html" class="pc-link">
+            <span class="pc-micon">
+              <i class="ph ph-desktop"></i>
+            </span>
+            <span class="pc-mtext">Sample page</span></a
+          ></li
+        >
+
+      </ul>
+      <div class="card nav-action-card bg-brand-color-9">
+        <div class="card-body" style="background-image: url('assets/images/layout/nav-card-bg.svg')"> -->
+
         </div>
       </div>
     </div>
@@ -349,7 +513,7 @@ body {
 </nav>
 <!-- [ Sidebar Menu ] end -->
 
-<!-- [ Header Topbar ] start -->
+ <!-- [ Header Topbar ] start -->
 
 <header class="pc-header">
   <div class="m-header">
@@ -444,206 +608,218 @@ body {
 
 <div class="col-12 col-sm-8 col-md-12">
   <div class="pc-container px-1">
+
   <form method="post" enctype="multipart/form-data">
+
     <div class="pc-content">
-      <?php if (isset($productData)) { ?>
-        <div class="row">
-          <div class="col-md-12">
-            <div class="page-header-title border-bottom pb-2 mb-2 d-flex align-items-center">
-              <a href="products_manage.php" class="breadcrumb-item me-2">
-                <i class="ph ph-arrow-left fs-3"></i>
-              </a>
-              <h4 class="mb-0">แก้ไขข้อมูลสินค้า</h4>
-              <!-- <div class="ms-auto form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="statusSwitch" 
-                onchange="toggleStatus(this)"
-                   <?php echo (isset($productStatus) && $productStatus === 'active') ? 'checked' : ''; ?>>
-            <label class="form-check-label" for="statusSwitch">
-                <?php echo (isset($productStatus) && $productStatus === 'active') ? 'เปิดขาย' : 'ปิดการขาย'; ?>
-            </label>
-        </div> -->
-    </div>
-</div>
-
-<div class="col-md-4">
-  <div class="card">
-    <div class="card-body pc-component">
-      <p class="lead m-t-0">รูปภาพ</p>
-      <div class="pic">
-        <img src="assets/images/products_2/<?=$productData['id'];?>.<?=$productData['img'];?>" class="card-img-top rounded mx-auto d-block" alt="">
-      </div>
-      <br><br><br>
-      <div class="col">
-        <label for="formFile" class="form-label">เปลี่ยนรูปภาพ</label>
-        <input class="form-control" type="file" name="ep_pic">
-        <br>
-        <h6 class="card-subtitle fw-normal mb-4">สำคัญ : สามารถอัพโหลดรูปภาพเฉพาะไฟล์ png, jpg, gif, tfif และ webp</h6>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<div class="col-md-8">
-  <div class="card">
-    <div class="card-header">
-      <div class="row align-items-center">
-        <div class="col-2">
-          <h5 class="mb-0">รหัสสินค้า</h5>
-        </div>
-        <div class="col-10">
-          <input class="form-control" type="text" name="ep_id" placeholder="<?= $productData['id']; ?>" aria-label="Disabled input example" disabled>              
-        </div>          
-      </div>
-    </div>
-    <div class="card-body pc-component">
-      <div class="row align-items-center">
-        <div class="col-2">
-          <p class="text-dark mb-0">เลขที่บาร์โค้ด</p>
-        </div>
-        <div class="col-10">
-          <input id="barcodeInput" name="barcode" type="text" class="form-control" value="<?= $productData['barcode']; ?>" aria-label="Disabled input example" disabled> 
-        </div> 
-      </div>
-      <div id="barcodeMessage"></div>
-      <br>
-      <div class="row align-items-center">
-        <div class="col-2">
-          <p class="text-dark mb-0">ชื่อสินค้า</p>
-        </div>
-        <div class="col-10">
-          <input name="p_name" type="text" class="form-control" value="<?= $productData['name']; ?>"> 
-        </div>          
-      </div>
-      <br>
-    
-    </div>
-    </div>
-
-
-    <div class="card">
-    <div class="card-header">
-      <div class="row align-items-center">
-        <div class="col-2">
-          <h5 class="mb-0">ขนาด</h5>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="card-body pc-component">
-  <div class="row align-items-center">
-    <?php do { ?>
-      <div class="row mb-3">
-        <div class="col-4">
-          <div class="form-floating">
-            <input type="text" name="size_name" class="form-control" id="size_name" placeholder="ชื่อขนาด" value="<?= htmlspecialchars($productData['size_name']); ?>" required>
-            <label for="size_name">ชื่อขนาด</label>
-          </div>
-        </div>
-        <div class="col-2">
-          <div class="form-floating">
-            <input type="number" name="size_qty" class="form-control" id="size_qty" placeholder="จำนวน" value="<?= htmlspecialchars($productData['qty']); ?>" required>
-            <label for="size_qty">จำนวน</label>
-          </div>
-        </div>
-        <div class="col-2">
-          <div class="form-floating">
-            <input type="number" name="size_restock" class="form-control" id="size_restock" placeholder="จุดรีสต๊อก" value="<?= htmlspecialchars($productData['re_stock']); ?>" required>
-            <label for="size_restock">จุดรีสต๊อก</label>
-          </div>
-        </div>
-        <div class="col-2">
-          <div class="form-floating">
-            <input type="text" name="size_price" class="form-control" id="size_price" placeholder="ราคา" value="<?= htmlspecialchars($productData['price']); ?>" required>
-            <label for="size_price">ราคา</label>
-          </div>
-        </div>
-        <div class="col-2 d-flex align-items-center justify-content-center">
-          <button type="button" class="btn btn-danger form-control">
-            <i class="ph ph-trash"></i>
-          </button>
-        </div>
-      </div>
-    <?php } while ($productData = mysqli_fetch_array($rs)); ?>
-
-  </div>
-</div>
-    
-
-
-    
-    </div>
-
-
-<br>
-
-
-    
-    
-<div class="card">
-  <div class="card-header">
-    <!-- Start Section: หน่วยนับ และ หมวดหมู่ -->
-    <div class="row align-items-center text-start">
       
-      <!-- หน่วยนับ -->
-      <div class="col-2">
-        <p class="text-dark mb-0">หน่วยนับ</p>
-      </div>
-      <div class="col-10">
-        <input name="ep_user" type="text" class="form-control" value="<?= htmlspecialchars($unitData['unit']); ?>"> 
+
+    <?php if (isset($data)) { ?>
+
+      <div class="row">
+
+      <div class="col-md-12">
+        <div class="page-header-title border-bottom pb-2 mb-2 d-flex align-items-center">
+          <a href="javascript:history.back()" class="breadcrumb-item me-2">
+            <i class="ph ph-arrow-left fs-3"></i>
+          </a>
+          <h4 class="mb-0">แก้ไขข้อมูลพนักงาน : <?=$data['emp_name'];?></h4>
+        </div>
       </div>
 
-      <!-- หมวดหมู่ -->
-      <div class="col-2 mt-3">
-        <p class="text-dark mb-0">หมวดหมู่</p>
-      </div>
-      <div class="col-10 mt-3">
-        <select class="form-select" id="role" aria-label="role" name="ep_role" onchange="toggleOtherInput()">
-          <?php
-            // ดึงข้อมูลหมวดหมู่จากตาราง type
-            $sql2 = "SELECT * FROM `type`";
-            $rs2 = mysqli_query($conn, $sql2);
-            if ($rs2) {
-              while ($data2 = mysqli_fetch_array($rs2)) {
-                // ตั้งค่า selected ถ้า type_id ตรงกับ type_id ของสินค้า
-                $selected = ($data2['type_id'] == $p_type_id) ? "selected" : "";
-                echo "<option value='{$data2['type_id']}' $selected>{$data2['type_name']}</option>";
-              }
-            } else {
-              echo "<option>ไม่สามารถดึงข้อมูลได้</option>";
-            }
-          ?>
-          <!-- <option value="">ไม่ระบุ</option> -->
-          <option value="other">อื่นๆ</option>
-        </select>
+
+      <!-- <h5 class="card-title fw-semibold mb-4">แก้ไขข้อมูลพนักงาน : <?=$data['emp_name'];?></h5> -->
+
+      <div class="col-md-6">
+          <div class="card">
+            <!-- <div class="card-header">
+              <h5>Inline Text Elements</h5>
+            </div> -->
+            <div class="card-body pc-component">
+              <p class="lead m-t-0">รูปภาพ</p>
+
+              <div class="pic">
+                        <img src="assets/images/emp/<?=$data['emp_id'];?>.<?=$data['img'];?>" class="card-img-top rounded mx-auto d-block" alt="">
+                      </div>
+
+                      <br><br><br>
+
+                      <div class="col">
+                        <label for="formFile" class="form-label">เปลี่ยนรูปภาพ</label>
+                        <input class="form-control" type="file" name="ep_pic">
+                        <br>
+                        <h6 class="card-subtitle fw-normal mb-4">สำคัญ : สามารถอัพโหลดรูปภาพเฉพาะไฟล์ png, jpg, gif, tfif และ webp</h6>
+                      </div>
+
+
+            </div>
+          </div>
+        </div>
+
         
-        <!-- ช่องกรอกข้อมูลสำหรับ "อื่นๆ" -->
-        <input type="text" class="form-control mt-2" id="otherInput" name="other_role" placeholder="กรุณากรอกหมวดหมู่" style="display: none;">
+        <div class="col-md-6">
+          <div class="card">
+            
+          <div class="card-header">
+            <div class="row align-items-center">
+              <div class="col-3">
+                <h5 class="mb-0">รหัสพนักงาน</h5>
+              </div>
+              <div class="col-9">
+              <input class="form-control" type="text" name="ep_id" placeholder="<?= $data['emp_id']; ?>" aria-label="Disabled input example" disabled>              
+            </div>          
+            </div>
+          </div>
+
+            <div class="card-body pc-component">
+
+              <div class="row align-items-center">
+              <div class="col-3">
+                <p class="text-dark mb-0">ชื่อ - นามสกุล</p>
+              </div>
+              <div class="col-5">
+                <input name="ep_name" type="text" class="form-control" value="<?= $data['emp_name']; ?>"> 
+              </div>
+              <div class="col-4">
+                <input name="ep_name" type="text" class="form-control" value="<?= $data['emp_last']; ?>"> 
+              </div>                    
+            </div>
+
+            <br>
+            <div class="row align-items-center">
+              <div class="col-3">
+                <p class="text-dark mb-0">E - mail</p>
+              </div>
+              <div class="col-9">
+                <input name="ep_email" type="text" class="form-control" value="<?= $data['emp_email']; ?>"> 
+              </div>          
+            </div>
+
+            <br>
+            <div class="row align-items-center">
+              <div class="col-3">
+                <p class="text-dark mb-0">เบอร์โทรศัพท์</p>
+              </div>
+              <div class="col-9">
+                <input name="ep_phone" type="text" class="form-control" value="<?= $data['emp_phone']; ?>"> 
+              </div>          
+            </div>
+              </div>
+
+
+              
+            </div>
+
+
+            <div class="card">
+            
+            <div class="card-header">
+              <div class="row align-items-center">
+                <div class="col-3">
+                  <h5 class="mb-0">หน้าที่</h5>
+                </div>
+
+
+                <div class="col-9">
+    <select class="form-select" id="role" aria-label="role" name="ep_role">
+        <?php
+        // ดึงข้อมูล role ทั้งหมดจากตาราง role
+        $sql2 = "SELECT * FROM `role`";
+        $rs2 = mysqli_query($conn, $sql2);
+
+        if ($rs2) {
+            while ($data2 = mysqli_fetch_array($rs2)) {
+                // ตั้งค่า selected ถ้า role_id ตรงกับ role_id ของพนักงาน
+                $selected = ($data2['role_id'] == $emp_role_id) ? "selected" : "";
+                echo "<option value='{$data2['role_id']}' $selected>{$data2['role_name']}</option>";
+            }
+        } else {
+            echo "Query failed.";
+        }
+        ?>
+    </select>
+</div>
+
+
+
+              </div>
+            </div>
+  
+              <div class="card-body pc-component">
+  
+                <div class="row align-items-center">
+                <div class="col-3">
+                  <p class="text-dark mb-0">ชื่อผู้ใช้</p>
+                </div>
+                <div class="col-9">
+                  <input name="ep_user" type="text" class="form-control" value="<?= $data['emp_user']; ?>"> 
+                </div>          
+              </div>
+  
+              <br>
+              <div class="row align-items-center">
+                <div class="col-3">
+                  <p class="text-dark mb-0">รหัสผ่านใหม่</p>
+                </div>
+                <div class="col-9">
+                  <input name="ep_pwd" type="password" class="form-control" value=""> 
+                </div>          
+              </div>
+                </div>               
+              </div>
+  
+
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+  <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">บันทึกข้อมูล</button>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">บันทึกข้อมูล</h5>
+        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+      </div>
+      <div class="modal-body" id="modalMessage">
+        ...
       </div>
 
     </div>
-    <!-- End Section: หน่วยนับ และ หมวดหมู่ -->
-  </div>
-
-  <div class="card-body pc-component">
-    <!-- ใส่ข้อมูลอื่นๆของสินค้า -->
   </div>
 </div>
 
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">บันทึกข้อมูล</button>
+            </div>
+          </div>
+        </div>
+
+        <?php } else  { ?>
+          <p>No employee data found.</p>
+
+          </form>
+          
+      </div>
+
+      <?php } ?>
+
+
+    </div>
+
+
+  <footer class="pc-footer">
+    <div class="footer-wrapper container-fluid">
+      <div class="row">
+
+
+  
+        <div class="col-sm-6 ms-auto my-1">
+          <ul class="list-inline footer-link mb-0 justify-content-sm-end d-flex">
+          <!-- <a href="#top" class="text-end">กลับไปบนสุด</a> -->
+          </ul>
+        </div>
       </div>
     </div>
-  </div>
-</div>
-
-<?php } else  { ?>
-  <p>No product data found.</p>
-  <?php } ?>
-</form>
-</div>
-</div>
+  </footer>
 
 
 
@@ -663,7 +839,6 @@ body {
 <script>layout_rtl_change('false');</script>
 <script>preset_change("preset-1");</script>
 <script>header_change("header-1");</script>
-
 
 
 
@@ -705,143 +880,9 @@ document.getElementById('okButton').addEventListener('click', function() {
   window.location.href = 'employee_list.php';
 });
 
-
-
-
-
-
-
-
-
-function toggleOtherInput() {
-    var select = document.getElementById("role");
-    var otherInput = document.getElementById("otherInput");
-
-    if (select.value === "other") {
-        otherInput.style.display = "block";  // แสดงช่องกรอกข้อมูล
-        otherInput.required = true; // ตั้งค่าให้เป็น required หากเลือก "อื่นๆ"
-    } else {
-        otherInput.style.display = "none";  // ซ่อนช่องกรอกข้อมูล
-        otherInput.required = false; // ยกเลิก required หากไม่ได้เลือก "อื่นๆ"
-    }
-}
-
-
-
-// ฟังก์ชันสำหรับใส่คอมม่าคั่นหลักพัน
-function formatNumber(input) {
-    let value = input.value.replace(/,/g, ''); // ลบคอมม่าก่อน
-    if (!isNaN(value) && value !== '') {
-        input.value = Number(value).toLocaleString('en'); // ใส่คอมม่าคั่นตัวเลขใหม่
-    } else {
-        input.value = ''; // ถ้าไม่ใช่ตัวเลข, รีเซ็ตเป็นค่าว่าง
-    }
-}
-
-
-
-
-function toggleStatus(switchElement) {
-    // ตรวจสอบสถานะที่ถูกเปลี่ยน
-    const newStatus = switchElement.checked ? 'active' : 'inactive';
-
-    // ส่งคำขอ AJAX เพื่อเปลี่ยนสถานะในฐานข้อมูล
-    fetch('update_status.php', {
-        method: 'POST',
-        body: JSON.stringify({ id: <?php echo $id; ?>, status: newStatus }),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // อัปเดตข้อความใน label ตามสถานะใหม่
-            const label = document.querySelector('label[for="statusSwitch"]');
-            label.textContent = newStatus === 'active' ? 'เปิดขาย' : 'ปิดการขาย';
-        } else {
-            alert('ไม่สามารถเปลี่ยนสถานะได้: ' + data.message);
-            // หากไม่สามารถเปลี่ยนสถานะได้ ให้คืนค่า switch กลับไป
-            switchElement.checked = !switchElement.checked; // คืนค่าสวิตช์กลับ
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
-
-
-
-
-//เพิ่มขนาด
-  // ตัวแปรนับขนาดสินค้า
-  let sizeCount = 0;
-
-  // ฟังก์ชันเพิ่มขนาดสินค้าใหม่
-  function addSize() {
-    sizeCount++;
-    const container = document.getElementById('sizeContainer');
-
-    // สร้างแถวใหม่สำหรับขนาดสินค้า
-    const row = document.createElement('div');
-    row.classList.add('row', 'g-2', 'mt-3');
-    row.id = `sizeRow${sizeCount}`;
-
-    
-
-    // ฟิลด์ขนาดสินค้า
-    row.innerHTML = `
-      <div class="col-md-3">
-        <input type="text" name="size[${sizeCount}][size]" class="form-control" placeholder="ชื่อขนาดสินค้า" required>
-      </div>
-      <div class="col-md-2">
-        <input type="number" name="size[${sizeCount}][quantity]" class="form-control" placeholder="จำนวน" required>
-      </div>
-      <div class="col-md-3">
-        <input type="number" name="size[${sizeCount}][restock]" class="form-control" placeholder="จุด Restock" required>
-      </div>
-<div class="col-md-3">
-    <input type="text" name="size[${sizeCount}][price]" class="form-control" placeholder="ราคาต่อหน่วย (รวมภาษี)" required oninput="formatPrice(this)">
-</div>
-      <div class="col-md-1">
-        <button type="button" class="btn btn-danger" onclick="removeSize(${sizeCount})">ลบ</button>
-      </div>
-    `;
-
-    container.appendChild(row);
-  }
-
-  // ฟังก์ชันลบขนาดสินค้า
-  function removeSize(index) {
-    const row = document.getElementById(`sizeRow${index}`);
-    row.remove();
-  }
-
-
-    // ฟังก์ชันสำหรับจัดรูปแบบราคา
-    function formatPrice(input) {
-        // ลบอักขระที่ไม่ใช่ตัวเลขและจุด
-        let value = input.value.replace(/[^0-9.]/g, '');
-        
-        // แยกจำนวนเต็มและทศนิยม
-        const parts = value.split('.');
-        // แปลงจำนวนเต็มให้มี , คั่น
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        
-        // ถ้ามีทศนิยม ให้เก็บไว้ แต่ไม่เกิน 2 ตำแหน่ง
-        if (parts[1]) {
-            parts[1] = parts[1].substring(0, 2); // จำกัดทศนิยมที่ 2 ตำแหน่ง
-        }
-        
-        // ตั้งค่ากลับไปยัง input
-        input.value = parts.join('.');
-    }
-
-
-
-
 </script>
 
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-
 </body>
 
 </body>
