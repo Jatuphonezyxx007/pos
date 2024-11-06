@@ -690,14 +690,13 @@ body {
       </div>
 
       <div class="col-2 d-flex align-items-center justify-content-center">
-  <a href="javascript:void(0);" onclick="toggleIcon(this)">
-    <button type="button" class="btn btn-light">
-      <i class="ph ph-eye"></i>
-    </button>
-  </a>
-</div>
-
-</div>
+        <a>
+          <button type="button" class="btn btn-light">
+          <i class="ph ph-eye"></i>
+          </button>
+        </a>
+      </div>
+    </div>
   <?php
           }
         } else {
@@ -974,18 +973,7 @@ function formatNumber(input) {
 // }
 
 
-  // ฟังก์ชันสำหรับสลับไอคอน
-  function toggleIcon(button) {
-    const icon = button.querySelector('i'); // ค้นหาไอคอนภายในปุ่ม
-    // สลับคลาสของไอคอน
-    if (icon.classList.contains('ph-eye')) {
-      icon.classList.remove('ph-eye');
-      icon.classList.add('ph-eye-slash');
-    } else {
-      icon.classList.remove('ph-eye-slash');
-      icon.classList.add('ph-eye');
-    }
-  }
+
 
 
 
