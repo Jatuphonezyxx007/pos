@@ -23,10 +23,6 @@ if (empty($img)) {
   $img = 'default.jpg'; 
 }
 
-// สร้าง URL สำหรับรูปภาพ
-$imagePath = "assets/images/emp/" . $aid . "." . $img;
-
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $emp_name = $_POST['ep_name'];
     $emp_last =$_POST['ep_last'];
