@@ -66,7 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $p_name = $_POST['p_name'];
   $product_id = $_GET['id']; // รหัสผลิตภัณฑ์จาก URL
   $unit = $_POST['unit']; // รับข้อมูลหน่วยนับ
-  $size_id = $_POST['size_id']; // array ของ size_id ที่ถูกส่งมา
   $size_name = $_POST['size_name']; // size_name ต้องเป็น array
   $size_qty = $_POST['size_qty']; // size_qty ต้องเป็น array
   $size_restock = $_POST['size_restock']; // size_restock ต้องเป็น array
@@ -128,44 +127,36 @@ if ($_FILES['p_pics']['name'] != "") {
   mysqli_query($conn, $sql_product);
 
 
-    // รับข้อมูลจากฟอร์ม
-    $size_ids = $_POST['size_id'];  // ขนาดที่มีอยู่
-    $size_names = $_POST['size_name']; // ชื่อขนาด
-    $size_qtys = $_POST['size_qty'];  // จำนวน
-    $size_restocks = $_POST['size_restock']; // จุดรีสต๊อก
-    $size_prices = $_POST['size_price']; // ราคารวมภาษี
-    // $product_id = $_POST['product_id']; // id ของสินค้าที่จะแก้ไข
+// อัปเดต/เพิ่มข้อมูลในตาราง size
+for ($i = 0; $i < count($size_name); $i++) {
+  $size_id = $size_id[$i]; // ดึงค่า size_id จาก hidden input
+  $name = $size_name[$i];
+  $qty = $size_qty[$i];
+  $restock = $size_restock[$i];
+  $price = $size_price[$i];
 
-    // การอัปเดตขนาดที่มีอยู่
-    foreach ($size_ids as $index => $size_id) {
-        if ($size_id) {
-            $name = mysqli_real_escape_string($conn, $size_names[$index]);
-            $qty = mysqli_real_escape_string($conn, $size_qtys[$index]);
-            $restock = mysqli_real_escape_string($conn, $size_restocks[$index]);
-            $price = mysqli_real_escape_string($conn, $size_prices[$index]);
+  if (!empty($size_id)) {
+      // ถ้ามี size_id แสดงว่าขนาดสินค้านี้มีอยู่แล้วในระบบ ทำการอัปเดตข้อมูล
+      $update_sql = "UPDATE size SET qty = ?, re_stock = ?, price = ?, size_name = ? WHERE size_id = ?";
+      $stmt_update = $conn->prepare($update_sql);
+      $stmt_update->bind_param("iid", $qty, $restock, $price, $name, $size_id);
 
-            // SQL สำหรับอัปเดต
-            $update_query = "UPDATE size SET size_name='$name', qty='$qty', re_stock='$restock', price='$price' WHERE size_id='$size_id'";
-            mysqli_query($conn, $update_query);
-        }
-    }
+      if (!$stmt_update->execute()) {
+          echo "เกิดข้อผิดพลาดในการอัปเดตข้อมูล";
+      }
+      $stmt_update->close();
+  } else {
+      // ถ้าไม่มี size_id แสดงว่าเป็นข้อมูลใหม่ ทำการเพิ่มข้อมูลใหม่
+      $insert_sql = "INSERT INTO size (id, size_name, qty, re_stock, price) VALUES (?, ?, ?, ?, ?)";
+      $stmt_insert = $conn->prepare($insert_sql);
+      $stmt_insert->bind_param("isiii", $product_id, $name, $qty, $restock, $price);
 
-    // การเพิ่มขนาดใหม่
-    foreach ($size_names as $index => $size_name) {
-        if (empty($size_ids[$index])) { // ถ้าขนาดใหม่
-            $name = mysqli_real_escape_string($conn, $size_name);
-            $qty = mysqli_real_escape_string($conn, $size_qtys[$index]);
-            $restock = mysqli_real_escape_string($conn, $size_restocks[$index]);
-            $price = mysqli_real_escape_string($conn, $size_prices[$index]);
-
-            // SQL สำหรับเพิ่มข้อมูลใหม่
-            $insert_query = "INSERT INTO size (id, size_name, qty, re_stock, price) VALUES ('$product_id', '$name', '$qty', '$restock', '$price')";
-            mysqli_query($conn, $insert_query);
-        }
-    }
-
-    // ปิดการเชื่อมต่อฐานข้อมูล
-    mysqli_close($conn);
+      if (!$stmt_insert->execute()) {
+          echo "เกิดข้อผิดพลาดในการเพิ่มข้อมูลใหม่";
+      }
+      $stmt_insert->close();
+  }
+}
 
 
   // แสดงข้อความยืนยันหลังการอัปเดตข้อมูลสำเร็จ
@@ -644,11 +635,11 @@ body {
 
     <div class="card-body pc-component">
   <div class="row align-items-center">
-    <?php
+  <?php
       // ตรวจสอบว่ามี id หรือไม่
-      if (isset($productData['id'])) {
+      if (isset($data['id'])) {
         // ดึงข้อมูลจากตาราง size
-        $id = $productData['id'];
+        $id = $data['id'];
         $query = "SELECT * FROM size WHERE id = $id";
         $result = mysqli_query($conn, $query);
 
@@ -656,35 +647,35 @@ body {
         if (mysqli_num_rows($result) > 0) {
           while ($row = mysqli_fetch_assoc($result)) {
             $modalId = "editSizeModal" . $row['size_id']; // กำหนด ID ที่ไม่ซ้ำกันสำหรับแต่ละ Modal
-    ?>
+            ?>
     <div class="row mb-3 size-row">
       <!-- Hidden input เพื่อเก็บค่า size_id สำหรับส่งกลับไปยังฝั่ง PHP -->
       <input type="hidden" name="size_id[]" value="<?= $row['size_id']; ?>">
 
       <div class="col-3">
         <div class="form-floating">
-          <input type="text" name="size_name[]" class="form-control" placeholder="ชื่อขนาด" value="<?= htmlspecialchars($row['size_name']); ?>">
+          <input type="text" name="size_name[]" class="form-control" placeholder="ชื่อขนาด" value="<?= htmlspecialchars($row['size_name']); ?>" disabled required>
           <label for="size_name">ชื่อขนาด</label>
         </div>
       </div>
 
       <div class="col-2">
         <div class="form-floating">
-          <input type="number" name="size_qty[]" class="form-control" placeholder="จำนวน" value="<?= htmlspecialchars($row['qty']); ?>">
+          <input type="number" name="size_qty[]" class="form-control" placeholder="จำนวน" value="<?= htmlspecialchars($row['qty']); ?>" disabled required>
           <label for="size_qty">จำนวน</label>
         </div>
       </div>
 
       <div class="col-2">
         <div class="form-floating">
-          <input type="number" name="size_restock[]" class="form-control" placeholder="จุดรีสต๊อก" value="<?= htmlspecialchars($row['re_stock']); ?>">
+          <input type="number" name="size_restock[]" class="form-control" placeholder="จุดรีสต๊อก" value="<?= htmlspecialchars($row['re_stock']); ?>" disabled required>
           <label for="size_restock">จุดรีสต๊อก</label>
         </div>
       </div>
 
       <div class="col-3">
         <div class="form-floating">
-          <input type="text" name="size_price[]" class="form-control" placeholder="ราคารวมภาษี" value="<?= htmlspecialchars($row['price']); ?>">
+          <input type="text" name="size_price[]" class="form-control" placeholder="ราคารวมภาษี" value="<?= htmlspecialchars($row['price']); ?>" disabled required>
           <label for="size_price">ราคารวมภาษี</label>
         </div>
       </div>
@@ -692,6 +683,11 @@ body {
       <div class="col-2 d-flex align-items-center justify-content-center">
       </div>
     </div>
+
+  <!-- ปุ่มสำหรับเพิ่มขนาดสินค้าใหม่ -->
+  <div class="col-md">
+    <button type="button" class="btn btn-secondary mt-2" onclick="addSize()">เพิ่มขนาดสินค้า</button>
+  </div>
   <?php
           }
         } else {
@@ -699,17 +695,6 @@ body {
         }
       }
   ?>
-  
-  <!-- Container สำหรับแสดงขนาดสินค้า -->
-  <div id="sizeContainer">
-    <!-- แถวขนาดสินค้าปัจจุบันจะแสดงที่นี่ -->
-  </div>
-
-  <!-- ปุ่มเพิ่มขนาดสินค้า -->
-  <div class="col-md">
-    <button type="button" class="btn btn-secondary mt-2" onclick="addSize()">เพิ่มขนาดสินค้า</button>
-  </div>
-
   </div>
 </div>
 
@@ -862,8 +847,29 @@ document.getElementById('okButton').addEventListener('click', function() {
 
 
 
-// ฟังก์ชันสำหรับเพิ่มขนาดสินค้าใหม่
-function addSize() {
+  // ฟังก์ชันสำหรับเปิดการแก้ไขแถวที่มีอยู่แล้ว
+  document.querySelectorAll('.edit-btn').forEach(button => {
+    button.addEventListener('click', function() {
+      const row = button.closest('.size-row');
+      const inputs = row.querySelectorAll('input[type="text"], input[type="number"]');
+
+      // เปิดการแก้ไข input
+      inputs.forEach(input => input.disabled = false);
+
+      // เปลี่ยนปุ่มจาก "แก้ไข" เป็น "ลบ"
+      button.textContent = 'ลบ';
+      button.classList.remove('btn-primary');
+      button.classList.add('btn-danger', 'remove-btn');
+
+      // ตั้งค่า event สำหรับปุ่มลบ
+      button.addEventListener('click', function() {
+        row.remove();
+      }, { once: true });
+    });
+  });
+
+  // ฟังก์ชันสำหรับเพิ่มขนาดสินค้าใหม่
+  function addSize() {
     const container = document.getElementById('sizeContainer');
     const row = document.createElement('div');
     row.classList.add('row', 'mb-3', 'size-row');
@@ -906,7 +912,7 @@ function addSize() {
     row.querySelector('.remove-row').addEventListener('click', function() {
       row.remove();
     });
-}
+  }
 
 
 

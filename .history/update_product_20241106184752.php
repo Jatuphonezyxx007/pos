@@ -134,7 +134,7 @@ if ($_FILES['p_pics']['name'] != "") {
     $size_qtys = $_POST['size_qty'];  // จำนวน
     $size_restocks = $_POST['size_restock']; // จุดรีสต๊อก
     $size_prices = $_POST['size_price']; // ราคารวมภาษี
-    // $product_id = $_POST['product_id']; // id ของสินค้าที่จะแก้ไข
+    $product_id = $_POST['product_id']; // id ของสินค้าที่จะแก้ไข
 
     // การอัปเดตขนาดที่มีอยู่
     foreach ($size_ids as $index => $size_id) {

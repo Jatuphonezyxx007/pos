@@ -128,45 +128,26 @@ if ($_FILES['p_pics']['name'] != "") {
   mysqli_query($conn, $sql_product);
 
 
-    // รับข้อมูลจากฟอร์ม
-    $size_ids = $_POST['size_id'];  // ขนาดที่มีอยู่
-    $size_names = $_POST['size_name']; // ชื่อขนาด
-    $size_qtys = $_POST['size_qty'];  // จำนวน
-    $size_restocks = $_POST['size_restock']; // จุดรีสต๊อก
-    $size_prices = $_POST['size_price']; // ราคารวมภาษี
-    // $product_id = $_POST['product_id']; // id ของสินค้าที่จะแก้ไข
+    // วนลูปเพื่ออัปเดตหรือเพิ่มข้อมูลในตาราง size
+    for ($i = 0; $i < count($size_name); $i++) {
+      $current_size_id = $size_id[$i]; // ดึงค่า size_id จาก input
+      $current_name = $size_name[$i];
+      $current_qty = $size_qty[$i];
+      $current_restock = $size_restock[$i];
+      $current_price = $size_price[$i];
 
-    // การอัปเดตขนาดที่มีอยู่
-    foreach ($size_ids as $index => $size_id) {
-        if ($size_id) {
-            $name = mysqli_real_escape_string($conn, $size_names[$index]);
-            $qty = mysqli_real_escape_string($conn, $size_qtys[$index]);
-            $restock = mysqli_real_escape_string($conn, $size_restocks[$index]);
-            $price = mysqli_real_escape_string($conn, $size_prices[$index]);
+      if (!empty($current_size_id)) {
+          // ถ้ามี size_id แสดงว่ามีการอัปเดตขนาดสินค้าแล้ว
+          $update_sql = "UPDATE size SET qty = ?, re_stock = ?, price = ?, size_name = ? WHERE size_id = ?";
+          $stmt_update = $conn->prepare($update_sql);
+          $stmt_update->bind_param("iidsi", $current_qty, $current_restock, $current_price, $current_name, $current_size_id);
 
-            // SQL สำหรับอัปเดต
-            $update_query = "UPDATE size SET size_name='$name', qty='$qty', re_stock='$restock', price='$price' WHERE size_id='$size_id'";
-            mysqli_query($conn, $update_query);
-        }
-    }
-
-    // การเพิ่มขนาดใหม่
-    foreach ($size_names as $index => $size_name) {
-        if (empty($size_ids[$index])) { // ถ้าขนาดใหม่
-            $name = mysqli_real_escape_string($conn, $size_name);
-            $qty = mysqli_real_escape_string($conn, $size_qtys[$index]);
-            $restock = mysqli_real_escape_string($conn, $size_restocks[$index]);
-            $price = mysqli_real_escape_string($conn, $size_prices[$index]);
-
-            // SQL สำหรับเพิ่มข้อมูลใหม่
-            $insert_query = "INSERT INTO size (id, size_name, qty, re_stock, price) VALUES ('$product_id', '$name', '$qty', '$restock', '$price')";
-            mysqli_query($conn, $insert_query);
-        }
-    }
-
-    // ปิดการเชื่อมต่อฐานข้อมูล
-    mysqli_close($conn);
-
+          if (!$stmt_update->execute()) {
+              echo "เกิดข้อผิดพลาดในการอัปเดตข้อมูล";
+          }
+          $stmt_update->close();
+      }
+  }
 
   // แสดงข้อความยืนยันหลังการอัปเดตข้อมูลสำเร็จ
   echo "<script>
