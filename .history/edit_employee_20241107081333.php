@@ -46,7 +46,6 @@ if (isset($_GET['id'])) {
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $emp_name = $_POST['ep_name'];
-  $emp_last = $_POST['ep_last'];
   $emp_user = $_POST['ep_user'];
   $emp_pwd = $_POST['ep_pwd'];  
   $emp_email = $_POST['ep_email'];
@@ -85,8 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   }
 
   $sql = "UPDATE employees SET 
-      emp_name='$emp_name',
-      emp_last='$emp_last', 
+      emp_name='$emp_name', 
       emp_user='$emp_user'
       $pwd_sql, 
       emp_email='$emp_email', 
@@ -625,7 +623,7 @@ body {
           <a href="javascript:history.back()" class="breadcrumb-item me-2">
             <i class="ph ph-arrow-left fs-3"></i>
           </a>
-          <h4 class="mb-0">แก้ไขข้อมูลพนักงาน : <?=$data['emp_name'];?> <?=$data['emp_last'];?></h4>
+          <h4 class="mb-0">แก้ไขข้อมูลพนักงาน : <?=$data['emp_name'];?></h4>
         </div>
       </div>
 
