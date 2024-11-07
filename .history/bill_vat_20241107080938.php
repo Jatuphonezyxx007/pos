@@ -379,7 +379,7 @@ if (isset($_GET['b'])) {
 
 
         <!-- ส่วนการลงชื่อที่อยู่ท้ายสุด -->
-<footer class="mt-4" style="position: fixed; bottom: 0; width: 100%;">
+<footer class="mt-4" style="position: sticky; bottom: 0; width: 100%;">
     <div class="container">
         <div class="row justify-content-between">
             <div class="col text-center font-table">
