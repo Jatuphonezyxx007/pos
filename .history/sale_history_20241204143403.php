@@ -53,7 +53,7 @@ if ($role_name == 'admin') {
     $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name, c.* FROM orders o 
             JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
             JOIN employees ep ON o.emp_id = ep.emp_id
-            JOIN customer c ON o.customer_id = c.customer_id";
+            JOIN customer c ON ep.customer_id = c.customer_id";
     
     // ถ้าเลือกเดือน ให้ปรับ SQL query
     if ($selectedMonth > 0) {
@@ -62,10 +62,9 @@ if ($role_name == 'admin') {
 
     $sql .= " ORDER BY o.order_id DESC LIMIT $start, $limit";
 } elseif ($role_name == 'employee') {
-    $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name, c.* FROM orders o 
+    $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name FROM orders o 
             JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
             JOIN employees ep ON o.emp_id = ep.emp_id
-            JOIN customer c ON o.customer_id = c.customer_id
             WHERE o.emp_id = '$aid'";
     
     // ถ้าเลือกเดือน ให้ปรับ SQL query
@@ -649,7 +648,7 @@ body {
                                                 <small><?= "วัน" . thai_day($data['order_date']) . " " . date('d', strtotime($data['order_date'])) . " " . thai_month($data['order_date']) . " " . thai_year($data['order_date']) . "<br>" . "เวลา " . date('H:i', strtotime($data['order_date'])) . " น."; ?>
                                                 </small>
                                             </td>
-                                            <td class="text-center"><small><?=$data['customer_name'];?> <?=$data['customer_last'];?></small></td>
+                                            <td class="text-center"><small><?=$data['customer_name'];?></small></td>
                                             <td class="text-end"><?=number_format($data['order_total'], 2);?></td>
                                             <td class="text-center"><small><?=$data['emp_name'];?></small></td>
                                             <td class="text-center"><small><?=$data['paymethod_name'];?></small></td>

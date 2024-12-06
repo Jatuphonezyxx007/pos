@@ -649,7 +649,7 @@ body {
                                                 <small><?= "วัน" . thai_day($data['order_date']) . " " . date('d', strtotime($data['order_date'])) . " " . thai_month($data['order_date']) . " " . thai_year($data['order_date']) . "<br>" . "เวลา " . date('H:i', strtotime($data['order_date'])) . " น."; ?>
                                                 </small>
                                             </td>
-                                            <td class="text-center"><small><?=$data['customer_name'];?> <?=$data['customer_last'];?></small></td>
+                                            <td class="text-center"><small><?=$data['customer_name'];?></small></td>
                                             <td class="text-end"><?=number_format($data['order_total'], 2);?></td>
                                             <td class="text-center"><small><?=$data['emp_name'];?></small></td>
                                             <td class="text-center"><small><?=$data['paymethod_name'];?></small></td>

@@ -552,7 +552,7 @@ body {
         <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/employee_list.php' ? 'active' : '') ?>" href="employee_list.php">พนักงาน</a>
     </li>
     <li class="pc-item">
-        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/customer_list.php' ? 'active' : '') ?>" href="customer_list.php">ลูกค้า</a>
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sample-page2.php' ? 'active' : '') ?>" href="sale_history.php">ลูกค้า</a>
     </li>
 </ul>
         </li>

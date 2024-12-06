@@ -820,7 +820,7 @@ body {
     <div class="row g-2 mt-2">
 
     <div class="col-3">
-            <button class="btn btn-secondary w-100" data-value="AC">
+            <button class="btn btn-danger w-100" data-value="AC">
             <i class="ph ph-user-plus"></i>
             </button>
         </div>

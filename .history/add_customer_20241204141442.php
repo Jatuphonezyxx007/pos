@@ -3,98 +3,131 @@ session_start();
 include("connectdb.php");
 
 if (empty($_SESSION['aid'])) {
-    echo "<script>";
-    echo "alert('Access Denied !!!');";
-    echo "window.location.href='index.php';";
-    echo "</script>";
-    exit;
+  echo "<script>";
+  echo "alert('Access Denied !!!');";
+  echo "window.location.href='index.php';";
+  echo "</script>";
+  exit;
 }
 
+// ใช้งาน session
 $aid = $_SESSION['aid'];
 $aname = $_SESSION['aname'];
 $role_id = $_SESSION['role_id'];
 $role_name = $_SESSION['role_name'];
 $img = $_SESSION['img'];
 
-if (empty($img)) {
-    $img = 'default.jpg'; 
-}
+// // ตรวจสอบว่าค่าที่เก็บใน session มีอยู่หรือไม่
+// if (empty($img)) {
+//   // กำหนดรูปภาพเริ่มต้นในกรณีที่ไม่มีรูปภาพ
+//   $img = 'default.jpg'; 
+// }
 
+// สร้าง URL สำหรับรูปภาพ
 $imagePath = "assets/images/emp/" . $aid . "." . $img;
 
-function thai_day($date) {
-    $dayNames = array("อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์");
-    return $dayNames[date('w', strtotime($date))];
+// ดึงข้อมูลพนักงานที่เลือกมาแสดง
+// if (isset($_GET['id'])) {
+//   $customer_id = $_GET['id'];
+  // include("connectdb.php");
+
+  // $sql = "SELECT * FROM customer WHERE customer.customer_id = '$customer_id'";
+  // $result = mysqli_query($conn, $sql);
+  // $data = mysqli_fetch_array($result);
+
+
+// } else {
+//   echo "customer_id is not set.";
+// }
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+  $cus_name = $_POST['cus_name'];
+  $cus_last = $_POST['cus_last'];
+  $cus_taxid = $_POST['cus_taxid'];
+  $cus_phone = $_POST['cus_phone'];  
+  $cus_email = $_POST['cus_email'];
+  $cus_address = $_POST['cus_address'];
+  // $role_id = $_POST['ep_role'];
+  // $com_id = $data['com_id']; // Assuming com_id is already set and should not be changed
+
+  // // ตรวจสอบว่ามีการกรอกรหัสผ่านใหม่หรือไม่
+  // if (!empty($emp_pwd)) {
+  //   $emp_pwd = md5($emp_pwd);  // แปลงรหัสผ่านเป็น MD5
+  //   $pwd_sql = ", emp_pwd='$emp_pwd'";
+  // } else {
+  //   // ใช้รหัสผ่านเดิมถ้าไม่มีการกรอกใหม่
+  //   $pwd_sql = "";
+  // }
+
+  // $img_sql = "";
+  // if ($_FILES['ep_pic']['name'] != "") {
+  //   $allowed = array('gif', 'png', 'jpg', 'jpeg', 'jfif', 'webp');
+  //   $filename = $_FILES['ep_pic']['name'];
+  //   $ext = pathinfo($filename, PATHINFO_EXTENSION);
+
+  //   if (!in_array($ext, $allowed)) {
+  //     echo "<script>";
+  //     echo "alert('แก้ไขข้อมูลพนักงานไม่สำเร็จ! ไฟล์รูปต้องเป็น jpg, gif หรือ png เท่านั้น');";
+  //     echo "</script>";
+  //     exit;
+  //   }
+  //   $target_file = "assets/images/emp/" . $emp_id . "." . $ext;
+  //   if (move_uploaded_file($_FILES['ep_pic']['tmp_name'], $target_file)) {
+  //     $img_sql = ", img='$ext'";
+  //   } else {
+  //     echo "Error uploading file.";
+  //     exit;
+  //   }
+  // }
+
+  $sql = "INSERT INTO customer (`customer_name`, `customer_last`, `customer_address`, `customer_phone`, `customer_email`, `customer_taxID`, `emp_id`) VALUES ('$cus_name', '$cus_last', '$cus_address', '$cus_phone', '$cus_email', '$cus_taxid', '$aid')";
+
+  if (mysqli_query($conn, $sql)) {
+      echo "<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {});
+    document.getElementById('modalMessage').innerHTML = `
+        <div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\">
+            <div class=\"text-center\">
+                <div class=\"spinner-border text-success\" role=\"status\">
+                    <span class=\"visually-hidden\">Loading...</span>
+                </div>
+                <div class=\"mt-2\">กำลังบันทึกข้อมูล</div>
+            </div>
+        </div>
+    `;
+    myModal.show();
+    setTimeout(function() {
+        document.getElementById('modalMessage').innerHTML = `
+            <div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\">
+                <div class=\"text-success\">
+                    <i class=\"bi bi-check-circle-fill\"></i> ข้อมูลถูกอัปเดตเรียบร้อยแล้ว
+                </div>
+            </div>
+        `;
+        setTimeout(function() {
+            window.location.href = 'customer_list.php';
+        }, 1000);
+    }, 2000);
+});
+</script>";
+  } else {
+      echo "Error updating record: " . mysqli_error($conn);
+  }
 }
-
-function thai_month($date) {
-    $monthNames = array(
-        1 => "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", 
-        "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-    );
-    return $monthNames[date('n', strtotime($date))];
-}
-
-function thai_year($date) {
-    return date('Y', strtotime($date)) + 543;
-}
-
-// จำนวนแถวต่อหน้า
-$limit = 10;
-// ตรวจสอบหมายเลขหน้าปัจจุบัน
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$start = ($page - 1) * $limit;
-
-// ตรวจสอบค่าที่เลือกใน dropdown
-$selectedMonth = isset($_GET['month']) ? (int)$_GET['month'] : 0;
-
-// สร้าง SQL Query ตามบทบาทของผู้ใช้
-if ($role_name == 'admin') {
-    $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name, c.* FROM orders o 
-            JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
-            JOIN employees ep ON o.emp_id = ep.emp_id
-            JOIN customer c ON o.customer_id = c.customer_id";
-    
-    // ถ้าเลือกเดือน ให้ปรับ SQL query
-    if ($selectedMonth > 0) {
-        $sql .= " WHERE MONTH(o.order_date) = $selectedMonth";
-    }
-
-    $sql .= " ORDER BY o.order_id DESC LIMIT $start, $limit";
-} elseif ($role_name == 'employee') {
-    $sql = "SELECT o.*, pm.paymethod_name, ep.emp_name, c.* FROM orders o 
-            JOIN paymethod pm ON o.paymethod_id = pm.paymethod_id
-            JOIN employees ep ON o.emp_id = ep.emp_id
-            JOIN customer c ON o.customer_id = c.customer_id
-            WHERE o.emp_id = '$aid'";
-    
-    // ถ้าเลือกเดือน ให้ปรับ SQL query
-    if ($selectedMonth > 0) {
-        $sql .= " AND MONTH(o.order_date) = $selectedMonth";
-    }
-
-    $sql .= " ORDER BY o.order_id DESC LIMIT $start, $limit";
-}
-
-$rs = mysqli_query($conn, $sql);
-
-// จำนวนแถวทั้งหมดสำหรับการคำนวณหน้า
-$totalQuery = "SELECT COUNT(*) as total FROM orders";
-if ($selectedMonth > 0) {
-    $totalQuery .= " WHERE MONTH(order_date) = $selectedMonth";
-}
-$totalResult = mysqli_query($conn, $totalQuery);
-$totalData = mysqli_fetch_assoc($totalResult);
-$totalRows = $totalData['total'];
-$totalPages = ceil($totalRows / $limit);
 ?>
+
+
+
+
+
 
 <!DOCTYPE html>
 <html lang="en">
 <!-- [Head] start -->
 
 <head>
-  <title>Sale History | Point of Sale</title>
+  <title>POS | Point of Sale</title>
   <!-- [Meta] -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -116,23 +149,6 @@ $totalPages = ceil($totalRows / $limit);
 
   <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
 
-  <!-- [Favicon] icon -->
-  <link rel="icon" href="assets/images/favicon.svg" type="image/x-icon"> <!-- [Google Font : Poppins] icon -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
-<!-- [Tabler Icons] https://tablericons.com -->
-<link rel="stylesheet" href="assets/fonts/tabler-icons.min.css" >
-<!-- [Feather Icons] https://feathericons.com -->
-<link rel="stylesheet" href="assets/fonts/feather.css" >
-<!-- [Font Awesome Icons] https://fontawesome.com/icons -->
-<link rel="stylesheet" href="assets/fonts/fontawesome.css" >
-<!-- [Material Icons] https://fonts.google.com/icons -->
-<link rel="stylesheet" href="assets/fonts/material.css" >
-<!-- [Template CSS Files] -->
-<link rel="stylesheet" href="assets/css/style.css" id="main-style-link" >
-<link rel="stylesheet" href="assets/css/style-preset.css" >
-
-
 
 <!-- Script -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -146,7 +162,7 @@ $totalPages = ceil($totalRows / $limit);
       // Function to fetch and display products
       function fetchProducts(query) {
         $.ajax({
-          url: "fetch_products.php",
+          url: "fetch_products2.php",
           method: "POST",
           data: { query: query },
           success: function(data) {
@@ -161,6 +177,8 @@ $totalPages = ceil($totalRows / $limit);
         fetchProducts(query);
       });
     });
+
+        
   </script>
 
 
@@ -254,6 +272,13 @@ body {
     font-weight: bold;
 }
 
+.pic{
+  height: 200px;
+  width: 150px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto
+}
   </style>
 
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
@@ -359,7 +384,7 @@ body {
         <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/employee_list.php' ? 'active' : '') ?>" href="employee_list.php">พนักงาน</a>
     </li>
     <!-- <li class="pc-item">
-        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sale_history.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
+        <a class="pc-link <?= ($_SERVER['PHP_SELF'] == '/sample-page2.php' ? 'active' : '') ?>" href="sale_history.php">ประวัติการขาย</a>
     </li> -->
 </ul>
         </li>
@@ -388,10 +413,10 @@ body {
             <span class="pc-micon"><i class="ph ph-flower-lotus"></i></span>
             <span class="pc-mtext">Icons</span>
           </a>
-        </li>
+        </li> -->
 
 
-        <li class="pc-item pc-caption">
+        <!-- <li class="pc-item pc-caption">
           <label>Pages</label>
           <i class="ph ph-devices"></i>
         </li>
@@ -498,13 +523,10 @@ body {
     </div>
 
     <!-- เพิ่ม form control ตรงนี้ -->
-    <form method="post" class="search-form" onsubmit="return false;">
-      <input type="text" name="src2" placeholder="ค้นหาเลขที่ใบสั่งซื้อ" class="search-input" autofocus>
+    <!-- <form method="post" class="search-form" onsubmit="return false;">
+      <input type="text" name="src" placeholder="ค้นหาสินค้า" class="search-input" autofocus>
       <a class="btn btn-primary"><i class="ph ph-magnifying-glass"></i></a>
-    </form>
-
-
-
+    </form> -->
 
     <div class="ms-auto">
       <h7 id="clock" class="text-white text-center">00:00:00</h7>
@@ -573,123 +595,207 @@ body {
 </header>
 <!-- [ Header ] end -->
 
-  <!-- [ Main Content ] start -->
+<div class="col-12 col-sm-8 col-md-12">
+  <div class="pc-container px-1">
 
-  <!-- [ Main Content ] start -->
+  <form method="post" enctype="multipart/form-data">
 
-  <div class="pc-container">
     <div class="pc-content">
-        <div class="page-header">
-            <div class="page-block card mb-0">
-                <div class="card-body">
-                    <div class="row align-items-center mb-3">
-                        <div class="col-md-12">
-                            <div class="page-header-title border-bottom pb-2 d-flex justify-content-between align-items-center">
-                                <h4 class="mb-0">ประวัติการขาย</h4>
+      
 
-                                <div class="col-12 col-md-3">
-                                    <form method="get" action="">
-                                        <select class="form-select" name="month" aria-label="เลือกเดือน" onchange="this.form.submit()">
-                                            <option value="0">ยอดขายของทุกเดือน</option>
-                                            <?php
-                                            $months = [
-                                                1 => 'มกราคม',
-                                                2 => 'กุมภาพันธ์',
-                                                3 => 'มีนาคม',
-                                                4 => 'เมษายน',
-                                                5 => 'พฤษภาคม',
-                                                6 => 'มิถุนายน',
-                                                7 => 'กรกฎาคม',
-                                                8 => 'สิงหาคม',
-                                                9 => 'กันยายน',
-                                                10 => 'ตุลาคม',
-                                                11 => 'พฤศจิกายน',
-                                                12 => 'ธันวาคม'
-                                            ];
+      <div class="row">
 
-                                            foreach ($months as $month_num => $month_name) {
-                                                echo "<option value=\"$month_num\" " . ($month_num == $selectedMonth ? 'selected' : '') . ">$month_name</option>";
-                                            }
-                                            ?>
-                                        </select>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <div class="table-responsive">
-                                <table class="table table-striped table-sm">
-                                    <thead>
-                                        <tr>
-                                            <td class="text-center"></td>
-                                            <td class="text-center">เลขที่บิล</td>
-                                            <td class="text-start">วันที่ (สร้าง)</td>
-                                            <td class="text-center">ลูกค้า</td>
-                                            <td class="text-end">ราคารวม (บาท)</td>
-                                            <td class="text-center">พนักงาน</td>
-                                            <td class="text-center">ชำระโดย</td>
-                                            <td class="text-center">รายการ</td>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                    <?php
-                                    if (mysqli_num_rows($rs) > 0) {
-                                        while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
-                                    ?>
-                                        <tr>
-                                            <td class="text-center">
-                                                <small>
-                                                    <a href="history_detail.php?a=<?=$data['order_id'];?>">รายละเอียด</a>
-                                                </small>
-                                            </td>
-                                            <td class="text-center"><?=$data['order_id'];?></td>
-                                            <td class="text-start text-muted">
-                                                <small><?= "วัน" . thai_day($data['order_date']) . " " . date('d', strtotime($data['order_date'])) . " " . thai_month($data['order_date']) . " " . thai_year($data['order_date']) . "<br>" . "เวลา " . date('H:i', strtotime($data['order_date'])) . " น."; ?>
-                                                </small>
-                                            </td>
-                                            <td class="text-center"><small><?=$data['customer_name'];?> <?=$data['customer_last'];?></small></td>
-                                            <td class="text-end"><?=number_format($data['order_total'], 2);?></td>
-                                            <td class="text-center"><small><?=$data['emp_name'];?></small></td>
-                                            <td class="text-center"><small><?=$data['paymethod_name'];?></small></td>
-                                            <td class="text-center">
-                                                <a href="delete.php?id=<?=$data['order_id'];?>" class="btn btn-danger btn-sm" onClick="return confirm('ยืนยันการลบ ?');"><i class="ph ph-trash"></i> ลบ</a>
-                                                <a class="btn btn-success btn-sm" onClick="window.open('bill_vat.php?b=<?=$data['order_id'];?>', '_blank', 'width=960,height=1080')"><i class="ph ph-printer"></i> ใบกำกับภาษี</a>
-                                            </td>
-                                        </tr>
-                                    <?php  
-                                        }
-                                    } else {
-                                        echo '<tr><td colspan="7" class="text-center">ไม่มีรายการการขาย</td></tr>';
-                                    }
-                                    ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="pagination-container text-center mt-3">
-                            <?php if($page > 1): ?>
-                                <a href="?page=<?= $page - 1; ?>&month=<?= $selectedMonth; ?>" class="btn btn-outline-secondary">ก่อนหน้า</a>
-                            <?php endif; ?>
-
-                            <?php for($i = 1; $i <= $totalPages; $i++): ?>
-                                <a href="?page=<?= $i; ?>&month=<?= $selectedMonth; ?>" class="btn btn-outline-secondary <?= $i == $page ? 'active' : ''; ?>"><?= $i; ?></a>
-                            <?php endfor; ?>
-
-                            <?php if($page < $totalPages): ?>
-                                <a href="?page=<?= $page + 1; ?>&month=<?= $selectedMonth; ?>" class="btn btn-outline-secondary">ถัดไป</a>
-                            <?php endif; ?>
-                        </div>
-
-                        
-                    </div>
-                </div>
-            </div>
+      <div class="col-md-12">
+        <div class="page-header-title border-bottom pb-2 mb-2 d-flex align-items-center">
+          <a href="javascript:history.back()" class="breadcrumb-item me-2">
+            <i class="ph ph-arrow-left fs-3"></i>
+          </a>
+          <h4 class="mb-0">เพิ่มข้อมูลลูกค้า</h4>
         </div>
-    </div>
+      </div>
+
+
+      <!-- <h5 class="card-title fw-semibold mb-4">แก้ไขข้อมูลพนักงาน : <?=$data['emp_name'];?></h5> -->
+
+      <!-- <div class="col-md-6">
+          <div class="card">
+            <div class="card-body pc-component">
+              <p class="lead m-t-0">รูปภาพ</p>
+
+
+                      <br><br><br>
+
+                      <div class="col">
+                        <label for="formFile" class="form-label">เปลี่ยนรูปภาพ</label>
+                        <input class="form-control" type="file" name="ep_pic">
+                        <br>
+                        <h6 class="card-subtitle fw-normal mb-4">สำคัญ : สามารถอัพโหลดรูปภาพเฉพาะไฟล์ png, jpg, gif, tfif และ webp</h6>
+                      </div>
+
+
+            </div>
+          </div>
+        </div> -->
+
+        
+        <div class="col-md-12">
+          <div class="card">
+            
+          <div class="card-header">
+            <div class="row align-items-center">
+              <div class="col-3">
+                <h5 class="mb-0">รหัสลูกค้า</h5>
+              </div>
+              <div class="col-9">
+              <input class="form-control" type="text" name="cus_id" placeholder="" aria-label="Disabled input example" disabled>              
+            </div>          
+            </div>
+          </div>
+
+            <div class="card-body pc-component">
+
+              <div class="row align-items-center">
+              <div class="col-3">
+                <p class="text-dark mb-0">ชื่อบริษัท หรือ ชื่อ - นามสกุล</p>
+              </div>
+              <div class="col-5">
+                <div class="form-floating">
+                <input name="cus_name" type="text" class="form-control"> 
+              </div>
+              </div>
+              <div class="col-4">
+                <input name="cus_last" type="text" class="form-control"> 
+              </div>                    
+            </div>
+
+            <div class="col-3">
+                        <div class="form-floating">
+                          <input type="text" name="unit_product" class="form-control" id="unit_product" placeholder="ราคา" required>
+                          <label for="floatingInputGrid">ชื่อหน่วยนับ</label>
+                        </div>
+                      </div>
+
+
+            <br>
+            <div class="row align-items-center">
+              <div class="col-3">
+                <p class="text-dark mb-0">หมายเลขผู้เสียภาษีอากร</p>
+              </div>
+              <div class="col-9">
+                <input name="cus_taxid" type="text" class="form-control"> 
+              </div>          
+            </div>
+            <br>
+
+            <div class="row align-items-center">
+              <div class="col-3">
+                <p class="text-dark mb-0">E - mail</p>
+              </div>
+              <div class="col-9">
+                <input name="cus_email" type="text" class="form-control"> 
+              </div>          
+            </div>
+
+            <br>
+            <div class="row align-items-center">
+              <div class="col-3">
+                <p class="text-dark mb-0">เบอร์โทรศัพท์</p>
+              </div>
+              <div class="col-9">
+                <input name="cus_phone" type="text" class="form-control"> 
+              </div>          
+            </div>
+
+            <br>
+
+            <div class="row align-items-center">
+              <div class="col-3">
+                <p class="text-dark mb-0">ที่อยู่</p>
+              </div>
+              <div class="col-9">
+              <textarea name="cus_address" class="form-control" aria-label="With textarea"></textarea>
+             </div>          
+            </div>
+
+
+              </div>
+
+
+              
+            </div>
+
+
+            <!-- <div class="card">
+            
+            <div class="card-header">
+              <div class="row align-items-center">
+                <div class="col-3">
+                  <h5 class="mb-0">หน้าที่</h5>
+                </div>
+
+
+
+
+              </div>
+            </div>
+  
+              <div class="card-body pc-component">
+  
+                <div class="row align-items-center">
+                <div class="col-3">
+                  <p class="text-dark mb-0">ชื่อผู้ใช้</p>
+                </div>
+                <div class="col-9">
+                  <input name="ep_user" type="text" class="form-control" value="<?= $data['emp_user']; ?>"> 
+                </div>          
+              </div>
+  
+              <br>
+              <div class="row align-items-center">
+                <div class="col-3">
+                  <p class="text-dark mb-0">รหัสผ่านใหม่</p>
+                </div>
+                <div class="col-9">
+                  <input name="ep_pwd" type="password" class="form-control" value=""> 
+                </div>          
+              </div>
+                </div>               
+              </div> -->
+  
+
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+  <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">บันทึกข้อมูล</button>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">บันทึกข้อมูล</h5>
+        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+      </div>
+      <div class="modal-body" id="modalMessage">
+        ...
+      </div>
+
+    </div>
+  </div>
+</div>
+
+            </div>
+          </div>
+        </div>
+
+
+
+          </form>
+          
+      </div>
+
+
+
+    </div>
 
 
   <footer class="pc-footer">
@@ -697,19 +803,19 @@ body {
       <div class="row">
 
 
-
-
-
-
   
         <div class="col-sm-6 ms-auto my-1">
           <ul class="list-inline footer-link mb-0 justify-content-sm-end d-flex">
-          <a href="#top" class="text-end">กลับไปบนสุด</a>
+          <!-- <a href="#top" class="text-end">กลับไปบนสุด</a> -->
           </ul>
         </div>
       </div>
     </div>
   </footer>
+
+
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
 
   <!-- Required Js -->
 <script src="assets/js/plugins/popper.min.js"></script>
@@ -762,53 +868,16 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+document.getElementById('okButton').addEventListener('click', function() {
+  window.location.href = 'customer_list.php';
+});
 
 </script>
 
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-
-
-
-<script src="../assets/js/plugins/popper.min.js"></script>
-<script src="../assets/js/plugins/simplebar.min.js"></script>
-<script src="../assets/js/plugins/bootstrap.min.js"></script>
-<script src="../assets/js/fonts/custom-font.js"></script>
-<script src="../assets/js/pcoded.js"></script>
-<script src="../assets/js/plugins/feather.min.js"></script>
-
-
-
-
-
-<script>layout_change('light');</script>
-
-
-
-
-<script>layout_sidebar_change('light');</script>
-
-
-
-<script>change_box_container('false');</script>
-
-
-<script>layout_caption_change('true');</script>
-
-
-
-
-<script>layout_rtl_change('false');</script>
-
-
-<script>preset_change("preset-1");</script>
-
-
-<script>header_change("header-1");</script>
-
-
 </body>
 
-
+</body>
 <!-- [Body] end -->
 
 </html>

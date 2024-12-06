@@ -818,13 +818,6 @@ body {
     </div>
 
     <div class="row g-2 mt-2">
-
-    <div class="col-3">
-            <button class="btn btn-secondary w-100" data-value="AC">
-            <i class="ph ph-user-plus"></i>
-            </button>
-        </div>
-
       <div class="col-3 ms-auto align-self-end">
         <button type="button" class="btn btn-primary w-100" id="calculateButton">คำนวณ</button>
       </div>
@@ -833,8 +826,10 @@ body {
     
     <!-- <button type="button" class="btn btn-primary w-100" id="paymentButton">ดำเนินการต่อ</button> -->
 
-
-        <!-- <div class="col-3">
+        <div class="col-3">
+            <button class="btn btn-danger w-100" data-value="AC">AC</button>
+        </div>
+        <div class="col-3">
             <button class="btn btn-warning w-100" data-value="DEL">DEL</button>
         </div>
         <div class="col-3">
@@ -843,7 +838,7 @@ body {
         <div class="col-3">
             <button class="btn btn-danger w-100" data-value="/">/</button>
         </div>
-    </div> -->
+    </div>
 
     
 </div>
