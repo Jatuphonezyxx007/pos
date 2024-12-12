@@ -26,77 +26,61 @@ if (empty($img)) {
 // สร้าง URL สำหรับรูปภาพ
 $imagePath = "assets/images/emp/" . $aid . "." . $img;
 
-// ดึงข้อมูลพนักงานที่เลือกมาแสดง
-if (isset($_GET['id'])) {
-  $emp_id = $_GET['id'];
-  $sql = "SELECT employees.*, role.role_name
-          FROM employees 
-          INNER JOIN role ON employees.role_id = role.role_id
-          WHERE employees.emp_id = '$emp_id'";
-  $rs = mysqli_query($conn, $sql);
-  if ($rs) {
-      $data = mysqli_fetch_array($rs);
-      $emp_role_id = $data['role_id']; // เก็บ role_id ของพนักงานเพื่อใช้เป็น default
-  } else {
-      echo "Error in query: " . mysqli_error($conn);
-  }
-} else {
-  echo "emp_id is not set.";
-}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-  $emp_name = $_POST['ep_name'];
-  $emp_last = $_POST['ep_last'];
-  $emp_user = $_POST['ep_user'];
-  $emp_pwd = $_POST['ep_pwd'];  
-  $emp_email = $_POST['ep_email'];
-  $emp_phone = $_POST['ep_phone'];
-  $role_id = $_POST['ep_role'];
-  $com_id = $data['com_id']; // Assuming com_id is already set and should not be changed
+    $emp_name = $_POST['ep_name'];
+    $emp_last =$_POST['ep_last'];
+    $emp_user = $_POST['ep_user'];
+    $emp_pwd = md5($_POST['ep_pwd']);  // แปลงรหัสผ่านเป็น MD5
+    $emp_email = $_POST['ep_email'];
+    $emp_phone = $_POST['ep_phone'];
+    $role_id = $_POST['ep_role'];
+    $com_id = '001';  // ตั้งค่าเป็นค่าเริ่มต้นหรือตามที่ต้องการ
 
-  // ตรวจสอบว่ามีการกรอกรหัสผ่านใหม่หรือไม่
-  if (!empty($emp_pwd)) {
-    $emp_pwd = md5($emp_pwd);  // แปลงรหัสผ่านเป็น MD5
-    $pwd_sql = ", emp_pwd='$emp_pwd'";
-  } else {
-    // ใช้รหัสผ่านเดิมถ้าไม่มีการกรอกใหม่
-    $pwd_sql = "";
-  }
+    // Insert the employee data first without the image
+    $sql = "INSERT INTO `employees` (`emp_name`, `emp_last`, `emp_user`, `emp_pwd`, `emp_email`, `emp_phone`, `role_id`, `com_id`)
+            VALUES ('$emp_name', '$emp_last', '$emp_user', '$emp_pwd', '$emp_email', '$emp_phone', '$role_id', '$com_id')";
 
-  $img_sql = "";
-  if ($_FILES['ep_pic']['name'] != "") {
-    $allowed = array('gif', 'png', 'jpg', 'jpeg', 'jfif', 'webp');
-    $filename = $_FILES['ep_pic']['name'];
-    $ext = pathinfo($filename, PATHINFO_EXTENSION);
+    if (mysqli_query($conn, $sql)) {
+        $emp_id = mysqli_insert_id($conn); // Get the newly inserted employee ID
 
-    if (!in_array($ext, $allowed)) {
-      echo "<script>";
-      echo "alert('แก้ไขข้อมูลพนักงานไม่สำเร็จ! ไฟล์รูปต้องเป็น jpg, gif หรือ png เท่านั้น');";
-      echo "</script>";
-      exit;
-    }
-    $target_file = "assets/images/emp/" . $emp_id . "." . $ext;
-    if (move_uploaded_file($_FILES['ep_pic']['tmp_name'], $target_file)) {
-      $img_sql = ", img='$ext'";
-    } else {
-      echo "Error uploading file.";
-      exit;
-    }
-  }
+        $img_sql = '';
+        $target_file = '';
 
-  $sql = "UPDATE employees SET 
-      emp_name='$emp_name',
-      emp_last='$emp_last', 
-      emp_user='$emp_user'
-      $pwd_sql, 
-      emp_email='$emp_email', 
-      emp_phone='$emp_phone', 
-      role_id='$role_id'
-      $img_sql
-  WHERE emp_id='$emp_id'";
+        // Handle the image upload
+        if (isset($_FILES['ep_pic']['name']) && $_FILES['ep_pic']['name'] != "") {
+            $allowed = array('gif', 'png', 'jpg', 'jpeg', 'jfif', 'webp');
+            $filename = $_FILES['ep_pic']['name'];
+            $ext = pathinfo($filename, PATHINFO_EXTENSION);
 
-  if (mysqli_query($conn, $sql)) {
-      echo "<script>
+            if (!in_array($ext, $allowed)) {
+                echo "<script>alert('บันทึกข้อมูลไม่สำเร็จ! ไฟล์รูปต้องเป็น jpg, gif หรือ png เท่านั้น');</script>";
+                exit;
+            }
+
+            $target_file = "assets/images/emp/" . str_pad($emp_id, 3, '0', STR_PAD_LEFT) . "." . $ext;
+            if (move_uploaded_file($_FILES['ep_pic']['tmp_name'], $target_file)) {
+                // Update the employee record with the image extension
+                $img_sql = "UPDATE `employees` SET `img` = '$ext' WHERE `emp_id` = '$emp_id'";
+                mysqli_query($conn, $img_sql);
+            } else {
+                echo "Error uploading file.";
+                exit;
+            }
+        } else {
+            // If no image is uploaded, copy default.jpg and rename it
+            $default_image_path = "assets/images/emp/default.jpg";
+            $target_file = "assets/images/emp/" . str_pad($emp_id, 3, '0', STR_PAD_LEFT) . ".jpg";
+            if (!copy($default_image_path, $target_file)) {
+                echo "Error copying default image.";
+                exit;
+            }
+            // Update the employee record with 'jpg' as the image extension
+            $img_sql = "UPDATE `employees` SET `img` = 'jpg' WHERE `emp_id` = '$emp_id'";
+            mysqli_query($conn, $img_sql);
+        }
+
+        echo "<script>
 document.addEventListener('DOMContentLoaded', function() {
     var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {});
     document.getElementById('modalMessage').innerHTML = `
@@ -105,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class=\"spinner-border text-success\" role=\"status\">
                     <span class=\"visually-hidden\">Loading...</span>
                 </div>
-                <div class=\"mt-2\">กำลังบันทึกข้อมูล</div>
+                <div class=\"mt-3\">กำลังบันทึกข้อมูล...</div>
             </div>
         </div>
     `;
@@ -113,8 +97,9 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
         document.getElementById('modalMessage').innerHTML = `
             <div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\">
-                <div class=\"text-success\">
-                    <i class=\"bi bi-check-circle-fill\"></i> ข้อมูลถูกอัปเดตเรียบร้อยแล้ว
+                <div class=\"text-center\">
+                    <i class=\"bi bi-check-circle-fill text-success\" style=\"font-size: 2rem;\"></i>
+                    <div class=\"mt-3\">ข้อมูลพนักงานบันทึกเรียบร้อยแล้ว</div>
                 </div>
             </div>
         `;
@@ -124,11 +109,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 2000);
 });
 </script>";
-  } else {
-      echo "Error updating record: " . mysqli_error($conn);
-  }
+    } else {
+        echo "Error inserting record: " . mysqli_error($conn);
+    }
 }
 ?>
+
 
 
 
@@ -140,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- [Head] start -->
 
 <head>
-  <title>POS | Point of Sale</title>
+  <title>เพิ่มรายการพนักงาน | Point of Sale</title>
   <!-- [Meta] -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -154,18 +140,13 @@ document.addEventListener('DOMContentLoaded', function() {
 <link rel="stylesheet" href="assets/css/style.css" id="main-style-link" >
 <link rel="stylesheet" href="assets/css/style-preset.css" >
 
-
-<!-- [Favicon] icon -->
-<link rel="icon" href="assets/images/logo/icn.png" type="image/x-icon"> <!-- [Google Font : Poppins] icon -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
-
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai+Looped:wght@500&display=swap" rel="stylesheet">
 
-
+  <!-- Phosphor Icons CSS -->
+  <link href="https://unpkg.com/phosphor-icons/css/phosphor.css" rel="stylesheet">
   <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
 
 
@@ -292,8 +273,8 @@ body {
 }
 
 .pic{
-  height: 200px;
-  width: 150px;
+  height: 300px;
+  width: 250px;
   display: block;
   margin-left: auto;
   margin-right: auto
@@ -414,20 +395,20 @@ body {
         <!-- <li class="pc-item pc-caption">
             <label>UI Components</label>
             <i class="ph ph-compass-tool"></i>
-        </li>
-        <li class="pc-item">
+        </li> -->
+        <!-- <li class="pc-item">
           <a href="elements/bc_typography.html" class="pc-link">
             <span class="pc-micon"><i class="ph ph-text-aa"></i></span>
             <span class="pc-mtext">Typography</span>
           </a>
-        </li>
-        <li class="pc-item">
+        </li> -->
+        <!-- <li class="pc-item">
           <a href="elements/bc_color.html" class="pc-link">
             <span class="pc-micon"><i class="ph ph-palette"></i></span>
             <span class="pc-mtext">Color</span>
           </a>
-        </li>
-        <li class="pc-item">
+        </li> -->
+        <!-- <li class="pc-item">
           <a href="elements/icon-feather.html" class="pc-link">
             <span class="pc-micon"><i class="ph ph-flower-lotus"></i></span>
             <span class="pc-mtext">Icons</span>
@@ -438,24 +419,24 @@ body {
         <!-- <li class="pc-item pc-caption">
           <label>Pages</label>
           <i class="ph ph-devices"></i>
-        </li>
-        <li class="pc-item">
+        </li> -->
+        <!-- <li class="pc-item">
           <a href="pages/login-v1.html" class="pc-link">
             <span class="pc-micon"><i class="ph ph-lock"></i></span>
             <span class="pc-mtext">Login</span>
           </a>
-        </li>
-        <li class="pc-item">
+        </li> -->
+        <!-- <li class="pc-item">
           <a href="pages/register-v1.html" class="pc-link">
             <span class="pc-micon"><i class="ph ph-user-circle-plus"></i></span>
             <span class="pc-mtext">Register</span>
           </a>
-        </li>
-        <li class="pc-item pc-caption">
+        </li> -->
+        <!-- <li class="pc-item pc-caption">
           <label>Other</label>
           <i class="ph ph-suitcase"></i>
-        </li>
-        <li class="pc-item pc-hasmenu">
+        </li> -->
+        <!-- <li class="pc-item pc-hasmenu">
           <a href="#!" class="pc-link"
             ><span class="pc-micon">
               <i class="ph ph-tree-structure"></i> </span
@@ -500,22 +481,22 @@ body {
               </ul>
             </li>
           </ul>
-        </li>
-        <li class="pc-item"
+        </li> -->
+        <!-- <li class="pc-item"
           ><a href="other/sample-page.html" class="pc-link">
             <span class="pc-micon">
               <i class="ph ph-desktop"></i>
             </span>
             <span class="pc-mtext">Sample page</span></a
           ></li
-        >
+        > -->
 
-      </ul>
+      <!-- </ul>
       <div class="card nav-action-card bg-brand-color-9">
-        <div class="card-body" style="background-image: url('assets/images/layout/nav-card-bg.svg')"> -->
+        <div class="card-body" style="background-image: url('assets/images/layout/nav-card-bg.svg')">
 
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </nav>
@@ -622,45 +603,38 @@ body {
     <div class="pc-content">
       
 
-    <?php if (isset($data)) { ?>
-
       <div class="row">
 
-      <div class="col-md-12">
-        <div class="page-header-title border-bottom pb-2 mb-2 d-flex align-items-center">
-          <a href="javascript:history.back()" class="breadcrumb-item me-2">
-            <i class="ph ph-arrow-left fs-3"></i>
-          </a>
-          <h4 class="mb-0">แก้ไขข้อมูลพนักงาน : <?=$data['emp_name'];?> <?=$data['emp_last'];?></h4>
-        </div>
-      </div>
+      <h5 class="card-title fw-semibold mb-4">เพิ่มพนักงาน</h5>
 
-
-      <!-- <h5 class="card-title fw-semibold mb-4">แก้ไขข้อมูลพนักงาน : <?=$data['emp_name'];?></h5> -->
 
       <div class="col-md-6">
           <div class="card">
             <!-- <div class="card-header">
               <h5>Inline Text Elements</h5>
             </div> -->
+
             <div class="card-body pc-component">
-              <p class="lead m-t-0">รูปภาพ</p>
+  <p class="lead m-t-0">รูปภาพ</p>
 
-              <div class="pic">
-                        <img src="assets/images/emp/<?=$data['emp_id'];?>.<?=$data['img'];?>" class="card-img-top rounded mx-auto d-block" alt="">
-                      </div>
+  <div class="pic">
+    <?php if (!empty($data['img'])): ?>
+      <img src="assets/images/emp/<?=$data['emp_id'];?>.<?=$data['img'];?>" class="card-img-top rounded mx-auto d-block" alt="Employee Image">
+    <?php else: ?>
+      <p class="text-center">ไม่มีรูปภาพในขณะนี้</p>
+    <?php endif; ?>
+  </div>
 
-                      <br><br><br>
+  <br>
 
-                      <div class="col">
-                        <label for="formFile" class="form-label">เปลี่ยนรูปภาพ</label>
-                        <input class="form-control" type="file" name="ep_pic">
-                        <br>
-                        <h6 class="card-subtitle fw-normal mb-4">สำคัญ : สามารถอัพโหลดรูปภาพเฉพาะไฟล์ png, jpg, gif, tfif และ webp</h6>
-                      </div>
+  <div class="col">
+    <label for="formFile" class="form-label">เปลี่ยนรูปภาพ</label>
+    <input class="form-control" type="file" name="ep_pic">
+    <br>
+    <h6 class="card-subtitle fw-normal mb-4">สำคัญ : สามารถอัพโหลดรูปภาพเฉพาะไฟล์ png, jpg, gif, tfif และ webp</h6>
+  </div>
+</div>
 
-
-            </div>
           </div>
         </div>
 
@@ -674,7 +648,7 @@ body {
                 <h5 class="mb-0">รหัสพนักงาน</h5>
               </div>
               <div class="col-9">
-              <input class="form-control" type="text" name="ep_id" placeholder="<?= $data['emp_id']; ?>" aria-label="Disabled input example" disabled>              
+              <input class="form-control" type="text" name="ep_id" placeholder="" aria-label="Disabled input example" disabled>              
             </div>          
             </div>
           </div>
@@ -686,11 +660,12 @@ body {
                 <p class="text-dark mb-0">ชื่อ - นามสกุล</p>
               </div>
               <div class="col-5">
-                <input name="ep_name" type="text" class="form-control" value="<?= $data['emp_name']; ?>"> 
+                <input name="ep_name" type="text" class="form-control" placeholder="ชื่อ"> 
               </div>
               <div class="col-4">
-                <input name="ep_last" type="text" class="form-control" value="<?= $data['emp_last']; ?>"> 
-              </div>                    
+                <input name="ep_last" type="text" class="form-control" placeholder="นามสกุล"> 
+              </div>          
+          
             </div>
 
             <br>
@@ -699,7 +674,7 @@ body {
                 <p class="text-dark mb-0">E - mail</p>
               </div>
               <div class="col-9">
-                <input name="ep_email" type="text" class="form-control" value="<?= $data['emp_email']; ?>"> 
+                <input name="ep_email" type="text" class="form-control" value=""> 
               </div>          
             </div>
 
@@ -709,7 +684,7 @@ body {
                 <p class="text-dark mb-0">เบอร์โทรศัพท์</p>
               </div>
               <div class="col-9">
-                <input name="ep_phone" type="text" class="form-control" value="<?= $data['emp_phone']; ?>"> 
+                <input name="ep_phone" type="text" class="form-control" value=""> 
               </div>          
             </div>
               </div>
@@ -724,32 +699,22 @@ body {
             <div class="card-header">
               <div class="row align-items-center">
                 <div class="col-3">
-                  <h5 class="mb-0">หน้าที่</h5>
+                  <h5 class="mb-0">สิทธิ์เข้าถึง</h5>
                 </div>
-
-
                 <div class="col-9">
-    <select class="form-select" id="role" aria-label="role" name="ep_role">
-        <?php
-        // ดึงข้อมูล role ทั้งหมดจากตาราง role
-        $sql2 = "SELECT * FROM `role`";
-        $rs2 = mysqli_query($conn, $sql2);
 
-        if ($rs2) {
-            while ($data2 = mysqli_fetch_array($rs2)) {
-                // ตั้งค่า selected ถ้า role_id ตรงกับ role_id ของพนักงาน
-                $selected = ($data2['role_id'] == $emp_role_id) ? "selected" : "";
-                echo "<option value='{$data2['role_id']}' $selected>{$data2['role_name']}</option>";
-            }
-        } else {
-            echo "Query failed.";
-        }
-        ?>
-    </select>
-</div>
+                <select class="form-select" id="role" name="ep_role" required>
+          <?php
+          include("connectdb.php");
+          $sql2 = "SELECT * FROM `role`";
+          $rs2 = mysqli_query($conn, $sql2);
+          while ($data2 = mysqli_fetch_array($rs2)) {
+          ?>
+          <option value="<?= $data2['role_id']; ?>"><?= $data2['role_name']; ?></option>
+          <?php } ?>
+        </select>
 
-
-
+              </div>          
               </div>
             </div>
   
@@ -760,7 +725,7 @@ body {
                   <p class="text-dark mb-0">ชื่อผู้ใช้</p>
                 </div>
                 <div class="col-9">
-                  <input name="ep_user" type="text" class="form-control" value="<?= $data['emp_user']; ?>"> 
+                  <input name="ep_user" type="text" class="form-control" value=""> 
                 </div>          
               </div>
   
@@ -792,7 +757,10 @@ body {
       <div class="modal-body" id="modalMessage">
         ...
       </div>
-
+      <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="okButton">OK</button>
+      </div> -->
     </div>
   </div>
 </div>
@@ -801,14 +769,11 @@ body {
           </div>
         </div>
 
-        <?php } else  { ?>
-          <p>No employee data found.</p>
 
           </form>
           
       </div>
 
-      <?php } ?>
 
 
     </div>

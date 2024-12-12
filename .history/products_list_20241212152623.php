@@ -33,7 +33,7 @@ $imagePath = "assets/images/emp/" . $aid . "." . $img;
 <!-- [Head] start -->
 
 <head>
-  <title>Details Order | Point of Sale</title>
+  <title>รายการสินค้าทั้งหมด | Point of Sale</title>
   <!-- [Meta] -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -55,8 +55,8 @@ $imagePath = "assets/images/emp/" . $aid . "." . $img;
 
   <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
 
-<!-- [Favicon] icon -->
-<link rel="icon" href="assets/images/logo/icn.png" type="image/x-icon"> <!-- [Google Font : Poppins] icon -->
+  <!-- [Favicon] icon -->
+  <link rel="icon" href="assets/images/favicon.svg" type="image/x-icon"> <!-- [Google Font : Poppins] icon -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
 <!-- [Tabler Icons] https://tablericons.com -->
@@ -108,6 +108,20 @@ $imagePath = "assets/images/emp/" . $aid . "." . $img;
 body {
   font-family: "IBM Plex Sans Thai Looped", sans-serif;
 }
+
+
+/* .status-ready {
+  color: green;
+}
+.status-almost {
+  color: orangered;
+}
+.status-out {
+  color: red;
+} */
+
+
+
 
 .fixed-col {
   position: fixed;
@@ -191,6 +205,12 @@ body {
 
 .pc-link.active {
     font-weight: bold;
+}
+
+.img-icon{
+  height: 70px;
+  width: 70px;
+  border-radius:20px;
 }
 
   </style>
@@ -438,9 +458,12 @@ body {
 
     <!-- เพิ่ม form control ตรงนี้ -->
     <form method="post" class="search-form" onsubmit="return false;">
-      <input type="text" name="src" placeholder="ค้นหาสินค้า" class="search-input" autofocus>
+      <input type="text" name="src2" placeholder="ค้นหาสินค้า" class="search-input" autofocus>
       <a class="btn btn-primary"><i class="ph ph-magnifying-glass"></i></a>
     </form>
+
+
+
 
     <div class="ms-auto">
       <h7 id="clock" class="text-white text-center">00:00:00</h7>
@@ -511,90 +534,477 @@ body {
 
   <!-- [ Main Content ] start -->
 
-<!-- [ Main Content ] start -->
-<!-- [ Main Content ] start -->
-<div class="pc-container">
-  <div class="pc-content">
-    <!-- [ breadcrumb ] start -->
-    <div class="page-header">
-      <div class="page-block card mb-0">
-        <div class="card-body">
-          <div class="row align-items-center">
-            <div class="col-12">
-              <div class="page-header-title border-bottom pb-2 mb-2 d-flex align-items-center">
-                <a href="javascript:history.back()" class="breadcrumb-item me-2">
-                  <i class="ph ph-arrow-left fs-3"></i>
-                </a>
-                <h4 class="mb-0">รายละเอียดคำสั่งซื้อ เลขที่ <?=$_GET['a'];?></h4>
+  <!-- [ Main Content ] start -->
+
+  <div class="pc-container">
+    <div class="pc-content">
+      <!-- [ breadcrumb ] start -->
+
+      <div>
+
+
+      <!-- <div class="col-md-6 col-xl-3">
+          <div class="card bg-grd-primary order-card">
+            <div class="card-body">
+              <h6 class="text-white">สินค้าทั้งหมด</h6>
+              <h2 class="text-end text-white"><i class="feather icon-shopping-cart float-start"></i><span>...</span>
+              </h2>
+              <p class="m-b-0">Completed Orders<span class="float-end">351</span></p>
+            </div>
+          </div>
+        </div>
+        </div> -->
+
+
+      <div class="page-header">
+        <div class="page-block card mb-0">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="page-header-title border-bottom pb-2 mb-2">
+                <div class="row align-items-center">
+                  <div class="col-md-7">
+                    <h4 class="mb-0">รายการสินค้า</h4>
+                  </div>
+                  <div class="col-md-5 text-end">
+                    <button type="button" class="btn btn-primary" onClick="window.open('product_print.php', '_blank', 'width=794,height=1123')">พิมพ์รายการสินค้า <i class="ph ph-printer"></i>
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div class="col-12">
-              <table class="table table-striped table-sm w-100">
-                <thead>
-                  <tr>
-                    <th style="width: 5%;" class="text-center">ที่</th>
-                    <th style="width: 15%;" class="text-center">เลขที่บาร์โค้ด</th>
-                    <th style="width: 45%;">สินค้า</th>
-                    <th style="width: 5%;" class="text-center">จำนวน</th>
-                    <th style="width: 15%;" class="text-center">ราคา/ชิ้น</th>
-                    <th style="width: 15%;" class="text-center">รวม (บาท)</th>
+
+              <div class="table-responsive">
+              <table class="table" width="100%">
+  <thead>
+  <tr>
+                    <td width="8%" class="text-center">รหัส</td>
+                    <!-- <td width="15%" class="text-center">&nbsp;</td> -->
+                    <td width="35%" class="text-start">ชื่อสินค้า</td>
+                    <td width="12%" class="text-start">ขนาด</td>
+                    <td width="10%" class="text-center">จำนวน<small>/Restock</small></td>
+                    <td width="10%" class="text-center">ราคา (บาท)</td>
+                    <td width="15%" class="text-start">หมวดหมู่</td>
+                    <td width="10%" class="text-start">สถานะ</td>
+
+
+                    <!-- <th width="5%">&nbsp;</th> -->
                   </tr>
-                </thead>
-                <tbody>
-                  <?php
-                  include("connectdb.php");
-                  $order_id = $_GET['a']; // รับค่า order_id จาก URL
-                  
-                  // ดึงข้อมูลจาก orders_detail และ products พร้อมข้อมูลจาก size
-                  $sql = "
-                  SELECT 
-                      od.*,
-                      p.barcode,
-                      p.name,
-                      s.price,
-                      s.size_name
-                  FROM orders_detail od
-                  INNER JOIN products p ON od.p_id = p.id
-                  INNER JOIN size s ON od.s_id = s.size_id
-                  WHERE od.order_id = '$order_id'
-                  ";
-                  $rs = mysqli_query($conn, $sql);
-                  
-                  $i = 0;
-                  $total = 0;
-                  
-                  while ($data = mysqli_fetch_array($rs, MYSQLI_BOTH)) {
-                      $i++;
-                      $sum = $data['price'] * $data['item'];
-                      $total += $sum;
+  </thead>
+
+
+<!-- old code -->
+  <!-- <tbody>
+    <?php
+    include("connectdb.php");
+
+    $sql = "SELECT 
+        products.id, 
+        products.name, 
+        MIN(size.price) AS min_price, 
+        MAX(size.price) AS max_price, 
+        type.type_name AS type_name,
+        size.id AS size_name,
+        size.qty,
+        CASE 
+            WHEN size.qty > 7 THEN 'พร้อมขาย'
+            WHEN size.qty > 0 AND size.qty <= 7 THEN 'ใกล้หมด'
+            ELSE 'สินค้าหมด'
+        END AS status
+    FROM 
+        `products`
+    JOIN 
+        `size` ON products.id = size.id
+    JOIN 
+        `type` ON products.type_id = type.type_id
+    GROUP BY 
+        products.id, size.id
+    ORDER BY 
+        products.id, size.id";
+
+    if ($stmt = mysqli_prepare($conn, $sql)) {
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        if ($result) {
+            $current_product_id = null;
+            $product_row_started = false;
+
+            while ($data = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+                if ($data['id'] != $current_product_id) {
+                    if ($product_row_started) {
+                        echo '</tr>';
+                    }
+
+                    $current_product_id = $data['id'];
+                    $product_row_started = true;
+
+                    ?>
+                    <tr>
+                        <td class="text-center"><?=$data['id'];?></td>
+                        <td class="text-center">
+                            <img src="assets/images/products_2/<?=$data['id'];?>.jpg" class="card-img-top img-icon" alt="Product Image">
+                        </td>
+                        <td class="text-start"><?=$data['name'];?></td>
+                        <td class="text-center">ขนาด</td>
+                        <td class="text-end">จำนวน</td>
+                            <td class="text-end"><?php if ($data['min_price'] == $data['max_price']) { ?>
+                                <?= number_format($data['min_price']); ?>
+                            <?php } else { ?>
+                                <?= number_format($data['min_price']); ?> - <?= number_format($data['max_price']); ?>
+                            <?php } ?></td>
+
+                        <td class="text-center"><?=$data['type_name'];?></td>
+                        <td><span class="text-center <?=$status_class;?>"><?=$data['status'];?></span></td>
+                    </tr>
+                    <?php
+                }
+
+                ?>
+                
+                <?php
+            }
+
+            if ($product_row_started) {
+                echo '</tr>';
+            }
+
+            mysqli_stmt_close($stmt);
+        } else {
+            echo "<tr><td colspan='7' class='text-center'>Query failed: " . mysqli_error($conn) . "</td></tr>";
+        }
+    } else {
+        die("Query preparation failed: " . mysqli_error($conn));
+    }
+    ?>
+</tbody> -->
+
+
+<tbody>
+<?php
+    include("connectdb.php");
+
+    // Prepare SQL query
+    $sql = "SELECT 
+        products.id AS id, 
+        products.name AS name, 
+        type.type_name AS type_name,
+        size.size_name, 
+        size.qty, 
+        size.price,
+        size.re_stock,
+        CASE 
+            WHEN size.qty > re_stock THEN 'พร้อมขาย'
+            WHEN size.qty > 0 AND size.qty <= re_stock THEN 'ใกล้หมด'
+            ELSE 'สินค้าหมด'
+        END AS status
+    FROM 
+        size
+    JOIN 
+        products ON size.id = products.id
+    JOIN 
+        type ON products.type_id = type.type_id
+    ORDER BY 
+        products.id, size.size_name";
+
+
+    // Prepare and execute the query
+    if ($stmt = mysqli_prepare($conn, $sql)) {
+      mysqli_stmt_execute($stmt);
+      $result = mysqli_stmt_get_result($stmt);
+
+      if ($result) {
+          $current_product_id = null;
+
+          while ($data = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+              // Determine status class
+              $status_class = '';
+              if ($data['status'] == 'พร้อมขาย') {
+                  $status_class = 'badge bg-success';
+              } elseif ($data['status'] == 'ใกล้หมด') {
+                  $status_class = 'badge bg-warning';
+              } else {
+                  $status_class = 'badge bg-danger';
+              }
+
+              // Check if we need to start a new product row
+              if ($data['id'] != $current_product_id) {
+                  // If we were displaying a product, close its row
+                  if ($current_product_id !== null) {
+                      echo '</tr>';
+                  }
+
+                  // Start a new product row
+                  $current_product_id = $data['id'];
+
+                  // Output the product row
                   ?>
-                      <tr>
-                          <td class="text-center"><?=$i;?></td>
-                          <td class="text-center"><?=@$data['barcode'];?></td>
-                          <td><?=$data['name'];?> <br><small class="text-muted" style="font-weight: 300;"> (<?=$data['size_name'];?>)</small></td>
-                          <td class="text-center"><?=$data['item'];?></td>
-                          <td class="text-center"><?=number_format($data['price'], 2);?></td>
-                          <td class="text-center"><?=number_format($sum, 2);?></td>
-                      </tr>
-                  <?php } ?>
-                  
-                  <tr>
-                      <td colspan="5" class="text-end"><strong>ราคารวม</strong></td>
-                      <td class="text-center"><strong><?=number_format($total, 2);?> บาท</strong></td>
+                    <tr class="table-light">
+                        <td class="text-center"><?=$data['id'];?></td>
+                        <!-- <td class="text-center">&nbsp;</td> -->
+                        <td colspan="4" class="text-start"><?=$data['name'];?></td>
+                        <!-- <td class="text-start">&nbsp;</td>
+                        <td class="text-center">&nbsp;</td>
+                        <td class="text-end">&nbsp;</td> -->
+                        <td colspan="2" class="text-start"><?=$data['type_name'];?></td>
+                        <td class="text-start">&nbsp;</td>
+                    </tr>
+                    <?php
+                }
+
+                // Output size row
+                ?>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <!-- <td>&nbsp;</td> -->
+                    <td class="text-start"><small><?=$data['size_name'];?></small></td>
+                    <td class="text-center"><?=$data['qty'];?><small>/<?=$data['re_stock'];?></small></td>
+                    <td class="text-center"><?=number_format($data['price']);?></td>
+                    <td class="text-center">&nbsp;</td>
+                    <td class="text-start"><span class="badge <?=$status_class;?>"><?=$data['status'];?></span></td>                
                   </tr>
-                </tbody>
-              </table>
+                <?php
+            }
+
+            // Close the last product row if it was started
+            if ($current_product_id !== null) {
+                echo '</tr>';
+            }
+
+            mysqli_stmt_close($stmt);
+        } else {
+            echo "<tr><td colspan='8' class='text-center'>Query failed: " . mysqli_error($conn) . "</td></tr>";
+        }
+    } else {
+        die("Query preparation failed: " . mysqli_error($conn));
+    }
+    ?>
+</tbody>
+
+
+</table>
+</div>
+
+
+
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-<!-- [ Main Content ] end -->
-<!-- [ Main Content ] end -->
+      <!-- [ breadcrumb ] end -->
 
+      <!-- [ Main Content ] start -->
+      <div class="row">
+        <!-- [ Typography ] start -->
+        <!-- <div class="col-sm-12">
+          <div class="card">
+            <div class="card-header">
+              <h5>Headings</h5>
+              <p><span class="badges">.h1</span> through .h6 classes are also available, for when you want to match
+                the font styling of a heading
+                but cannot use the associated HTML element.</p>
+            </div>
+            <div class="card-body pc-component">
+              <h1>h1. Heading</h1>
+              <div class="clearfix"></div>
+              <h2>h2. Heading</h2>
+              <div class="clearfix"></div>
+              <h3>This is a H3</h3>
+              <div class="clearfix"></div>
+              <h4>This is a H4</h4>
+              <div class="clearfix"></div>
+              <h5>This is a H5</h5>
+              <div class="clearfix"></div>
+              <h6>This is a H6</h6>
+            </div>
+          </div>
+        </div> -->
+        <!-- <div class="col-sm-12">
+          <div class="card">
+            <div class="card-header">
+              <h5>Display Headings</h5>
+            </div>
+            <div class="card-body pc-component">
+              <h1 class="display-1">Display 1</h1>
+              <h1 class="display-2">Display 2</h1>
+              <h1 class="display-3">Display 3</h1>
+              <h1 class="display-4">Display 4</h1>
+              <h1 class="display-5">Display 5</h1>
+              <h1 class="display-6">Display 6</h1>
+            </div>
+          </div>
+        </div> -->
+        <!-- <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Inline Text Elements</h5>
+            </div>
+            <div class="card-body pc-component">
+              <p class="lead m-t-0">Your title goes here</p>
+              You can use the mark tag to
+              <mark>highlight</mark> text.
+              <br>
+              <del>This line of text is meant to be treated as deleted text.</del>
+              <br>
+              <ins>This line of text is meant to be treated as an addition to the document.</ins>
+              <br>
+              <strong>rendered as bold text</strong>
+              <br>
+              <em>rendered as italicized text</em>
+            </div>
+          </div>
+        </div> -->
+        <!-- <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Contextual Text Colors</h5>
+            </div>
+            <div class="card-body pc-component">
+              <p class="text-muted mb-1"> Fusce dapibus, tellus ac cursus commodo, tortor mauris nibh. </p>
+              <p class="text-primary mb-1"> Nullam id dolor id nibh ultricies vehicula ut id elit. </p>
+              <p class="text-success mb-1"> Duis mollis, est non commodo luctus, nisi erat porttitor ligula. </p>
+              <p class="text-info mb-1"> Maecenas sed diam eget risus varius blandit sit amet non magna. </p>
+              <p class="text-warning mb-1"> Etiam porta sem malesuada magna mollis euismod. </p>
+              <p class="text-danger mb-1"> Donec ullamcorper nulla non metus auctor fringilla. </p>
+              <p class="text-dark mb-1"> Nullam id dolor id nibh ultricies vehicula ut id elit. </p>
+            </div>
+          </div>
+        </div> -->
+        <!-- <div class="col-md-6 col-lg-4">
+          <div class="card">
+            <div class="card-header">
+              <h5>Unordered</h5>
+            </div>
+            <div class="card-body pc-component">
+              <ul>
+                <li>Lorem ipsum dolor sit amet</li>
+                <li>Consectetur adipiscing elit</li>
+                <li>Integer molestie lorem at massa</li>
+                <li>Facilisis in pretium nisl aliquet</li>
+                <li>Nulla volutpat aliquam velit
+                  <ul>
+                    <li>Phasellus iaculis neque</li>
+                    <li>Purus sodales ultricies</li>
+                    <li>Vestibulum laoreet porttitor sem</li>
+                    <li>Ac tristique libero volutpat at</li>
+                  </ul>
+                </li>
+                <li>Faucibus porta lacus fringilla vel</li>
+                <li>Aenean sit amet erat nunc</li>
+                <li>Eget porttitor lorem</li>
+              </ul>
+            </div>
+          </div>
+        </div> -->
+        <!-- <div class="col-md-6 col-lg-4">
+          <div class="card">
+            <div class="card-header">
+              <h5>Ordered</h5>
+            </div>
+            <div class="card-body pc-component">
+              <ol>
+                <li>Lorem ipsum dolor sit amet</li>
+                <li>Consectetur adipiscing elit</li>
+                <li>Integer molestie lorem at massa</li>
+                <li>Facilisis in pretium nisl aliquet</li>
+                <li>Nulla volutpat aliquam velit
+                  <ul>
+                    <li>Phasellus iaculis neque</li>
+                    <li>Purus sodales ultricies</li>
+                    <li>Vestibulum laoreet porttitor sem</li>
+                    <li>Ac tristique libero volutpat at</li>
+                  </ul>
+                </li>
+                <li>Faucibus porta lacus fringilla vel</li>
+                <li>Aenean sit amet erat nunc</li>
+                <li>Eget porttitor lorem</li>
+              </ol>
+            </div>
+          </div>
+        </div> -->
+        <!-- <div class="col-md-12 col-lg-4">
+          <div class="card">
+            <div class="card-header">
+              <h5>Unstyled</h5>
+            </div>
+            <div class="card-body pc-component">
+              <ul class="list-unstyled">
+                <li>Lorem ipsum dolor sit amet</li>
+                <li>Integer molestie lorem at massa
+                  <ul>
+                    <li>Phasellus iaculis neque</li>
+                  </ul>
+                </li>
+                <li>Faucibus porta lacus fringilla vel</li>
+                <li>Eget porttitor lorem</li>
+              </ul>
+              <h5>Inline</h5>
+              <hr>
+              <ul class="list-inline m-b-0">
+                <li class="list-inline-item">Lorem ipsum</li>
+                <li class="list-inline-item">Phasellus iaculis</li>
+                <li class="list-inline-item">Nulla volutpat</li>
+              </ul>
+            </div>
+          </div>
+        </div> -->
+        <!-- <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Blockquotes</h5>
+            </div>
+            <div class="card-body pc-component">
+              <p class="text-muted mb-1"> Your awesome text goes here. </p>
+              <blockquote class="blockquote">
+                <p class="mb-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a
+                  ante.</p>
+                <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite>
+                </footer>
+              </blockquote>
+              <p class="text-muted m-b-15 m-t-20"> Add <code>.text-end</code> for a blockquote with right-aligned
+                content. </p>
+              <blockquote class="blockquote text-end">
+                <p class="mb-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a
+                  ante.</p>
+                <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite>
+                </footer>
+              </blockquote>
+            </div>
+          </div>
+        </div> -->
+        <!-- <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>Horizontal Description</h5>
+            </div>
+            <div class="card-body pc-component">
+              <dl class="dl-horizontal row">
+                <dt class="col-sm-3">Description lists</dt>
+                <dd class="col-sm-9">A description list is perfect for defining terms.</dd>
+
+                <dt class="col-sm-3">Euismod</dt>
+                <dd class="col-sm-9">Vestibulum id ligula porta felis euismod semper eget lacinia odio sem nec elit.
+                </dd>
+                <dd class="col-sm-9">Donec id elit non mi porta gravida at eget metus.</dd>
+
+                <dt class="col-sm-3">Malesuada porta</dt>
+                <dd class="col-sm-9">Etiam porta sem malesuada magna mollis euismod.</dd>
+
+                <dt class="col-sm-3 text-truncate">Truncated term is truncated</dt>
+                <dd class="col-sm-9">Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut
+                  fermentum massa justo sit amet risus.</dd>
+              </dl>
+            </div>
+          </div>
+        </div> -->
+        <!-- [ Typography ] end -->
+      </div>
+      <!-- [ Main Content ] end -->
+    </div>
+
+
+  </div>
+  <!-- [ Main Content ] end -->
 
   <footer class="pc-footer">
     <div class="footer-wrapper container-fluid">
@@ -604,18 +1014,6 @@ body {
 
 
 
-
-  <?php
-// ดึงข้อมูลการซื้อจากหน้า checkout.php
-// $product_name = $_POST['product_name'];
-// $product_quantity = $_POST['product_quantity'];
-// $product_price = $_POST['product_price'];
-// $total_price = $product_quantity * $product_price;
-
-// ส่งข้อมูลการซื้อไปยังหน้า detail.php
-// header("Location: detail.php?product_name=$product_name&product_quantity=$product_quantity&product_price=$product_price&total_price=$total_price");
-
-?>
 
   
         <div class="col-sm-6 ms-auto my-1">

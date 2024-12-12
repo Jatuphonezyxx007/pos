@@ -3,11 +3,11 @@ session_start();
 include("connectdb.php");
 
 if (empty($_SESSION['aid'])) {
-  echo "<script>";
-  echo "alert('Access Denied !!!');";
-  echo "window.location.href='index.php';";
-  echo "</script>";
-  exit;
+    echo "<script>";
+    echo "alert('Access Denied !!!');";
+    echo "window.location.href='index.php';";
+    echo "</script>";
+    exit;
 }
 
 // ใช้งาน session
@@ -19,120 +19,13 @@ $img = $_SESSION['img'];
 
 // ตรวจสอบว่าค่าที่เก็บใน session มีอยู่หรือไม่
 if (empty($img)) {
-  // กำหนดรูปภาพเริ่มต้นในกรณีที่ไม่มีรูปภาพ
-  $img = 'default.jpg'; 
+    // กำหนดรูปภาพเริ่มต้นในกรณีที่ไม่มีรูปภาพ
+    $img = 'default.jpg'; 
 }
 
 // สร้าง URL สำหรับรูปภาพ
 $imagePath = "assets/images/emp/" . $aid . "." . $img;
-
-// ดึงข้อมูลพนักงานที่เลือกมาแสดง
-if (isset($_GET['id'])) {
-  $emp_id = $_GET['id'];
-  $sql = "SELECT employees.*, role.role_name
-          FROM employees 
-          INNER JOIN role ON employees.role_id = role.role_id
-          WHERE employees.emp_id = '$emp_id'";
-  $rs = mysqli_query($conn, $sql);
-  if ($rs) {
-      $data = mysqli_fetch_array($rs);
-      $emp_role_id = $data['role_id']; // เก็บ role_id ของพนักงานเพื่อใช้เป็น default
-  } else {
-      echo "Error in query: " . mysqli_error($conn);
-  }
-} else {
-  echo "emp_id is not set.";
-}
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-  $emp_name = $_POST['ep_name'];
-  $emp_last = $_POST['ep_last'];
-  $emp_user = $_POST['ep_user'];
-  $emp_pwd = $_POST['ep_pwd'];  
-  $emp_email = $_POST['ep_email'];
-  $emp_phone = $_POST['ep_phone'];
-  $role_id = $_POST['ep_role'];
-  $com_id = $data['com_id']; // Assuming com_id is already set and should not be changed
-
-  // ตรวจสอบว่ามีการกรอกรหัสผ่านใหม่หรือไม่
-  if (!empty($emp_pwd)) {
-    $emp_pwd = md5($emp_pwd);  // แปลงรหัสผ่านเป็น MD5
-    $pwd_sql = ", emp_pwd='$emp_pwd'";
-  } else {
-    // ใช้รหัสผ่านเดิมถ้าไม่มีการกรอกใหม่
-    $pwd_sql = "";
-  }
-
-  $img_sql = "";
-  if ($_FILES['ep_pic']['name'] != "") {
-    $allowed = array('gif', 'png', 'jpg', 'jpeg', 'jfif', 'webp');
-    $filename = $_FILES['ep_pic']['name'];
-    $ext = pathinfo($filename, PATHINFO_EXTENSION);
-
-    if (!in_array($ext, $allowed)) {
-      echo "<script>";
-      echo "alert('แก้ไขข้อมูลพนักงานไม่สำเร็จ! ไฟล์รูปต้องเป็น jpg, gif หรือ png เท่านั้น');";
-      echo "</script>";
-      exit;
-    }
-    $target_file = "assets/images/emp/" . $emp_id . "." . $ext;
-    if (move_uploaded_file($_FILES['ep_pic']['tmp_name'], $target_file)) {
-      $img_sql = ", img='$ext'";
-    } else {
-      echo "Error uploading file.";
-      exit;
-    }
-  }
-
-  $sql = "UPDATE employees SET 
-      emp_name='$emp_name',
-      emp_last='$emp_last', 
-      emp_user='$emp_user'
-      $pwd_sql, 
-      emp_email='$emp_email', 
-      emp_phone='$emp_phone', 
-      role_id='$role_id'
-      $img_sql
-  WHERE emp_id='$emp_id'";
-
-  if (mysqli_query($conn, $sql)) {
-      echo "<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {});
-    document.getElementById('modalMessage').innerHTML = `
-        <div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\">
-            <div class=\"text-center\">
-                <div class=\"spinner-border text-success\" role=\"status\">
-                    <span class=\"visually-hidden\">Loading...</span>
-                </div>
-                <div class=\"mt-2\">กำลังบันทึกข้อมูล</div>
-            </div>
-        </div>
-    `;
-    myModal.show();
-    setTimeout(function() {
-        document.getElementById('modalMessage').innerHTML = `
-            <div class=\"d-flex justify-content-center align-items-center\" style=\"height: 100px;\">
-                <div class=\"text-success\">
-                    <i class=\"bi bi-check-circle-fill\"></i> ข้อมูลถูกอัปเดตเรียบร้อยแล้ว
-                </div>
-            </div>
-        `;
-        setTimeout(function() {
-            window.location.href = 'employee_list.php';
-        }, 1000);
-    }, 2000);
-});
-</script>";
-  } else {
-      echo "Error updating record: " . mysqli_error($conn);
-  }
-}
 ?>
-
-
-
-
 
 
 <!DOCTYPE html>
@@ -140,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- [Head] start -->
 
 <head>
-  <title>POS | Point of Sale</title>
+  <title>รายการจัดการสินค้า | Point of Sale</title>
   <!-- [Meta] -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -153,12 +46,6 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- [Template CSS Files] -->
 <link rel="stylesheet" href="assets/css/style.css" id="main-style-link" >
 <link rel="stylesheet" href="assets/css/style-preset.css" >
-
-
-<!-- [Favicon] icon -->
-<link rel="icon" href="assets/images/logo/icn.png" type="image/x-icon"> <!-- [Google Font : Poppins] icon -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
 
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -291,13 +178,6 @@ body {
     font-weight: bold;
 }
 
-.pic{
-  height: 200px;
-  width: 150px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto
-}
   </style>
 
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
@@ -432,10 +312,10 @@ body {
             <span class="pc-micon"><i class="ph ph-flower-lotus"></i></span>
             <span class="pc-mtext">Icons</span>
           </a>
-        </li> -->
+        </li>
 
 
-        <!-- <li class="pc-item pc-caption">
+        <li class="pc-item pc-caption">
           <label>Pages</label>
           <i class="ph ph-devices"></i>
         </li>
@@ -520,8 +400,7 @@ body {
   </div>
 </nav>
 <!-- [ Sidebar Menu ] end -->
-
- <!-- [ Header Topbar ] start -->
+<!-- [ Header Topbar ] start -->
 
 <header class="pc-header">
   <div class="m-header">
@@ -542,10 +421,10 @@ body {
     </div>
 
     <!-- เพิ่ม form control ตรงนี้ -->
-    <!-- <form method="post" class="search-form" onsubmit="return false;">
+    <form method="post" class="search-form" onsubmit="return false;">
       <input type="text" name="src" placeholder="ค้นหาสินค้า" class="search-input" autofocus>
       <a class="btn btn-primary"><i class="ph ph-magnifying-glass"></i></a>
-    </form> -->
+    </form>
 
     <div class="ms-auto">
       <h7 id="clock" class="text-white text-center">00:00:00</h7>
@@ -614,224 +493,99 @@ body {
 </header>
 <!-- [ Header ] end -->
 
-<div class="col-12 col-sm-8 col-md-12">
-  <div class="pc-container px-1">
+  <!-- [ Main Content ] start -->
+  <div class="col-12 col-sm-8 col-md-12">
+        <div class="pc-container px-1">
+            <div class="pc-content">
 
-  <form method="post" enctype="multipart/form-data">
-
-    <div class="pc-content">
-      
-
-    <?php if (isset($data)) { ?>
-
-      <div class="row">
-
-      <div class="col-md-12">
-        <div class="page-header-title border-bottom pb-2 mb-2 d-flex align-items-center">
-          <a href="javascript:history.back()" class="breadcrumb-item me-2">
-            <i class="ph ph-arrow-left fs-3"></i>
-          </a>
-          <h4 class="mb-0">แก้ไขข้อมูลพนักงาน : <?=$data['emp_name'];?> <?=$data['emp_last'];?></h4>
-        </div>
-      </div>
-
-
-      <!-- <h5 class="card-title fw-semibold mb-4">แก้ไขข้อมูลพนักงาน : <?=$data['emp_name'];?></h5> -->
-
-      <div class="col-md-6">
-          <div class="card">
-            <!-- <div class="card-header">
-              <h5>Inline Text Elements</h5>
-            </div> -->
-            <div class="card-body pc-component">
-              <p class="lead m-t-0">รูปภาพ</p>
-
-              <div class="pic">
-                        <img src="assets/images/emp/<?=$data['emp_id'];?>.<?=$data['img'];?>" class="card-img-top rounded mx-auto d-block" alt="">
-                      </div>
-
-                      <br><br><br>
-
-                      <div class="col">
-                        <label for="formFile" class="form-label">เปลี่ยนรูปภาพ</label>
-                        <input class="form-control" type="file" name="ep_pic">
-                        <br>
-                        <h6 class="card-subtitle fw-normal mb-4">สำคัญ : สามารถอัพโหลดรูปภาพเฉพาะไฟล์ png, jpg, gif, tfif และ webp</h6>
-                      </div>
-
-
-            </div>
-          </div>
-        </div>
-
-        
-        <div class="col-md-6">
-          <div class="card">
-            
-          <div class="card-header">
-            <div class="row align-items-center">
-              <div class="col-3">
-                <h5 class="mb-0">รหัสพนักงาน</h5>
-              </div>
-              <div class="col-9">
-              <input class="form-control" type="text" name="ep_id" placeholder="<?= $data['emp_id']; ?>" aria-label="Disabled input example" disabled>              
-            </div>          
-            </div>
-          </div>
-
-            <div class="card-body pc-component">
-
-              <div class="row align-items-center">
-              <div class="col-3">
-                <p class="text-dark mb-0">ชื่อ - นามสกุล</p>
-              </div>
-              <div class="col-5">
-                <input name="ep_name" type="text" class="form-control" value="<?= $data['emp_name']; ?>"> 
-              </div>
-              <div class="col-4">
-                <input name="ep_last" type="text" class="form-control" value="<?= $data['emp_last']; ?>"> 
-              </div>                    
-            </div>
-
-            <br>
-            <div class="row align-items-center">
-              <div class="col-3">
-                <p class="text-dark mb-0">E - mail</p>
-              </div>
-              <div class="col-9">
-                <input name="ep_email" type="text" class="form-control" value="<?= $data['emp_email']; ?>"> 
-              </div>          
-            </div>
-
-            <br>
-            <div class="row align-items-center">
-              <div class="col-3">
-                <p class="text-dark mb-0">เบอร์โทรศัพท์</p>
-              </div>
-              <div class="col-9">
-                <input name="ep_phone" type="text" class="form-control" value="<?= $data['emp_phone']; ?>"> 
-              </div>          
-            </div>
-              </div>
-
-
-              
-            </div>
-
-
-            <div class="card">
-            
-            <div class="card-header">
-              <div class="row align-items-center">
-                <div class="col-3">
-                  <h5 class="mb-0">หน้าที่</h5>
-                </div>
-
-
-                <div class="col-9">
-    <select class="form-select" id="role" aria-label="role" name="ep_role">
-        <?php
-        // ดึงข้อมูล role ทั้งหมดจากตาราง role
-        $sql2 = "SELECT * FROM `role`";
-        $rs2 = mysqli_query($conn, $sql2);
-
-        if ($rs2) {
-            while ($data2 = mysqli_fetch_array($rs2)) {
-                // ตั้งค่า selected ถ้า role_id ตรงกับ role_id ของพนักงาน
-                $selected = ($data2['role_id'] == $emp_role_id) ? "selected" : "";
-                echo "<option value='{$data2['role_id']}' $selected>{$data2['role_name']}</option>";
-            }
-        } else {
-            echo "Query failed.";
-        }
-        ?>
-    </select>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+  <a href="add_product.php" class="btn btn-success">
+    <i class="ph ph-plus-circle me-2"></i> เพิ่มรายการสินค้า
+  </a>
 </div>
 
+                <br> 
+                <div id="product-list" class="row g-2">
 
 
-              </div>
-            </div>
-  
-              <div class="card-body pc-component">
-  
-                <div class="row align-items-center">
-                <div class="col-3">
-                  <p class="text-dark mb-0">ชื่อผู้ใช้</p>
+
+                <?php
+include("connectdb.php");
+@$src = $_POST['src'];
+$sql = "SELECT products.*, MIN(size.price) AS min_price, MAX(size.price) AS max_price 
+FROM `products`
+JOIN `size` ON products.id = size.id
+WHERE (`products`.`barcode` LIKE '%{$src}%' OR `products`.`name` LIKE '%{$src}%')
+GROUP BY products.id
+ORDER BY `id` ASC";
+
+$rs = mysqli_query($conn, $sql);
+while ($data = mysqli_fetch_array($rs)){
+?>
+                    <div class="col-sm-12 col-md-4 col-lg-3">
+                        <div class="card">
+                            <img src="assets/images/products_2/<?=$data['id'];?>.<?=$data['img'];?>" class="card-img-top" alt="" height="280px">
+                            <div class="card-body">
+                                <h8 class="card-title d-inline-block text-truncate" style="max-width: 150px;"><?=$data['name'];?></h8>
+                                <p class="card-text">
+                <?php if ($data['min_price'] == $data['max_price']) { ?>
+                    <?= number_format($data['min_price'],); ?> บาท
+                <?php } else { ?>
+                    <?= number_format($data['min_price'],); ?> - <?= number_format($data['max_price'],); ?> บาท
+                <?php } ?>
+            </p>
+
+            <form action="update_product.php" method="POST" style="display:inline;">
+
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+
+    <input type="hidden" name="id" value="<?= $id ?>">
+    <a href="update_product.php?id=<?= $data['id']; ?>" type="button" class="btn btn-primary">แก้ไข</a>
+
+                                    <!-- <button class="btn btn-primary me-md-2" type="button">แก้ไข</button> -->
+                                    <!-- <a href="#" type="button" class="btn btn-danger" onClick="return confirm('ยืนยันการลบ ?');">ลบ</a> -->
+                                    </div>
+                                </form>
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <?php
+                    }
+                    mysqli_close($conn);
+                    ?> 
                 </div>
-                <div class="col-9">
-                  <input name="ep_user" type="text" class="form-control" value="<?= $data['emp_user']; ?>"> 
-                </div>          
-              </div>
-  
-              <br>
-              <div class="row align-items-center">
-                <div class="col-3">
-                  <p class="text-dark mb-0">รหัสผ่านใหม่</p>
-                </div>
-                <div class="col-9">
-                  <input name="ep_pwd" type="password" class="form-control" value=""> 
-                </div>          
-              </div>
-                </div>               
-              </div>
-  
-
-              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-  <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">บันทึกข้อมูล</button>
-</div>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">บันทึกข้อมูล</h5>
-        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
-      </div>
-      <div class="modal-body" id="modalMessage">
-        ...
-      </div>
-
-    </div>
-  </div>
-</div>
-
             </div>
-          </div>
         </div>
-
-        <?php } else  { ?>
-          <p>No employee data found.</p>
-
-          </form>
-          
-      </div>
-
-      <?php } ?>
-
-
     </div>
 
 
+
+    </div>
+    </div>  
+    </div>
+</div>
+
+
+  <!-- [ Main Content ] end -->
   <footer class="pc-footer">
     <div class="footer-wrapper container-fluid">
       <div class="row">
 
 
+
+
+
   
         <div class="col-sm-6 ms-auto my-1">
           <ul class="list-inline footer-link mb-0 justify-content-sm-end d-flex">
-          <!-- <a href="#top" class="text-end">กลับไปบนสุด</a> -->
+          <a href="#top" class="text-end">กลับไปบนสุด</a>
           </ul>
         </div>
       </div>
     </div>
   </footer>
-
-
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
 
   <!-- Required Js -->
 <script src="assets/js/plugins/popper.min.js"></script>
@@ -884,9 +638,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-document.getElementById('okButton').addEventListener('click', function() {
-  window.location.href = 'employee_list.php';
-});
 
 </script>
 

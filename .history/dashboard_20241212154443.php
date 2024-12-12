@@ -313,12 +313,6 @@ $conn->close();
 <link rel="stylesheet" href="assets/css/style.css" id="main-style-link" >
 <link rel="stylesheet" href="assets/css/style-preset.css" >
 
-<!-- [Favicon] icon -->
-<link rel="icon" href="assets/images/logo/icn.png" type="image/x-icon"> <!-- [Google Font : Poppins] icon -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
-
-
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
